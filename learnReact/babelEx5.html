@@ -1,0 +1,26 @@
+<html>
+<head>
+<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
+<!-- Load Babel -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+
+<body>
+<div id="root"></div>
+<!-- Your custom script here -->
+<script type="text/babel">
+const rootElement = document.getElementById('root')
+const Message= (props) => <div>{props.msg}</div>
+const element= (
+	<div className="container" >
+		<Message msg= "Hello World" />
+		<Message msg= "Goodbye World" />
+	</div>
+)
+
+ReactDOM.render(element, rootElement);
+</script>
+
+</body>
+</html>

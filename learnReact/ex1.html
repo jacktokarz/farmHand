@@ -1,0 +1,60 @@
+<html>
+
+<head>
+<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
+<!-- Load Babel -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+
+<body>
+<div id="root"></div>
+<script type"text/babel">
+	
+const rootElement = document.getElementById('root');
+// The original way which is not using React.
+	// const element = document.createElement('div')
+	// element.textContent = 'Hello World'
+	// element.className= 'container'
+	// rootElement.appendChild(element)
+
+// The simplest way using React, directly making elements.
+	// const element= React.createElement(
+	// 	'div', 
+	// 	{className: 'container',
+	// 	children: 'Hello World'
+	// })
+
+//Using JSX with Babel to make it cleaner
+	//const element= <div className="container">Hello World</div>
+		//or, to put a variable as the content... 
+	//const content= 'Hello World'
+	//const myClassName= "container"
+			// anything in curly braces is interpreted as js
+	//const element = <div className={myClassName}>{content}</div>
+		/// OR, insert the entire object into React as js
+	// const props= {
+	// 	className: 'container',
+	// 	children: 'Hello World',
+	// }
+	// const element= <div {...props} />
+			// a defined prop in the element will be overwritten if it comes before the reference
+	// const props= {
+	// 	className: 'container',
+	// 	children: 'Hello World',
+	// }
+	// 		//this className will be "container"
+	// const element= className="my-class" <div {...props} />
+			
+			//this className will be 'my-class'
+	// const props= {
+	// 	className: 'container',
+	// 	children: 'Hello World',
+	// }
+	// const element= <div {...props} className='my-class' />
+	
+	ReactDOM.render(element, rootElement);
+
+</script>
+
+</html>

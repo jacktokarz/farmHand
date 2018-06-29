@@ -1,0 +1,71 @@
+<html>
+<head>
+<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.development.js"></script>
+<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/prop-types@15.6.0/prop-types.js"></script>
+<!-- Load Babel -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<style>
+.box {
+	border: 1px black solid;
+}
+
+.box--small {
+	width: 60px;
+	height: 60px;
+}
+.box--medium {
+	width: 90px;
+	height: 90px;
+}
+.box--large {
+	width: 120px;
+	height: 120px;
+}
+</style>
+
+</head>
+
+<body>
+<div id="root"></div>
+<!-- Your custom script here -->
+<script type="text/babel">
+const rootElement = document.getElementById('root')
+
+function Box({className='', style, ...rest}) {
+	return (
+		<div
+			className= {`box ${className}`}
+			style= {{paddingLeft: 30, ...style}}
+			{...rest}
+		/>
+	)
+}
+const element = 
+	<div>
+		<Box
+			className= "box--small"
+			style={{backgroundColor: 'lightblue'}}
+		>
+			small box
+		</Box>
+		<Box
+			className= "box--medium"
+			style={{backgroundColor: 'pink'}}
+		>
+			small box
+		</Box>
+		<Box
+			className= "box--large"
+			style={{backgroundColor: 'orange'}}
+		>
+			small box
+		</Box>
+	</div>
+
+ReactDOM.render(element,rootElement)
+</script>
+
+</body>
+</html>

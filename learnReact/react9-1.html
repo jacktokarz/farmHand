@@ -1,0 +1,63 @@
+<html>
+<head>
+<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.development.js"></script>
+<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/prop-types@15.6.0/prop-types.js"></script>
+<!-- Load Babel -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+<div id="root"></div>
+<!-- Your custom script here -->
+<script type="text/babel">
+const state= {eventCount: 0, username: ''}
+
+function App() {
+	return(
+	<div>
+		<p>
+			There have been {state.eventCount} events
+		</p>
+		<p>
+			<button>:)</button>
+		</p>
+		<p>You typed: {state.username}</p>
+		<p>
+			<input />
+		</p>
+	</div>
+	)
+}
+
+function increment() {
+	setState({
+		eventCount: state.eventCount + 1,
+	})
+}
+
+function setState(newState) {
+	Object.assign(state, newState)
+	renderApp()
+}
+
+
+setState({eventCount: 10, username: 'Timothy'})
+
+
+function renderApp() {
+	ReactDOM.render(
+		<App />,
+		document.getElementById('root'),
+	)
+}
+renderApp()
+
+</script>
+</body>
+</html>

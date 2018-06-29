@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<head>
+	<title>Farm Hand Lobby</title>
+	<meta charset="UTF-8">
+	<link rel="icon" href="images/cardBack.png"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<style>
+
+
+html{
+	height: 100%;
+}
+body {
+	background-color: #EAFAF1;
+	position: relative;
+	margin: 0px;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+
+
+.bigRectangle {
+	width: 30%;
+	height: 20%;
+	border: 2px;
+}
+
+.bottomBuffer {
+	height: 1px;
+	margin: 40px;
+}
+
+.card {
+	margin: 8px;
+	border-radius: 6px;
+	border: 1px black solid;
+	width: 200px;
+	height: 273px;
+}
+
+.card img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.smallRectangle {
+	width:15%;
+	height: 10%;
+	border: 2px;
+}
+
+
+.red {
+	background-color: #E74C3C;
+}
+
+.yellow {
+	background-color: #F7DC6F;
+}
+
+
+
+#displayTable {
+	display: none;
+	width: fit-content;
+	padding: 2px;
+	border: 1px solid black;
+}
+
+#displayTable th {
+	width: 50px;
+	font-weight: bold;
+	margin: 6px;
+}
+
+#displayTable td {
+	border: 1px solid black;
+	width: 50px;
+}
+
+#mainTitle {
+	position: relative;
+	margin: 20px;
+}
+
+#randomCard {
+	display: none;
+}
+
+
+</style>
+<body onload="init()">
+
+<h3 id="mainTitle"></h3>
+
+<div class="bigRectangle red">
+	<p>Player Area?</p>
+</div>
+
+
+<div class="smallRectangle yellow">
+	<p>Hand goes here?</p>
+</div>
+
+<br />
+<table id="displayTable">
+	<thead>
+		<th>id</th>
+		<th>name</th>
+		<th>faction</th>
+		<th>cost</th>
+	</thead>
+	<tbody id="displayTableBody">
+	</tbody>
+</table>
+
+<br />
+<button onclick="readTable()">Click Me To Update Table!</button>
+
+<div class="card">
+	<img onclick= "turnOver(this)" src="images/cardBack.png">
+</div>
+
+<button onclick="getTopMainDeck()">Draw A Card From Main Deck!</button>
+<table id="totalValues">
+	<thead>
+		<th>coin</th>
+		<th>plenty</th>
+		<th>plant</th>
+		<th>harvest</th>
+		<th>scrap</th>
+		<th>market scrap</th>
+		<th>draw</th>
+		<th>discard</th>
+		<th>waste</th>
+	</thead>
+	<tbody id="">
+		<tr>
+			<td id="totalCoin">0</td>
+			<td id="totalPlenty">0</td>
+			<td id="totalPlant">0</td>
+			<td id="totalHarvest">0</td>
+			<td id="totalScrap">0</td>
+			<td id="totalMarketScrap">0</td>
+			<td id="totalDraw">0</td>
+			<td id="totalDiscard">0</td>
+			<td id="totalWaste">0</td>
+		</tr>
+	</tbody>
+</table>
+
+
+<div class="card" id="randomCard">
+	<img id="randomCardImg" onclick= "turnOver(this)" src="images/cardBack.png">
+</div>
+
+
+
+<div class="bottomBuffer"></div>
+
+<script>
+var webAddress= "http://otterowlfox.x10host.com/farmHand/";
+var imagePath= "images/";
+var backImage= imagePath+"cardBack.png";
+var dispTable= document.getElementById('displayTable');
+
+var username= "";
+var password="";
+var asyncDone= false;
+var count= 0;
+var totalMainDeckCount=1;
+var mainDeckIndex=0;
+
+var cardIdList=[];
+var returnedCardDetails= null;
+var returnedPrimary= [];
+var returnedSecondary= [];
+var returnedCards= [];
+var mainDeck= [];
+
+
+function cardDetails(id, name, cost, faction, type, image) {
+	this.id= id;
+	this.name= name;
+	this.cost= cost;
+	this.faction= faction;
+	this.type= type;
+	this.image= image;
+	this.toString= "id: "+id+", name: "+name+", cost: "+cost+" etc...";
+}
+function primaryEffect(coin, plenty, plant, harvest, scrap, marketScrap, draw, discard, waste) {
+	this.coin= coin;
+	this.plenty= plenty;
+	this.plant= plant;
+	this.harvest= harvest;
+	this.scrap= scrap;
+	this.marketScrap= marketScrap;
+	this.draw= draw;
+	this.discard= discard;
+	this.waste= waste;
+}
+function secondaryEffect(coin, plenty, plant, harvest, scrap, marketScrap, draw, discard, waste) {
+	this.coin= coin;
+	this.plenty= plenty;
+	this.plant= plant;
+	this.harvest= harvest;
+	this.scrap= scrap;
+	this.marketScrap= marketScrap;
+	this.draw= draw;
+	this.discard= discard;
+	this.waste= waste;
+}
+function cardObj(cardDetails, primaryEffect, secondaryEffect) {
+	this.cardDetails= cardDetails;
+	this.primaryEffect= primaryEffect;
+	this.secondaryEffect= secondaryEffect;
+}
+
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function getMainDeck() {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'readGeneric.php',
+		data: {
+			query: "SELECT * FROM `cards`"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("Reply: " + reply);
+			var data = JSON.parse(reply);
+			totalMainDeckCount= data.length;
+			for(var i=0; i<data.length;i++) {
+				var tempCard= new cardDetails(data[i].id, data[i].name, data[i].cost, data[i].faction, data[i].type, data[i].image);
+				mainDeck.push(tempCard);
+			}
+			mainDeck= shuffleArray(mainDeck);
+			console.log("main deck has "+mainDeck.length+" cards.");
+		}
+	});
+}
+
+function getTopMainDeck() {
+	console.log("Drawing top cards, top being index "+mainDeckIndex);
+	returnedCardDetails= mainDeck[mainDeckIndex];
+	console.log("Got card: "+returnedCardDetails.toString);
+	console.log("that card's details: "+returnedCardDetails.name);
+	document.getElementById("totalCoin").innerHTML = parseInt(document.getElementById("totalCoin").innerHTML) + parseInt(returnedCardDetails.cost);
+	document.getElementById("randomCardImg").src=imagePath + returnedCardDetails.image;
+	document.getElementById("randomCard").style.display= "block";
+	mainDeckIndex = mainDeckIndex==totalMainDeckCount-1 ? 0: mainDeckIndex+1;
+}
+
+function getRandomInt(max) {
+	return Math.floor(Math.random() * max);
+}
+
+function getSingleCardDetails(randomId) {
+	console.log("Random id to return card data from: "+randomId);
+	jQuery.ajax({
+		type: 'POST',
+		url: 'readGeneric.php',
+		data: {
+			query: "SELECT * FROM `cards` WHERE id= "+randomId
+		},
+		datatype: 'text',
+		success: function(reply){
+			var dataArray = JSON.parse(reply);
+			console.log("Raw reply: "+reply);
+			console.log("Data Array: " + dataArray.length);
+			var data= dataArray[0];
+			console.log("data-- "+data.name);
+			returnedCardDetails= new cardDetails(data.id, data.name, data.cost, data.faction, data.type, data.image);
+			console.log("dard dets "+returnedCardDetails.toString);
+			asyncDone= true;
+		}
+	});
+}
+
+function getTotalCardCount() {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'readGeneric.php',
+		data: {
+			query: "SELECT id FROM `cards`"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("Id Array: " + reply);
+			var tempArray = JSON.parse(reply);
+			console.log("JSON version of Id Array: " + reply);
+			for(var i=0; i < tempArray.length; i++) {
+				cardIdList.push(tempArray[i].id);
+			}
+		}
+	});
+}
+
+function init() {
+	username= getCookie("username");
+	if ( username == ''){
+		window.location.href = 'login.html';
+	}
+	document.getElementById("mainTitle").innerHTML="Welcome back "+username;
+	
+	getTotalCardCount();
+	getMainDeck();
+}
+
+function readTable(){
+	jQuery.ajax({
+		type: 'POST',
+		url: 'readGeneric.php',
+		data: {
+			query: "SELECT * FROM `cards`"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("Reply: " + reply);
+			var data = JSON.parse(reply);
+			updateDisplayTable(data);
+		}
+	});
+}
+
+function shuffleArray(initialArray) {
+	var randomIndex;
+	var finalArray= [];
+	while(initialArray.length > 0) {
+		randomIndex= getRandomInt(initialArray.length);
+		finalArray.push(initialArray[randomIndex]);
+		// this is going to move the value of the final entry into the selected entry, so I can pop the final entry. If the selected one is the final one, no need to swap.
+		if(randomIndex != initialArray.length-1) {
+			initialArray[randomIndex]= initialArray[initialArray.length-1];
+		}
+		initialArray.pop();
+	}
+	return finalArray;
+}
+
+function turnOver(thisCard) {
+	console.log(thisCard.src + "=?=" +backImage);
+	if(thisCard.src != webAddress + backImage) {
+		thisCard.src= backImage;
+	}
+	else {
+		thisCard.src= imagePath + "Recycle.png";
+	}
+}
+
+function updateDisplayTable(data) {
+
+	var tBody= document.getElementById("displayTableBody");
+	tBody.innerHTML= "";
+	for(var i =0; i < data.length; i++) {
+		var row= tBody.insertRow(0);
+		var cell0= row.insertCell(0);
+		cell0.innerHTML= data[i].id;
+		var cell1= row.insertCell(1);
+		cell1.innerHTML= data[i].name;
+		var cell2= row.insertCell(2);
+		cell2.innerHTML= data[i].faction;
+		var cell3= row.insertCell(3);
+		cell3.innerHTML= data[i].cost;
+		i += (Math.floor(Math.random() * 2) +1);
+	}
+	
+	document.getElementById("displayTable").style.display= "block";
+}
+
+</script>
+</body>

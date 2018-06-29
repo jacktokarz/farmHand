@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<head>
+	<title>Farm Hand Login</title>
+	<meta charset="UTF-8"> 
+	<link rel="icon" href="icon.png"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<style>
+html{
+	height: 100%;
+}
+body {
+	background-color: #000041;
+	position: relative;
+	margin: 0px;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#login{
+	position: relative;
+	border: 5px solid #b9667c;
+	border-style: ridge;
+	border-radius: 5px;
+	background-color: #b9667c;
+	width: 220px;
+	height: auto;
+	padding: 2px;
+	display: flex;
+ 	justify-content: center; /* center horizontally */
+  	align-items: center; /* center vertically */
+}
+
+.inputBox{
+	margin: 4px auto;
+	border-radius: 5px;
+	display: inline-block;
+	width: 150px;
+	position: relative;
+}
+::-moz-placeholder {
+	font-style: italic;
+}
+::-webkit-input-placeholder {
+	font-style: italic;
+}
+
+#submitButton{
+	border-radius: 3px;
+	color: #b2133d;
+	text-align: center;
+	padding-bottom: 2px;
+	margin-top: 10px;
+}
+.hidden{
+	display:none;
+}
+.error {
+	display: none;
+	justify-content: center;
+	width: auto;
+	height: auto;
+	padding: 6px;
+	margin: 6px;
+	color: red;
+	font-weight: bold;
+	background-color: beige;
+	border-radius: 4px;
+	border: 2px double black;
+}
+
+form {
+	text-align: center;
+}
+
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+.modal-body {padding: 2px 16px;}
+
+</style>
+
+
+<body onload="init()">
+
+
+<div id="loginError" class="error"></div>
+
+<div id="login">
+	<form action="index.html" autocomplete="off" name="loginForm" method="post">
+	  <input id="username" class="inputBox" type="text" name="username" placeholder="Username">
+	  <input id="password" class="inputBox" type="password" name="password" placeholder= "Password"/>
+	  <br />
+	  <input onclick="saveCookies()" type="button" value="Log In" id="submitButton" />
+	  <input type="submit" id="reallySubmit" class="hidden">
+	</form> 
+</div>
+
+
+<!-- The Modal -->
+<div id="registerModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h2>Register</h2>
+    </div>
+    <div class="modal-body">
+      <p id="registerModalError" class="error"></p>
+      <p>We don't have the username / password you entered, would you like to register them?</p>
+      <form action="index.html" autocomplete="off" name="registerForm" method="post">
+		  <input id="modalUsername" class="inputBox" type="text" name="username" placeholder="Username">
+		  <input id="modalPassword" class="inputBox" type="password" name="password" placeholder= "Password"/>
+		  <input id="modalConfirmPassword" class="inputBox" type="password" name="confirmPassword" placeholder= "Confirm Password"/>
+		  <br />
+		  <input onclick="registerUser()" type="button" value="Register" id="registerButton" />
+		  <input type="submit" id="modalReallySubmit" class="hidden">
+	  </form>
+    </div>
+</div>
+
+
+<script>
+
+var oldUsername= getCookie("username");
+var allUsersAndPasswords=[];
+var errorHolder= document.getElementById("loginError");
+var modalErrorHolder= document.getElementById("registerModalError");
+
+				//Modal stuff I took from w3schools
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+var modal= document.getElementById("registerModal");
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+
+
+function checkIfUserExists(un, pw) {
+	for(var i=0; i<allUsersAndPasswords.length; i=i+2) {
+		if(un == allUsersAndPasswords[i]) {
+			if(pw == allUsersAndPasswords[i+1]) {
+				return "both";
+			}
+			return "username";
+		}
+	}
+	return "";
+}
+
+function deleteCookie(cname) {
+	document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function getAllUsers() {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'readGeneric.php',
+		data: {
+			query:"SELECT * FROM `users`"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("Reply: " + reply);
+			var data = JSON.parse(reply);
+			for(var i=0; i<data.length;i++) {
+				allUsersAndPasswords.push(data[i].username);
+				allUsersAndPasswords.push(data[i].password);
+			}
+			console.log("saved array: "+allUsersAndPasswords);
+		}
+	});
+}
+
+function init() {
+	getAllUsers();
+	if(oldUsername != "") {
+		document.getElementById("username").value= oldUsername;
+		console.log("login cookie: "+document.cookie);
+	}
+}
+
+function insertUser(un, pw) {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'insertGeneric.php',
+		data: {
+			query: "INSERT INTO `users` SET username='" + un +"', password='" + pw + "'"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("The insert reply is: "+reply);
+		}
+	});
+}
+
+function registerUser() {
+	var newUsername= document.getElementById("modalUsername").value;
+	var newPassword= document.getElementById("modalPassword").value;
+	var validateResponse= validateForm("registerForm");
+	if(validateResponse != "") {
+		modalErrorHolder.innerHTML= validateResponse;
+		modalErrorHolder.style.display= "block";
+	}
+	else {
+		if(checkIfUserExists(newUsername, newPassword) != "") {
+			modalErrorHolder.innerHTML= "This username is already taken";
+			modalErrorHolder.style.display= "block";
+		}
+		else {
+			insertUser(newUsername, newPassword);
+			setCookie("username", newUsername);
+			setCookie("password", newPassword);
+			document.getElementById("modalReallySubmit").click();
+		}
+	}
+}
+
+function saveCookies(){
+	var newUsername= document.getElementById('username').value;
+	var newPassword= document.getElementById('password').value;
+	console.log("trying to save cookies for: "+newUsername+", and "+newPassword);
+	var validateResponse= validateForm("loginForm");
+	console.log("The check response is: "+validateResponse);
+	if(validateResponse != "") {
+		errorHolder.innerHTML= validateResponse;
+		errorHolder.style.display= "block";
+	}
+	else {
+		var userExistence= checkIfUserExists(newUsername, newPassword);
+		console.log("second check: "+userExistence);
+		if(userExistence == "both") {
+			//document.cookie = 'username=' + document.getElementById('username').value + ';expires=Thu, 21 July 2050 12:00:00 UTC';
+			setCookie("username", newUsername);
+			setCookie("password", newPassword);
+			document.getElementById('reallySubmit').click();
+		}
+		else if(userExistence=="username") {
+			errorHolder.innerHTML= "Incorrect Password";
+			errorHolder.style.display="block";
+		}
+		else {
+			errorHolder.style.display= "none";
+			document.getElementById("modalUsername").value= newUsername;
+			document.getElementById("modalPassword").value= newPassword;
+			document.getElementById("registerModal").style.display="block";
+		}
+	}
+}
+
+function setCookie(cname, cvalue) {
+    document.cookie = cname + "=" + cvalue + ";expires=Thu, 21 July 2050 01:00:00 UTC;";
+}
+
+function validateForm(formName) {
+    var x = document.forms[formName]["username"].value;
+    var y = document.forms[formName]["password"].value;
+    if (x == "" || y == "") {
+        return "Name and Password must be filled out";
+    }
+    if(x.length >= 20 || y.length >= 20) {
+        return "Name and Password must be less than 20 characters";
+    }
+    if(formName== "registerForm") {
+    	var z= document.forms[formName]["confirmPassword"].value;
+    	if(z != y) {
+    		return "Password must match Confirm Password";
+    	}
+    }
+    return "";
+}
+
+</script>
+</body>

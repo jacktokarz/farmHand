@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<head>
+	<title>Otter Owl Fox Games</title>
+	<meta charset="UTF-8">
+	<link rel="icon" href="images/cardBack.png"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<style>
+
+
+html{
+	height: 100%;
+}
+body {
+	background-color: #EAFAF1;
+	margin: 0px;
+}
+form {
+	text-align: center;
+}
+
+::-moz-placeholder {
+	font-style: italic;
+}
+::-webkit-input-placeholder {
+	font-style: italic;
+}
+
+
+.bottomBuffer {
+	height: 1px;
+	margin: 40px;
+}
+.error {
+	display: none;
+	width: fit-content;
+	height: auto;
+	padding: 6px 10px;
+	margin: 6px;
+	color: red;
+	font-weight: bold;
+	background-color: beige;
+	border-radius: 4px;
+	border: 2px double black;
+}
+.inputBox{
+	margin: 4px auto;
+	border-radius: 5px;
+	display: inline-block;
+	width: 150px;
+	position: relative;
+}
+.hidden{
+	display:none;
+}
+.prettyButton {
+	background: #564D4E;
+	color: #C7D0C5;
+	padding: 8px;
+	margin: 10%;
+	min-width: 40%;
+	height: auto;
+	font-size: 18px;
+}
+.rightSide{
+	float: right;
+	margin-right: 10%;
+}
+.smallButton{
+	margin: 10px;
+	padding: 2px;
+	width: inherit;
+	height: auto;
+	font-size: 12px;
+	color: black;
+}
+
+
+#FHBox {
+	margin-right: 20%;
+	margin-top: 12%;
+	position: relative;
+	width: 20%;
+	height: auto;
+}
+#FHBox img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 6px;
+	position: absolute;
+	z-index: -1;
+}
+#FHText {
+	width: 80%;
+	height: 80%;
+	margin: 10%;
+	max-height: 100%;
+	text-align: center;
+}
+#FHTitle {
+	font-size: 40px;
+	font-weight: bold;
+	margin-bottom: 30%;
+	margin-top: 5%;
+	color: #564D4E; /*dark gray, slightly red */
+}
+#header {
+	background-color: #e9eccc;
+	border-bottom: 1px solid black;
+}
+#login{
+	position: relative;
+	border: 5px solid #b9667c;
+	border-style: ridge;
+	border-radius: 5px;
+	background-color: #b9667c;
+	width: 220px;
+	height: auto;
+	padding: 2px;
+	display: flex;
+ 	justify-content: center; /* center horizontally */
+  	align-items: center; /* center vertically */
+}
+#mainTitle {
+	margin: 0px;
+	padding-top: 10px;
+	padding-bottom: 20px;
+	font-size: 48px;
+	text-align: center;
+}
+#submitButton{
+	border-radius: 3px;
+	color: #b2133d;
+	text-align: center;
+	padding-bottom: 2px;
+	margin-top: 10px;
+}
+
+
+
+
+
+					/* The Modal */
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-body {padding: 2px 16px;}
+
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: fit-content;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+
+    text-align: center;
+}
+
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+
+
+</style>
+<body onload="init()">
+
+<div id="header">
+	<button onclick="openLoginModal()" class="smallButton rightSide">Log In</button>
+	<button onclick="openRegisterModal()" class="smallButton rightSide">Register</button>
+	<h3 id="mainTitle">Welcome To <span style="font-style: italic;">Otter Owl Fox Games</span></h3>
+</div>
+
+<div class="rightSide" id="FHBox">
+	<img src="http://otterowlfox.x10host.com/farmHand/images/cardBack.png" alt="Farm Hand Card Back">
+	<div id="FHText">
+		<div id="FHTitle">Farm Hand</div>
+		<button onclick="playFH()" class="prettyButton">Play</button>
+		<button onclick="openFHRules()" class="prettyButton">Rules</button>
+	</div>
+</div>
+
+<div class="bottomBuffer"></div>
+
+
+				<!-- Modals -->
+<div id="registerModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Register</h2>
+    </div>
+    <div class="modal-body">
+      <div id="registerError" class="error"></div>
+      <p>Please Enter Your Desired Username And Password Below</p>
+      <form action="farmHand/" autocomplete="off" name="registerForm" method="post">
+		  <input id="registerUsername" class="inputBox" type="text" name="username" placeholder="Username">
+		  <input id="registerPassword" class="inputBox" type="password" name="password" placeholder= "Password"/>
+		  <input id="registerConfirmPassword" class="inputBox" type="password" name="confirmPassword" placeholder= "Confirm Password"/>
+		  <br />
+		  <input onclick="registerUser()" type="button" value="Register" id="registerButton" />
+		  <input type="submit" id="registerReallySubmit" class="hidden">
+	  </form>
+    </div>
+  </div>
+</div>
+
+<div id="loginModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Login</h2>
+    </div>
+    <div class="modal-body">
+      <div id="loginError" class="error"></div>
+      <p>Please Log In With Your Username And Password Below</p>
+      <form action="farmHand/" autocomplete="off" name="loginForm" method="post">
+		  <input id="loginUsername" class="inputBox" type="text" name="username" placeholder="Username">
+		  <input id="loginPassword" class="inputBox" type="password" name="password" placeholder= "Password"/>
+		  <br />
+		  <input onclick="loginUser()" type="button" value="Login" id="loginButton" />
+		  <input type="submit" id="loginReallySubmit" class="hidden">
+	  </form>
+    </div>
+    <div class="modal-footer">
+    	<button onclick="openRegisterFromLogin()">Or Register Here</button>
+    </div>
+</div>
+
+
+
+
+
+
+<script>
+var webAddress= "http://otterowlfox.x10host.com/farmHand/";
+var imagePath= "images/";
+var backImage= imagePath+"cardBack.png";
+var rulesURL= "https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing"
+
+var username= getCookie("username");
+var loginErrorHolder= document.getElementById("loginError");
+var registerErrorHolder= document.getElementById("registerError");
+
+var allUsersAndPasswords=[];
+var username= "";
+var password="";
+var message="";
+
+var modal= "";
+
+function closeModal() {
+    modal.style.display = "none";
+}
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+
+function checkIfUserExists(un, pw) {
+	for(var i=0; i<allUsersAndPasswords.length; i=i+2) {
+		if(un == allUsersAndPasswords[i]) {
+			if(pw == allUsersAndPasswords[i+1]) {
+				return "both";
+			}
+			return "username";
+		}
+	}
+	return "";
+}
+
+function getAllUsers() {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'farmHand/readGeneric.php',
+		data: {
+			query:"SELECT * FROM `users`"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("Reply: " + reply);
+			var data = JSON.parse(reply);
+			for(var i=0; i<data.length;i++) {
+				allUsersAndPasswords.push(data[i].username);
+				allUsersAndPasswords.push(data[i].password);
+			}
+			console.log("saved array: "+allUsersAndPasswords);
+		}
+	});
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function init() {
+	if ( username == ''){
+		//window.location.href = 'login.html';
+	}
+	//document.getElementById("mainTitle").innerHTML="Welcome back "+username;
+	getAllUsers();
+}
+
+function insertUser(un, pw) {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'farmHand/insertGeneric.php',
+		data: {
+			query: "INSERT INTO `users` SET username='" + un +"', password='" + pw + "'"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("The insert reply is: "+reply);
+		}
+	});
+}
+
+
+function loginUser() {
+	var newUsername= document.getElementById('loginUsername').value;
+	var newPassword= document.getElementById('loginPassword').value;
+	var validateResponse= validateForm("loginForm");
+	console.log("The check response is: "+validateResponse);
+	if(validateResponse != "") {
+		loginErrorHolder.innerHTML= validateResponse;
+		loginErrorHolder.style.display= "block";
+	}
+	else {
+		var userExistence= checkIfUserExists(newUsername, newPassword);
+		console.log("second check: "+userExistence);
+		if(userExistence == "both") {
+			//document.cookie = 'username=' + document.getElementById('username').value + ';expires=Thu, 21 July 2050 12:00:00 UTC';
+			setCookie("username", newUsername);
+			setCookie("password", newPassword);
+			document.getElementById('loginReallySubmit').click();
+		}
+		else { 
+			if(userExistence=="username") {
+				loginErrorHolder.innerHTML= "Incorrect Password";
+			}
+			else {
+				loginErrorHolder.innerHTML= "That Username Does Not Match Any Of Our Records";
+			}
+			loginErrorHolder.style.display="block";
+		}
+	}
+}
+
+function openFHRules() {
+	window.open(rulesURL, "_blank", "location=yes");
+}
+
+function openRegisterFromLogin() {
+	document.getElementById("loginModal").style.display="none";
+	modal= document.getElementById("registerModal");
+	modal.style.display="block";
+}
+
+function openRegisterModal() {
+	modal= document.getElementById("registerModal")
+	modal.style.display="block";
+}
+
+function openLoginModal(message) {
+	//put the message into the modal somewhere?
+	console.log("opening login modal");
+	modal= document.getElementById("loginModal")
+	modal.style.display="block";
+}
+
+function playFH() {
+	if(username == "") {
+		message= "You must be logged in to play";
+		openLoginModal(message);
+	}
+	else {
+		//go to game page//
+	}
+}
+
+function registerUser() {
+	var newUsername= document.getElementById("registerUsername").value;
+	var newPassword= document.getElementById("registerPassword").value;
+	var validateResponse= validateForm("registerForm");
+	if(validateResponse != "") {
+		registerErrorHolder.innerHTML= validateResponse;
+		registerErrorHolder.style.display= "block";
+	}
+	else {
+		if(checkIfUserExists(newUsername, newPassword) != "") {
+			registerErrorHolder.innerHTML= "This username is already taken";
+			registerErrorHolder.style.display= "block";
+		}
+		else {
+			insertUser(newUsername, newPassword);
+			setCookie("username", newUsername);
+			setCookie("password", newPassword);
+			document.getElementById("registerReallySubmit").click();
+		}
+	}
+}
+
+function setCookie(cname, cvalue) {
+    document.cookie = cname + "=" + cvalue + ";expires=Thu, 21 July 2050 01:00:00 UTC;";
+}
+
+function validateForm(formName) {
+    var x = document.forms[formName]["username"].value;
+    var y = document.forms[formName]["password"].value;
+    if (x == "" || y == "") {
+        return "Name and Password must be filled out";
+    }
+    if(x.length >= 20 || y.length >= 20) {
+        return "Name and Password must be less than 20 characters";
+    }
+    if(formName== "registerForm") {
+    	var z= document.forms[formName]["confirmPassword"].value;
+    	if(z != y) {
+    		return "Password must match Confirm Password";
+    	}
+    }
+    return "";
+}
+
+
+
+</script>
+</body>

@@ -1,0 +1,91 @@
+<html>
+<head>
+<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.development.js"></script>
+<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/prop-types@15.6.0/prop-types.js"></script>
+<!-- Load Babel -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+<div id="root"></div>
+<!-- Your custom script here -->
+<script type="text/babel">
+
+
+class StopWatch extends React.Component {
+	state= {lapse: 0, running: false}
+	handleRunClick = () => {
+		const startTime = Date.now() - this.state.lapse
+		this.setState(state => {
+			if(!state.running) {
+				this.timer= setInterval(() => {
+					this.setState({
+						lapse: Date.now() - startTime,
+					})
+				})
+			}
+			else {
+				clearInterval(this.timer)
+			}
+			return {running: !state.running}
+		})
+	}
+	handleClearClick = () => {
+		clearInterval(this.timer)
+		this.setState({
+			lapse: 0,
+			running: false
+		})
+	}
+	render() {
+		const {lapse, running} = this.state
+		const buttonStyles = {
+			border: '1px solid #ccc',
+			background: '#fff',
+			fontSize: '2em',
+			padding: 15,
+			margin: 5,
+			width: 200,
+		}
+
+		return (
+			<div style={{textAlign: 'center'}}>
+				<label
+					style= {{fontSize: '5em', display: 'block'}}
+				>
+					{lapse}ms
+				</label>
+				<button 
+					style={buttonStyles}
+					onClick= {this.handleRunClick}
+				>
+					{running ? 'Stop' : 'Start'}
+				</button>
+				<button
+					onClick= {this.handleClearClick}
+					style={buttonStyles}
+				>
+					Clear
+				</button>
+			</div>
+		)
+	}
+}
+
+const element = (
+	<StopWatch />
+)
+ReactDOM.render(
+	element,
+	document.getElementById('root'),
+)
+
+</script>
+</body>
+</html>
