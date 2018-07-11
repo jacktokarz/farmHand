@@ -1,17 +1,202 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
 <head>
 	<title>Farm Hand Lobby</title>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="icon" href="images/cardBack.png"/>
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<!-- Adding in Bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+ crossorigin="anonymous">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+ crossorigin="anonymous">
+
+	<script src="FHGlobal.js"></script>
+
 </head>
 <style>
 
 </style>
 
-<body>
-	<div>A header with options to go back to the main page, or to sign out and in as a different user</div>
-	<div>A title to tell you to pick a game to join / create</div>
-	<div>A table of games available to join</div>
-	<button>Create a game</button>
+<body onload="init()">
+
+<div class="container">
+	<div class="page-header">
+		<h1 class="text-center" id="pageWelcome">Farm Hand</h1>
+		<a class="text-right" href="../">Go Home</a>
+	</div>
+	<div>
+		<table class="table table-striped" id="matchesTable">
+	      <thead>
+	        <tr>
+	          <th>Players</th>
+	          <th>Status</th>
+	        </tr>
+	      </thead>
+	      <tbody id="matchesTableBody">
+	      </tbody>
+	    </table>
+
+
+	</div>
+	<button onclick="createMatch()">Create Match</button>
+
+</div>
+<script>
+
+var mtb= document.getElementById("matchesTableBody");
+var username="";
+
+var matchInfo= []
+function match(id, playerOne, playerTwo, playerThree, status) {
+  this.id= id;
+  this.playerOne= playerOne
+  this.playerTwo= playerTwo
+  this.playerThree= playerThree
+  this.status= status
+}
+
+
+
+function createMatch() {
+  jQuery.ajax({
+    type: 'POST',
+    url: 'insertGeneric.php',
+    data: {
+      query: "INSERT INTO `matches` SET playerOne = '" + username + "', date= '1111-11-11'"
+    },
+    datatype: 'text',
+    success: function (reply) {
+      reloadMatchesData();
+    }
+  });
+}
+
+function init() {
+	username= getCookie("username");
+	if(username.length <1) {
+		alert("You are not signed in. Go sign in so nothing breaks.");
+		username="blah";
+	}
+	console.log("cookie: "+document.cookie);
+	document.getElementById("pageWelcome").innerHTML= "Farm Hand<br /><small>Welcome to the lobby "+username+", join or start a match below.</small>";
+	reloadMatchesData();
+}
+
+function joinMatch(id, two) {
+	var updateQuery= "UPDATE `matches` SET ";
+	if(two == null) {
+		updateQuery= updateQuery+"playerTwo= '"+username+"'";
+	}
+	else{
+		updateQuery= updateQuery+"playerThree= "+username;
+	}
+	updateQuery= updateQuery+ "WHERE id=" + id;
+	console.log("Joining match with id: "+id+'\n'+"update query: "+updateQuery);
+	jQuery.ajax({
+    type: 'POST',
+    url: 'insertGeneric.php',
+    data: {
+      query: updateQuery
+    },
+    datatype: 'text',
+    success: function (reply) {
+      reloadMatchesData();
+    }
+  });
+}
+
+function playMatch(id) {
+	deleteCookie("matchId");
+	setCookie("matchId", id);
+	window.location.href= "match.html";
+}
+
+function recreateMatchesTableBody() {
+	var rows= [];
+	console.log("recreating matches table with matchInfo: "+matchInfo);
+	for(var i=0; i < matchInfo.length; i++) {
+		var tempLine= "<tr><td>"+matchInfo[i].playerOne;
+		if(matchInfo[i].playerTwo != null) {
+			tempLine = tempLine  + ", " + matchInfo[i].playerTwo;
+			if(matchInfo[i].playerThree != null) {
+				tempLine = tempLine + ", " + matchInfo[i].playerThree ;
+			}
+		}
+		tempLine= tempLine + "</td><td>";
+		var actionLabel= "";
+		/*
+			The idea here is that there are three main things to check: whether the user is in the match, whether the match is full, and the status of the match. Depending on these the user may be able to take an action (button) or not. 
+		*/
+		var inMatch= (matchInfo[i].playerThree==username || matchInfo[i].playerTwo==username || matchInfo[i].playerOne==username);
+		var matchFull= (matchInfo[i].playerThree!=null && matchInfo[i].playerTwo!=null && matchInfo[i].playerOne!=null);
+		/* 
+			Not in match and either it has started, or there is no more room. They cannot take any action on this. Just a div, not a button.
+		*/
+		if( !inMatch && (matchInfo[i].status == "STARTED" || (matchFull && matchInfo[i].status == "CREATED"))) {
+			actionLabel= matchInfo[i].status == "STARTED" ? "Match In Progress" : "Match Created";
+			tempLine = tempLine + "<div class='matchStatus'>"+actionLabel+"</div>";
+		}
+		else {
+			var action= "";
+			if(matchInfo[i].status == "ENDED") {
+				action= "viewStats("+matchInfo[i].id+")";
+				actionLabel= "View Stats";
+			}
+			else if(matchInfo[i].status == "STARTED") {
+				action= "playMatch("+matchInfo[i].id+")";
+				actionLabel= "Play Match";
+			}
+			else {
+				if(inMatch) {
+					action= "startMatch("+matchInfo[i].id+")";
+					actionLabel = "Start Match";
+				}
+				else {
+					action= "joinMatch("+matchInfo[i].id+", "+matchInfo[i].playerTwo+")";
+					actionLabel= "Join Match";
+				}
+			}
+			tempLine = tempLine + "<button onclick='"+action+"'>"+actionLabel+"</button>";
+		}
+		tempLine= tempLine + "</td></tr>";
+		rows.push(tempLine);
+	}
+	mtb.innerHTML= rows.join('');
+}
+
+function reloadMatchesData() {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'readGeneric.php',
+		data: {
+	      query: "SELECT * FROM `matches` WHERE status != 'ENDED'"
+	    },
+    datatype: 'text',
+    success: function (reply) {
+    	var data = JSON.parse(reply);
+    	console.log("Match data length: "+data.length);
+    	if (data != '') {
+			matchInfo = [];
+			for (var i = 0; i < data.length; i++) {
+				var tempMatch= new match(data[i].id, data[i].playerOne, data[i].playerTwo, data[i].playerThree, data[i].status);
+				matchInfo.push(tempMatch);
+			}
+			recreateMatchesTableBody();
+		}
+    }
+	});
+}
+
+function startMatch(id) {
+	console.log("Starting match with id: "+id);
+}
+
+</script>
+
+
 </body>
+</html>

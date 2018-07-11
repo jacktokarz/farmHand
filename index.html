@@ -4,6 +4,12 @@
 	<meta charset="UTF-8">
 	<link rel="icon" href="images/cardBack.png"/>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+	<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
+	<!-- Load Babel -->
+	<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+	<script type="text/javascript" src="farmHand/FHGlobal.js"></script>
 </head>
 <style>
 
@@ -218,9 +224,6 @@ form {
 <body onload="init()">
 
 <div id="header">
-	<button onclick="openLoginModal()" class="smallButton rightSide">Log In</button>
-	<button onclick="openRegisterModal()" class="smallButton rightSide">Register</button>
-	<h3 id="mainTitle">Welcome To <span style="font-style: italic;">Otter Owl Fox Games</span></h3>
 </div>
 
 <div class="rightSide" id="FHBox">
@@ -252,7 +255,6 @@ form {
 		  <input id="registerConfirmPassword" class="inputBox" type="password" name="confirmPassword" placeholder= "Confirm Password"/>
 		  <br />
 		  <input onclick="registerUser()" type="button" value="Register" id="registerButton" />
-		  <input type="submit" id="registerReallySubmit" class="hidden">
 	  </form>
     </div>
   </div>
@@ -273,7 +275,6 @@ form {
 		  <input id="loginPassword" class="inputBox" type="password" name="password" placeholder= "Password"/>
 		  <br />
 		  <input onclick="loginUser()" type="button" value="Login" id="loginButton" />
-		  <input type="submit" id="loginReallySubmit" class="hidden">
 	  </form>
     </div>
     <div class="modal-footer">
@@ -282,6 +283,8 @@ form {
 </div>
 
 
+
+<a href="farmHand" class="hidden" id="FHRedirect" />
 
 
 
@@ -292,81 +295,116 @@ var imagePath= "images/";
 var backImage= imagePath+"cardBack.png";
 var rulesURL= "https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing"
 
-var username= getCookie("username");
 var loginErrorHolder= document.getElementById("loginError");
 var registerErrorHolder= document.getElementById("registerError");
 
-var allUsersAndPasswords=[];
-var username= "";
-var password="";
-var message="";
 
+var username= ""
+var message="";
 var modal= "";
+
 
 function closeModal() {
     modal.style.display = "none";
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
+    if (event.target == modal && modal != "") {
+        closeModal();
     }
 }
 
 
-function checkIfUserExists(un, pw) {
-	for(var i=0; i<allUsersAndPasswords.length; i=i+2) {
-		if(un == allUsersAndPasswords[i]) {
-			if(pw == allUsersAndPasswords[i+1]) {
-				return "both";
-			}
-			return "username";
-		}
-	}
-	return "";
-}
 
-function getAllUsers() {
+function checkCookieAndPlay() {
 	jQuery.ajax({
 		type: 'POST',
 		url: 'farmHand/readGeneric.php',
 		data: {
-			query:"SELECT * FROM `users`"
+			query:"SELECT id FROM `users` WHERE username = '"+username+"'"
 		},
 		datatype: 'text',
 		success: function(reply){
-			console.log("Reply: " + reply);
+			console.log("cookie is real?: " + reply);
 			var data = JSON.parse(reply);
-			for(var i=0; i<data.length;i++) {
-				allUsersAndPasswords.push(data[i].username);
-				allUsersAndPasswords.push(data[i].password);
+			if(data == '') {
+				message= "You must be logged in to play";
+				openLoginModal(message);
 			}
-			console.log("saved array: "+allUsersAndPasswords);
+			else {
+				document.getElementById("FHRedirect").click();
+			}
+		}
+	});
+
+}
+
+function checkUserAndLogin(un, pw) {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'farmHand/readGeneric.php',
+		data: {
+			query:"SELECT password FROM `users` WHERE username = '"+un+"'"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("matching password: " + reply);
+			var data = JSON.parse(reply);
+			if(data == '') {
+				loginErrorHolder.innerHTML= "That Username Does Not Match Any Of Our Records";
+				loginErrorHolder.style.display="block";
+			}
+			else {
+				var retrievedPassword= [];
+				for(var i=0; i<data.length;i++) {
+					retrievedPassword.push(data[i].password);
+				}
+				if(retrievedPassword.includes(pw)) {
+					//document.cookie = 'username=' + document.getElementById('username').value + ';expires=Thu, 21 July 2050 12:00:00 UTC';
+					setCookie("username", un);
+					username= un;
+					updateLoginSpace();
+					closeModal();
+				}
+				else {
+					loginErrorHolder.innerHTML= "Incorrect Password";
+					loginErrorHolder.style.display="block";
+				}
+			}
 		}
 	});
 }
 
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
+function checkUserAndRegister(un, pw) {
+	jQuery.ajax({
+		type: 'POST',
+		url: 'farmHand/readGeneric.php',
+		data: {
+			query:"SELECT id FROM `users` WHERE username = '"+un+"'"
+		},
+		datatype: 'text',
+		success: function(reply){
+			console.log("matching username: " + reply);
+			var data = JSON.parse(reply);
+			if(data.length > 0) {
+				registerErrorHolder.innerHTML= "This username is already taken";
+				registerErrorHolder.style.display= "block";
+			}
+			else {
+				insertUser(un, pw);
+				setCookie("username", un);
+				username= un;
+				updateLoginSpace();
+				closeModal();
+			}
+		}
+	});
 }
 
 function init() {
-	if ( username == ''){
-		//window.location.href = 'login.html';
-	}
-	//document.getElementById("mainTitle").innerHTML="Welcome back "+username;
-	getAllUsers();
+	username= getCookie("username");
+	console.log("cookie: "+document.cookie);
+	updateLoginSpace();
 }
 
 function insertUser(un, pw) {
@@ -394,23 +432,8 @@ function loginUser() {
 		loginErrorHolder.style.display= "block";
 	}
 	else {
-		var userExistence= checkIfUserExists(newUsername, newPassword);
-		console.log("second check: "+userExistence);
-		if(userExistence == "both") {
-			//document.cookie = 'username=' + document.getElementById('username').value + ';expires=Thu, 21 July 2050 12:00:00 UTC';
-			setCookie("username", newUsername);
-			setCookie("password", newPassword);
-			document.getElementById('loginReallySubmit').click();
-		}
-		else { 
-			if(userExistence=="username") {
-				loginErrorHolder.innerHTML= "Incorrect Password";
-			}
-			else {
-				loginErrorHolder.innerHTML= "That Username Does Not Match Any Of Our Records";
-			}
-			loginErrorHolder.style.display="block";
-		}
+		console.log("calling check user with: "+newUsername+", and "+newPassword);
+		checkUserAndLogin(newUsername, newPassword);
 	}
 }
 
@@ -432,7 +455,14 @@ function openRegisterModal() {
 function openLoginModal(message) {
 	//put the message into the modal somewhere?
 	console.log("opening login modal");
-	modal= document.getElementById("loginModal")
+	modal= document.getElementById("loginModal");
+	if(message == '' || message == null) {
+		loginErrorHolder.style.display="none";
+	}
+	else {
+		loginErrorHolder.innerHTML=message;
+		loginErrorHolder.style.display="block";
+	}
 	modal.style.display="block";
 }
 
@@ -442,7 +472,7 @@ function playFH() {
 		openLoginModal(message);
 	}
 	else {
-		//go to game page//
+		checkCookieAndPlay();
 	}
 }
 
@@ -455,21 +485,24 @@ function registerUser() {
 		registerErrorHolder.style.display= "block";
 	}
 	else {
-		if(checkIfUserExists(newUsername, newPassword) != "") {
-			registerErrorHolder.innerHTML= "This username is already taken";
-			registerErrorHolder.style.display= "block";
-		}
-		else {
-			insertUser(newUsername, newPassword);
-			setCookie("username", newUsername);
-			setCookie("password", newPassword);
-			document.getElementById("registerReallySubmit").click();
-		}
+		checkUserAndRegister(newUsername, newPassword);
 	}
 }
 
-function setCookie(cname, cvalue) {
-    document.cookie = cname + "=" + cvalue + ";expires=Thu, 21 July 2050 01:00:00 UTC;";
+function signOut() {
+	deleteCookie("username");
+	deleteCookie("password");
+	username="";
+	updateLoginSpace();
+}
+
+function updateLoginSpace() {
+	if(username=="") {
+		document.getElementById("header").innerHTML= "<button onClick= 'openLoginModal()' class='smallButton rightSide'>Log In</button><button onClick= 'openRegisterModal()'class='smallButton rightSide'>Register</button><h3 id='mainTitle'>Welcome To <span style='font-style: italic;'>Otter Owl Fox Games</span></h3>"
+	}
+	else {
+		document.getElementById("header").innerHTML= "<button onClick='signOut()' class='smallButton rightSide'>Log Out</button></div><h3 id='mainTitle'>Welcome Back To <span style='font-style: italic;'>Otter Owl Fox Games</span>, " + username + "</h3>"
+	}
 }
 
 function validateForm(formName) {
@@ -493,4 +526,5 @@ function validateForm(formName) {
 
 
 </script>
+
 </body>

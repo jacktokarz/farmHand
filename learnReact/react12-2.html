@@ -1,0 +1,49 @@
+<html>
+<head>
+<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.development.js"></script>
+<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/prop-types@15.6.0/prop-types.js"></script>
+<!-- Load Babel -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+<div id="root"></div>
+<!-- Your custom script here -->
+<script type="text/babel">
+
+class Counter extends React.Component {
+	constructor(...args) {
+		super(...args)
+		this.state = {count:0}
+		this.handleClick= this.handleClick.bind(this)
+	}
+	handleClick() {
+		this.setState(({count}) => ({
+			count: count+1,
+		}))
+	}
+	render() {
+		return (
+		<button
+			onClick={this.handleClick}
+		>
+			{this.state.count}
+		</button>
+		)
+	}
+}
+
+ReactDOM.render(
+	<Counter />,
+	document.getElementById('root'),
+)
+
+</script>
+</body>
+</html>
