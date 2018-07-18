@@ -11,7 +11,7 @@ class App extends Component {
         <Header />
         <div className="row justify-content-around" id="FHBox">
           <div className="col-4">
-            <img src="../../images/cardBack.png" alt="Farm Hand Card Back">
+            <img src="../../images/cardBack.png" alt="Farm Hand Card Back" />
             <div id="FHText">
               <div id="FHTitle">Farm Hand</div>
               <button onClick="playFH()" className="btn">Play</button>

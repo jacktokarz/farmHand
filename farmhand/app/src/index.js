@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { listenForMessage } from './utils';
+
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 import Store from './store'
 import './index.css';
@@ -11,7 +12,6 @@ import registerServiceWorker from './registerServiceWorker';
 
 const storeInstance= Store({})
 
-listenForMessage(storeInstance);
 
 ReactDOM.render(
 	<Provider store={storeInstance}>

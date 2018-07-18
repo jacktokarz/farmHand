@@ -2,17 +2,21 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 
-const Header= ({greeting, headerButtonText, headerButtonAction}) => (
-	<nav className="navbar navbar-dark">
-      <div className="navbar-text">{greeting}</div>
-      <button className="btn" onClick={headerButtonAction}>{headerButtonText}</button>
+const Header= ({buttonText, onClick}) => (
+	<nav className="navbar">
+      <div className="navbar-brand navbar-dark" href="#">Navbar 1</div>
+      <button className="btn" onClick={() => {
+	      	onClick({buttonText});
+	      } }
+      >
+      	{buttonText}
+      </button>
     </nav>
 )
 
-TextInput.PropTypes = {
-	greeting: PropTypes.string.isRequired,
-	headerButtonText: PropTypes.string.isRequired,
-	headerButtonAction: PropTypes.func.isRequired,
+Header.PropTypes = {
+	buttonText: PropTypes.string.isRequired,
+	onClick: PropTypes.func.isRequired,
 }
 
 export default Header;

@@ -1,8 +1,8 @@
 export const actionTypes= {
-	SIGNIN: 'header signIn',
+	SIGNINTOGGLE: 'header signInToggle',
 }
 
-export const signIn= (username) => ({
-	type: actionTypes.signIn,
-	payload: username
+export const signInToggle= (value) => ({
+	type: actionTypes.SIGNINTOGGLE,
+	payload: (value.buttonText === "Log In" ? "Log Out" : "Log In"),
 })

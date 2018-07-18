@@ -1,3 +1,3 @@
-import * as fromHeader from './text'
+import * as fromHeader from './header'
 
 export { fromHeader };

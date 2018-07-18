@@ -1,19 +1,17 @@
 import { connect } from 'react-redux'
-import {getHeader} from '../selectors'
+import {getHeaderButtonText} from '../selectors'
 import {fromHeader} from '../actions'
 import {Header} from '../components'
-import {registerUser, logInUser} from '../utils'
 
 const mapStateToProps= state => (
 	{
-		greeting: getHeader(state),
-		headerButtonText: getHeader(state),
+		buttonText: getHeaderButtonText(state),
 	}
 )
 
 const mapDispatchToProps= dispatch => ({
-	headerButtonAction: e => dispatch(fromHeader.signIn(e.target.username.value)),
+	onClick: text => dispatch(fromHeader.signInToggle(text)),
 })
 
 
-export default connect(mapStateToProps)(Header)
+export default connect(mapStateToProps, mapDispatchToProps)(Header)

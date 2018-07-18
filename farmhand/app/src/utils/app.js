@@ -1,5 +1,5 @@
 import firebase from 'firebase';
-import { fromText } from '../actions'
+import { fromHeader } from '../actions'
 
 
 const config = {
@@ -32,8 +32,9 @@ export function logInUser(data) {
 }
 
 
-export function listenForMessage(store) {
-  database.ref('message/').on('value', snapshot => {
-    store.dispatch(fromText.save(snapshot.val().value)) 
-  })
+
+
+export function signInToggle(value, store) {
+  console.log("The button says: "+value);
+  store.dispatch(fromHeader.signInToggle(value));
 }
