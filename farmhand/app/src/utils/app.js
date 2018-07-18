@@ -20,21 +20,15 @@ export function registerUser(data) {
   });
 }
 
-export function logInUser(data) {
-  var password= database.ref('/users/' + data.username + '/password');
+export function checkLogin(un, pw) {
+  console.log("In utils, checkLogin: passed vars: "+un+", "+pw);
+  var password= database.ref('/users/' + un + '/password').once('value');
+  console.log("In utils, checkLogin: retrieved pw: "+password);
   if(password === null) {
     return "missing";
   }
-  if(password === data.password) {
+  if(password === pw) {
     return "incorrect";
   }
   return "loggedIn";
-}
-
-
-
-
-export function signInToggle(value, store) {
-  console.log("The button says: "+value);
-  store.dispatch(fromHeader.signInToggle(value));
 }
