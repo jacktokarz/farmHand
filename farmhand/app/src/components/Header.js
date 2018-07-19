@@ -3,31 +3,55 @@ import PropTypes from 'prop-types'
 import {getLoginModalVis} from '../selectors'
 
 
-const Header= ({buttonText, password, username, onClick, loginModalVis, errorMessage, closeLoginModal, onLoginSubmit, updateUsername, updatePassword, checkLogin, openRegisterFromLogin}) => (
+const Header= (
+  {
+    buttonText, 
+    checkLogin, 
+    checkRegister, 
+    closeLoginModal, 
+    closeRegisterModal, 
+    confirmPassword, 
+    errorMessage, 
+    logButtonAction, 
+    loginModalVis, 
+    openRegisterFromLogin, 
+    password, 
+    registerErrorMessage, 
+    registerModalVis, 
+    updateConfirmPassword, 
+    updatePassword, 
+    updateUsername, 
+    user, 
+    username,
+  }
+) => (
 	<div>
-    <nav className="navbar">
-        <div className="navbar-brand navbar-dark" href="#">{loginModalVis}</div>
+    <nav className="navbar navbar-dark bg-dark">
+        <div className="navbar-brand" href="#">
+          {user === null ? "Welcome to Otter Owl Games" : "Welcome back to Otter Owl Games, "+user}
+        </div>
         <button className="btn" onClick={() => {
-  	      	onClick({buttonText});
+  	      	logButtonAction({buttonText});
   	      } }
         >
         	{buttonText}
         </button>
     </nav>
+
+
     <div style={{display: loginModalVis}} id="loginModal" className="modal">
-      <div className="modal-content">
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
           <div className="modal-header">
-          <span className="close" onClick={closeLoginModal}>&times;</span>
-          <h2>Login</h2>
+            <h3 className="modal-title">Login</h3>
+            <span className="close" onClick={closeLoginModal}>&times;</span>
           </div>
           <div className="modal-body">
-          <div id="loginError" className="error">{errorMessage}</div>
+          <div id="loginError" className="error" style={{display: errorMessage.length > 1 ? "block" : "none"}}>
+            {errorMessage}
+          </div>
           <p>Please Log In With Your Username And Password Below</p>
-          <form autoComplete="off" name="loginForm" onSubmit={ e => {
-            e.preventDefault();
-            onLoginSubmit(this.username);
-            } }
-          >
+          <form autoComplete="off" name="loginForm">
             <input id="loginUsername" className="inputBox" type="text" value={username} onChange={updateUsername} placeholder="Username" />
             <input id="loginPassword" className="inputBox" type="password" value={password} onChange={updatePassword} placeholder= "Password"/>
             <br />
@@ -38,13 +62,37 @@ const Header= ({buttonText, password, username, onClick, loginModalVis, errorMes
             <button onClick={openRegisterFromLogin}>Or Register Here</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div style={{display: registerModalVis}} id="registerModal" className="modal container">
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+          <h3 className="modal-title align-self-center">Register</h3>
+            <span className="close" onClick={closeRegisterModal}>&times;</span>
+          </div>
+          <div className="modal-body">
+            <div id="registerError" className="error row row justify-content-around" style={{display: registerErrorMessage.length > 1 ? "block" : "none"}}>
+              {registerErrorMessage}
+            </div>
+            <p>Please Enter Your Desired Username And Password Below</p>
+            <div className="row justify-content-around">
+              <form autocomplete="off" name="registerForm">
+                <input id="registerUsername" className="inputBox" type="text" value={username} onChange={updateUsername} placeholder="Username" />
+                <input id="registerPassword" className="inputBox" type="password" value={password} onChange={updatePassword} placeholder= "Password"/>
+                <input id="registerConfirmPassword" className="inputBox" type="password" value={confirmPassword} onChange={updateConfirmPassword} placeholder= "Confirm Password"/>
+                <br />
+                <input onClick={() => checkRegister({username}, {password}, {confirmPassword})} type="button" value="Register" id="registerButton" />
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 )
 
-Header.defaultProps= {
-  buttonText: "Log Out",
-}
 
 Header.propTypes = {
 	buttonText: PropTypes.string.isRequired,

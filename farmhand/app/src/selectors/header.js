@@ -7,3 +7,6 @@ export const getLoginModalVis= createSelector(headerState, state => state.loginM
 export const getErrorMessage= createSelector(headerState, state => state.errorMessage);
 export const getUsername= createSelector(headerState, state => state.username);
 export const getPassword= createSelector(headerState, state => state.password);
+export const getRegisterModalVis= createSelector(headerState, state => state.registerModalVis);
+export const getRegisterErrorMessage= createSelector(headerState, state => state.registerErrorMessage);
+export const getConfirmPassword= createSelector(headerState, state => state.confirmPassword);

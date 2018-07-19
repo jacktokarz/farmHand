@@ -1,12 +1,15 @@
 export const actionTypes= {
 	CLOSELOGINMODAL: 'header closeLoginModal',
+	CLOSEREGISTERMODAL: 'header closeRegisterModal',
 	LOGIN: 'header logIn',
 	LOGOUT: 'header logOut',
 	OPENLOGIN: 'header openLogin',
 	OPENREGISTERFROMLOGIN: 'header openRegisterFromLogin',
+	REGISTERUSER: 'header registerUser',
 	SETERRORMESSAGE: 'header setErrorMessage',
+	SETREGISTERERRORMESSAGE: 'header setRegisterErrorMessage',
 	SETUSERNAME: 'header setUsername',
-	SIGNINTOGGLE: 'header signInToggle',
+	UPDATECONFIRMPASSWORD: 'header updateConfirmPassword',
 	UPDATEUSERNAME: 'header updateUsername',
 	UPDATEPASSWORD: 'header updatePassword',
 }
@@ -16,32 +19,44 @@ export const closeLoginModal= () => ({
 	payload: "",
 })
 
-export const logIn= (value) => {
-	console.log("log in in header actions");
-	return {
+
+export const closeRegisterModal= () => ({
+	type: actionTypes.CLOSEREGISTERMODAL,
+	payload: "",
+})
+
+export const logIn= (value) => ({
 	type: actionTypes.LOGIN,
 	payload: value,
-} }
+})
 
-export const logOut= () => {
-	console.log("log out in header actions");
-	return { type: actionTypes.LOGOUT,
+export const logOut= () => ({
+	type: actionTypes.LOGOUT,
 	payload: "",
-} }
+})
 
-export const openLogin= () => {
-	console.log("actions: open login");
-	return {type: actionTypes.OPENLOGIN,
-	payload: "", }
-}
+export const openLogin= () => ({
+	type: actionTypes.OPENLOGIN,
+	payload: "",
+})
 
 export const openRegisterFromLogin= () => ({
 	type: actionTypes.OPENREGISTERFROMLOGIN,
 	payload: "",
 })
 
+export const registerUser= (un) => ({
+	type: actionTypes.REGISTERUSER,
+	payload: un,
+})
+
 export const setErrorMessage= (msg) => ({
 	type: actionTypes.SETERRORMESSAGE,
+	payload: msg,
+})
+
+export const setRegisterErrorMessage= (msg) => ({
+	type: actionTypes.SETREGISTERERRORMESSAGE,
 	payload: msg,
 })
 
@@ -50,9 +65,9 @@ export const setUsername= (un) => ({
 	payload: un,
 })
 
-export const signInToggle= (value) => ({
-	type: actionTypes.SIGNINTOGGLE,
-	payload: value.buttonText === "Log In" ? "Log Out" : "Log In",
+export const updateConfirmPassword= (value) => ({
+	type: actionTypes.UPDATECONFIRMPASSWORD,
+	payload: value,
 })
 
 export const updateUsername= (value) => ({

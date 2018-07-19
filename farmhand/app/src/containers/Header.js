@@ -1,8 +1,8 @@
 import { connect } from 'react-redux'
-import {getHeaderButtonText, getLoginModalVis, getErrorMessage, getUsername, getPassword} from '../selectors'
+import {getHeaderButtonText, getLoginModalVis, getErrorMessage, getUsername, getPassword, getConfirmPassword, getRegisterModalVis, getRegisterErrorMessage} from '../selectors'
 import {fromHeader} from '../actions'
 import {Header} from '../components'
-import {checkLogin} from '../utils'
+import {checkLogin, checkRegister, deleteCookie, getCookie} from '../utils'
 
 
 const mapStateToProps= state => (
@@ -12,40 +12,36 @@ const mapStateToProps= state => (
 		errorMessage: getErrorMessage(state),
 		username: getUsername(state),
 		password: getPassword(state),
+
+		confirmPassword: getConfirmPassword(state),
+		registerModalVis: getRegisterModalVis(state),
+    	registerErrorMessage: getRegisterErrorMessage(state),
+    
+		user: getCookie('user'),
 	}
 )
 
 const mapDispatchToProps= dispatch => ({
-	onClick: text => {
-		console.log("in header container, text= "+text.buttonText);
+	logButtonAction: text => {
 		if(text.buttonText==="Log In") {
-			console.log("log in triggered");
 			return dispatch(fromHeader.openLogin());
 		}
 		else if(text.buttonText==="Log Out") {
+			deleteCookie("user");
 			return dispatch(fromHeader.logOut());
 		}
 	},
 
-	checkLogin: (un, pw) => {
-		console.log("checkLogin: "+un.username);
-		const status= checkLogin(un.username, pw.password);
-		console.log("in check login in the container, got status: "+status);
-		if(status === "missing") {
-			return dispatch(fromHeader.setErrorMessage("Incorrect Username"));
-		}
-		else if(status === "incorrect") {
-			return dispatch(fromHeader.setErrorMessage("Incorrect Password"));
-		}
-		else if(status === "loggedIn") {
-			return dispatch(fromHeader.logIn(un.username));
-		}
-	},
+	checkLogin: (un, pw) => { checkLogin(dispatch, un.username, pw.password); },
 	closeLoginModal: () => dispatch(fromHeader.closeLoginModal()),
-	loginSubmit: (un) => dispatch(fromHeader.setUsername(un)),
 	openRegisterFromLogin: () => dispatch(fromHeader.openRegisterFromLogin()),
 	updateUsername: e => dispatch(fromHeader.updateUsername(e.target.value)),
 	updatePassword: e => dispatch(fromHeader.updatePassword(e.target.value)),
+
+	closeRegisterModal: () => dispatch(fromHeader.closeRegisterModal()),
+    updateConfirmPassword: e => dispatch(fromHeader.updateConfirmPassword(e.target.value)),
+    checkRegister: (un, pw, cp) => { checkRegister(dispatch, un.username, pw.password, cp.confirmPassword); },
+
 })
 
 
