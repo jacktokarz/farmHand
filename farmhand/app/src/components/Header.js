@@ -46,7 +46,7 @@ const Header= (
             <span className="close" onClick={closeLoginModal}>&times;</span>
           </div>
           <div className="modal-body">
-          <div id="loginError" className="error" style={{display: errorMessage!==null ? "block" : "none"}}>
+          <div id="loginError" className="error" style={{display: errorMessage.length > 0 ? "block" : "none"}}>
             {errorMessage}
           </div>
           <p>Please Log In With Your Username And Password Below</p>
@@ -72,7 +72,7 @@ const Header= (
             <span className="close" onClick={closeRegisterModal}>&times;</span>
           </div>
           <div className="modal-body">
-            <div id="registerError" className="error row row justify-content-around" style={{display: registerErrorMessage !== null ? "block" : "none"}}>
+            <div id="registerError" className="error row row justify-content-around" style={{display: registerErrorMessage.length > 0 ? "block" : "none"}}>
               {registerErrorMessage}
             </div>
             <p>Please Enter Your Desired Username And Password Below</p>

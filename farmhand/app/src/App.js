@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom'
 import './App.css';
 
-import { Home, Lobby } from './components'
+import { Home, Lobby } from './containers'
 
 const App = () => (
   <main>

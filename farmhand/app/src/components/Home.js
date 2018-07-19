@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { BrowserRouter as Router } from 'react-router-dom'
 
-import {Header} from './'
+import {Header} from '../containers'
 import {getCookie} from '../utils'
 
 
