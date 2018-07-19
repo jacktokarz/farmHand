@@ -4,6 +4,7 @@ export const actionTypes= {
 	LOGIN: 'header logIn',
 	LOGOUT: 'header logOut',
 	OPENLOGIN: 'header openLogin',
+	OPENLOGINFROMPLAY: 'header openLoginFromPlay',
 	OPENREGISTERFROMLOGIN: 'header openRegisterFromLogin',
 	REGISTERUSER: 'header registerUser',
 	SETERRORMESSAGE: 'header setErrorMessage',
@@ -37,6 +38,11 @@ export const logOut= () => ({
 
 export const openLogin= () => ({
 	type: actionTypes.OPENLOGIN,
+	payload: "",
+})
+
+export const openLoginFromPlay= () => ({
+	type: actionTypes.OPENLOGINFROMPLAY,
 	payload: "",
 })
 

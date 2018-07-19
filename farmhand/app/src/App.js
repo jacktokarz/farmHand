@@ -1,28 +1,16 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { Switch, Route } from 'react-router-dom'
 import './App.css';
 
-import { Header } from './containers'
+import { Home, Lobby } from './components'
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App container-fluid">
-        <Header />
-        <div className="row justify-content-around" id="FHBox">
-          <div className="col-4">
-            <img src="../../images/cardBack.png" alt="Farm Hand Card Back" />
-            <div id="FHText">
-              <div id="FHTitle">Farm Hand</div>
-              <button onClick="playFH()" className="btn">Play</button>
-              <button onClick="openFHRules()" className="btn">Rules</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    );
-  }
-}
+const App = () => (
+  <main>
+    <Switch>
+      <Route exact path="/" component={Home} />
+      <Route exact path="/lobby" component={Lobby} />
+    </Switch>
+  </main>
+)
 
 export default App;

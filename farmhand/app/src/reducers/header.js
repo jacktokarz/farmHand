@@ -1,4 +1,4 @@
-import { fromHeader } from '../actions'
+import {fromHeader} from '../actions'
 import {getCookie} from '../utils'
 
 const initState= 
@@ -37,6 +37,11 @@ export default (state=initState, action) => {
 		case fromHeader.actionTypes.OPENLOGIN:
 			return {...state, 
 				loginModalVis: "block"
+			};
+		case fromHeader.actionTypes.OPENLOGINFROMPLAY:
+			return {...state, 
+				loginModalVis: "block",
+				errorMessage: "You must be logged in to play",
 			};
 		case fromHeader.actionTypes.OPENREGISTERFROMLOGIN:
 			return {...state, 

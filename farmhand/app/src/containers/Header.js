@@ -22,25 +22,6 @@ const mapStateToProps= state => (
 )
 
 const mapDispatchToProps= dispatch => ({
-	logButtonAction: text => {
-		if(text.buttonText==="Log In") {
-			return dispatch(fromHeader.openLogin());
-		}
-		else if(text.buttonText==="Log Out") {
-			deleteCookie("user");
-			return dispatch(fromHeader.logOut());
-		}
-	},
-
-	checkLogin: (un, pw) => { checkLogin(dispatch, un.username, pw.password); },
-	closeLoginModal: () => dispatch(fromHeader.closeLoginModal()),
-	openRegisterFromLogin: () => dispatch(fromHeader.openRegisterFromLogin()),
-	updateUsername: e => dispatch(fromHeader.updateUsername(e.target.value)),
-	updatePassword: e => dispatch(fromHeader.updatePassword(e.target.value)),
-
-	closeRegisterModal: () => dispatch(fromHeader.closeRegisterModal()),
-    updateConfirmPassword: e => dispatch(fromHeader.updateConfirmPassword(e.target.value)),
-    checkRegister: (un, pw, cp) => { checkRegister(dispatch, un.username, pw.password, cp.confirmPassword); },
 
 })
 

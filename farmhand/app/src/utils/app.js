@@ -66,6 +66,28 @@ export function checkRegister(dispatch, un, pw, cp) {
   }
 }
 
+export function createMatch() {
+  const user= getCookie("user");
+  const idMax= database.ref('/matches/').orderByChild('id');
+  const today = new Date();
+  const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+  database.ref('matches/').set({
+    id: idMax+1,
+    playerOne: user,
+    playerTwo: null,
+    playerThree: null,
+    status: "Pending",
+    date: todayDate,
+  }, function(error) {
+    if(error) {
+      console.log("match submission error");
+    }
+    else {
+      console.log("match should be registered");
+    }
+  });
+}
+
 export function deleteCookie(cname) {
     document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
 }
@@ -84,6 +106,11 @@ export function getCookie(cname) {
         }
     }
     return null;
+}
+
+export function openRules() {
+  window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing"
+, "_blank", "location=yes");
 }
 
 export function registerUser(username, password) {
