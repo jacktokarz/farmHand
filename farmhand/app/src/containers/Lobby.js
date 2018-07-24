@@ -1,18 +1,30 @@
 import { connect } from 'react-redux'
 import {Lobby} from '../components'
-import {getMatches, createMatch} from '../utils'
+import {getMatches} from '../selectors'
+import {createMatch, joinMatch, setCookie, startMatch} from '../utils'
 
-const matchResults= getMatches();
-console.log("match results: "+matchResults);
 
-const mapStateToProps= state => (
+const mapStateToProps= state => { console.log("matches are: "+getMatches(state)); return (
 	{
-		matches: matchResults === undefined ? ["banana", "orange"] : matchResults,
+		matches: getMatches(state),
 	}
-)
+)}
 
 const mapDispatchToProps= dispatch => ({
 	createMatch: () => { createMatch(); },
+	entryAction: (item, e) => {
+		if(item.actionLabel === "Play Match") {
+	    	setCookie("match", item.key);
+	    	history => { history.push('/match') };
+	    }
+	    else if(item.actionLabel === "Start Match") {
+	    	startMatch(item.key);
+	    	history => { history.push('/match') };
+	    }
+	    else if(item.actionLabel === "Join Match") {
+	      joinMatch(item.key, item.playerList);
+	    }
+	}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Lobby)

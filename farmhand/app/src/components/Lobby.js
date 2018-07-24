@@ -2,11 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { BrowserRouter as Router } from 'react-router-dom'
 
-import {Header} from './'
-import {getCookie} from '../utils'
 
 
-const Lobby= ({history, createMatch}) => (
+const Lobby= ({createMatch, entryAction, history, matches}) => (
   <div className="App container-fluid">
 
     <div>
@@ -14,14 +12,29 @@ const Lobby= ({history, createMatch}) => (
         <thead>
           <tr>
             <th>Players</th>
-            <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody id="matchesTableBody">
+          {matches.map((i, index) => (
+            <tr key={i.id}>
+              <td>
+                {i.playerList}
+              </td>
+              <td>
+                <button 
+                  className={i.actionLabel=="" ? "hidden": "tableAction"} 
+                  onClick={() => entryAction(i, history)}
+                >
+                  {i.actionLabel}
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
-    <button onclick={createMatch}>Create Match</button>
+    <button onClick={createMatch}>Create Match</button>
   </div>
 )
 

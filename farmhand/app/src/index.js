@@ -10,8 +10,12 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
+import { listenForMatches } from './utils';
 
-const storeInstance= Store({})
+
+const storeInstance= Store({});
+
+listenForMatches(storeInstance);
 
 
 ReactDOM.render(

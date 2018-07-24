@@ -1,6 +1,8 @@
 import firebase from 'firebase';
-import { fromHeader } from '../actions'
+import { fromHeader, fromLobby } from '../actions'
 
+
+var user= getCookie('user');
 
 const config = {
     apiKey: "AIzaSyBreOUIUqC9gFC2pX5VrcsvTaHqVwpTJWI",
@@ -28,6 +30,7 @@ export function checkLogin(dispatch, un, pw) {
       const password= snapshot.val();
       if(password === pw) {
         setCookie("user", un);
+        user= un;
         dispatch(fromHeader.logIn(un));
       }
       else if(password === null) {
@@ -59,7 +62,6 @@ export function checkRegister(dispatch, un, pw, cp) {
       }
       else {
         registerUser(un, pw);
-        setCookie("user", un);
         dispatch(fromHeader.registerUser(un));
       }
     });
@@ -67,25 +69,28 @@ export function checkRegister(dispatch, un, pw, cp) {
 }
 
 export function createMatch() {
-  const user= getCookie("user");
-  const idMax= database.ref('/matches/').orderByChild('id');
   const today = new Date();
   const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-  database.ref('matches/').set({
-    id: idMax+1,
-    playerOne: user,
-    playerTwo: null,
-    playerThree: null,
-    status: "Pending",
-    date: todayDate,
-  }, function(error) {
-    if(error) {
-      console.log("match submission error");
-    }
-    else {
-      console.log("match should be registered");
-    }
-  });
+  const keyQuery= database.ref('/matches/').orderByKey().limitToLast(1);
+  keyQuery.once("value")
+    .then(function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        database.ref('matches/'+(parseInt(childSnapshot.key)+1)).set({
+          playerOne: user,
+          playerTwo: null,
+          playerThree: null,
+          status: "pending",
+          date: todayDate,
+        }, function(error) {
+          if(error) {
+            console.log("match submission error");
+          }
+          else {
+            console.log("match should be registered");
+          }
+        });
+      });
+    });
 }
 
 export function deleteCookie(cname) {
@@ -108,9 +113,66 @@ export function getCookie(cname) {
     return null;
 }
 
+export function joinMatch(key, playerList) {
+  console.log("joining match "+key);
+  const players= playerList.split(", ");
+  for(var i=0; i < players.length; i++) {
+    console.log("player "+i+" of players: "+players[i]);
+  }
+  var updates= {};
+  if(players.length > 1) {
+    updates['matches/'+key+'/playerThree']= user;
+  }
+  else {
+    updates['matches/'+key+'/playerTwo']= user;
+  }
+  database.ref().update(updates);
+}
+
+export function listenForMatches(store) {
+  console.log("retrieving matches");
+  database.ref('matches/').on('value', snapshot => {
+    const matchList= [];
+    snapshot.forEach(function(childSnapshot) {
+      const pOne= childSnapshot.child('/playerOne').val();
+      const pTwo= childSnapshot.child('/playerTwo').val();
+      const pThree= childSnapshot.child('/playerThree').val();
+      console.log("this match has p1- "+pOne+" and p2 "+pTwo+" and p3 "+pThree);
+      const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n != undefined }).join(', ');
+      const inMatch= (user === pOne || user === pTwo || user === pThree);
+      const matchFull= (pOne!==null && pTwo!==null && pThree!==null);
+      const status= childSnapshot.child('/status').val();
+  console.log("in match? "+inMatch+"... full? "+matchFull+"... status: "+status);
+      var label= "";
+      if(inMatch) {
+        if(status === "pending") {
+          if(pTwo) {
+            label= "Start Match";
+          }
+        }
+        else if(status === "in progress") {
+          label="Play Match";
+        }
+      }
+      else {
+        if(!matchFull) {
+          label= "Join Match";
+        }
+      }
+      matchList.push({playerList: joinedPlayers, actionLabel: label, key: childSnapshot.key});
+    });
+    matchList.sort(function(a, b) {a.key - b.key});
+    matchList.reverse();
+    store.dispatch(fromLobby.save(matchList));
+  });
+}
+
 export function openRules() {
-  window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing"
-, "_blank", "location=yes");
+  window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
+}
+
+export function playMatch(key) {
+  console.log("playing match "+key);
 }
 
 export function registerUser(username, password) {
@@ -121,6 +183,8 @@ export function registerUser(username, password) {
       console.log("user submission error");
     }
     else {
+      setCookie("user", username);
+      user = username;
       console.log("user should be registered");
     }
   });
@@ -129,4 +193,12 @@ export function registerUser(username, password) {
 export function setCookie(cname, cvalue) {
     document.cookie = cname + "=" + cvalue + ";expires=Thu, 21 July 2050 01:00:00 UTC;";
     console.log(cname+" cookie set as "+cvalue);
+}
+
+export function startMatch(key) {
+  console.log("starting match "+key);
+  setCookie("match", key);
+  var updates= {};
+  updates['matches/'+key+'/status']= "in progress";
+  database.ref().update(updates);
 }

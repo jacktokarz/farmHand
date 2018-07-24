@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { BrowserRouter as Router } from 'react-router-dom'
 
+import cardBack from '../images/cardBack.png'
+
 import {Header} from '../containers'
 import {getCookie} from '../utils'
 
@@ -11,9 +13,9 @@ const Home= ({openLoginFromPlay, playRedirect, openRules, history}) => (
 
     <Header />
   
-    <div className="row justify-content-around" id="FHBox">
-      <div className="col-4">
-        <img src="../../images/cardBack.png" alt="Farm Hand Card Back" />
+    <div className="row justify-content-around">
+      <div className="col-4 text-center" id="FHBox">
+        <img src={cardBack} alt="Farm Hand Card Back" />
         <div id="FHText">
           <div id="FHTitle">Farm Hand</div>
           <button 
