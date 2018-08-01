@@ -8,3 +8,4 @@ export const getCardModalId= createSelector(matchState, state => state.cardModal
 export const getCardModalVis= createSelector(matchState, state => state.cardModalVis);
 export const getHandSize= createSelector(matchState, state => state.handSize);
 export const getMarket= createSelector(matchState, state => state.market);
+export const getUserHand= createSelector(matchState, state => state.userHand);
