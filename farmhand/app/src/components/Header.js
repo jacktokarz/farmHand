@@ -77,7 +77,7 @@ const Header= (
             </div>
             <p>Please Enter Your Desired Username And Password Below</p>
             <div className="row justify-content-around">
-              <form autocomplete="off" name="registerForm">
+              <form autoComplete="off" name="registerForm">
                 <input id="registerUsername" className="inputBox" type="text" value={username} onChange={updateUsername} placeholder="Username" />
                 <input id="registerPassword" className="inputBox" type="password" value={password} onChange={updatePassword} placeholder= "Password"/>
                 <input id="registerConfirmPassword" className="inputBox" type="password" value={confirmPassword} onChange={updateConfirmPassword} placeholder= "Confirm Password"/>

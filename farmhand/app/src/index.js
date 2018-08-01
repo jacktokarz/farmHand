@@ -15,7 +15,7 @@ import { listenForMatches } from './utils';
 
 const storeInstance= Store({});
 
-listenForMatches(storeInstance);
+listenForMatches(storeInstance.dispatch);
 
 
 ReactDOM.render(

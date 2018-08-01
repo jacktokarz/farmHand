@@ -12,14 +12,14 @@ const mapStateToProps= state => { console.log("matches are: "+getMatches(state))
 
 const mapDispatchToProps= dispatch => ({
 	createMatch: () => { createMatch(); },
-	entryAction: (item, e) => {
+	entryAction: (item, history) => {
 		if(item.actionLabel === "Play Match") {
 	    	setCookie("match", item.key);
-	    	history => { history.push('/match') };
+	    	history.push('/match');
 	    }
 	    else if(item.actionLabel === "Start Match") {
 	    	startMatch(item.key);
-	    	history => { history.push('/match') };
+	    	history.push('/match');
 	    }
 	    else if(item.actionLabel === "Join Match") {
 	      joinMatch(item.key, item.playerList);

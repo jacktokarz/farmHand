@@ -29,9 +29,7 @@ export function checkLogin(dispatch, un, pw) {
       console.log("db pw: "+snapshot.val());
       const password= snapshot.val();
       if(password === pw) {
-        setCookie("user", un);
-        user= un;
-        dispatch(fromHeader.logIn(un));
+        loginUser(un, dispatch);
       }
       else if(password === null) {
         dispatch(fromHeader.setErrorMessage("Incorrect Username"));
@@ -41,6 +39,13 @@ export function checkLogin(dispatch, un, pw) {
       }
     });
   }
+}
+
+export function loginUser(un, dispatch) {
+  setCookie("user", un);
+  user= un;
+  listenForMatches(dispatch);
+  dispatch(fromHeader.logIn(un));
 }
 
 export function checkRegister(dispatch, un, pw, cp) {
@@ -61,7 +66,7 @@ export function checkRegister(dispatch, un, pw, cp) {
         dispatch(fromHeader.setRegisterErrorMessage("Username Already Taken"));
       }
       else {
-        registerUser(un, pw);
+        registerUser(un, pw, dispatch);
         dispatch(fromHeader.registerUser(un));
       }
     });
@@ -97,8 +102,11 @@ export function deleteCookie(cname) {
     document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
 }
 
+export function getCardInfo(id) {
+  console.log("gonna get the info for card "+id);
+}
+
 export function getCookie(cname) {
-  console.log("calling get cookie");
     var name = cname + "=";
     var ca = document.cookie.split(';');
     for(var i = 0; i < ca.length; i++) {
@@ -107,10 +115,22 @@ export function getCookie(cname) {
             c = c.substring(1);
         }
         if (c.indexOf(name) == 0) {
+            console.log("calling get cookie, got: "+c.substring(name.length, c.length));
             return c.substring(name.length, c.length);
         }
     }
     return null;
+}
+
+export function getMatchPlayers(matchId) {
+  console.log("getting match players");
+  database.ref('matches/'+matchId).once('value')
+    .then(function(snapshot) {
+      const pOne= snapshot.child('/playerOne').val();
+      const pTwo= snapshot.child('/playerTwo').val();
+      const pThree= snapshot.child('/playerThree').val();
+      return [pOne, pTwo, pThree];
+    });
 }
 
 export function joinMatch(key, playerList) {
@@ -129,7 +149,7 @@ export function joinMatch(key, playerList) {
   database.ref().update(updates);
 }
 
-export function listenForMatches(store) {
+export function listenForMatches(dispatch) {
   console.log("retrieving matches");
   database.ref('matches/').on('value', snapshot => {
     const matchList= [];
@@ -137,7 +157,7 @@ export function listenForMatches(store) {
       const pOne= childSnapshot.child('/playerOne').val();
       const pTwo= childSnapshot.child('/playerTwo').val();
       const pThree= childSnapshot.child('/playerThree').val();
-      console.log("this match has p1- "+pOne+" and p2 "+pTwo+" and p3 "+pThree);
+      console.log("this match has p1- "+pOne+" and p2 "+pTwo+" and p3 "+pThree+'\n'+"And the user is: "+user);
       const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n != undefined }).join(', ');
       const inMatch= (user === pOne || user === pTwo || user === pThree);
       const matchFull= (pOne!==null && pTwo!==null && pThree!==null);
@@ -163,7 +183,7 @@ export function listenForMatches(store) {
     });
     matchList.sort(function(a, b) {a.key - b.key});
     matchList.reverse();
-    store.dispatch(fromLobby.save(matchList));
+    dispatch(fromLobby.save(matchList));
   });
 }
 
@@ -175,7 +195,7 @@ export function playMatch(key) {
   console.log("playing match "+key);
 }
 
-export function registerUser(username, password) {
+export function registerUser(username, password, dispatch) {
   database.ref('users/'+username+'/').set({
     password: password,
   }, function(error) {
@@ -183,8 +203,7 @@ export function registerUser(username, password) {
       console.log("user submission error");
     }
     else {
-      setCookie("user", username);
-      user = username;
+      loginUser(username, dispatch);
       console.log("user should be registered");
     }
   });

@@ -23,7 +23,7 @@ const Lobby= ({createMatch, entryAction, history, matches}) => (
               </td>
               <td>
                 <button 
-                  className={i.actionLabel=="" ? "hidden": "tableAction"} 
+                  className={i.actionLabel=="" ? "hidden": "btn"} 
                   onClick={() => entryAction(i, history)}
                 >
                   {i.actionLabel}

@@ -1,9 +1,10 @@
 export const actionTypes= {
+	OPENCARDMODAL: 'match openCardModal',
 	SAVE: 'match save',
 }
 
 
-export const save= (text) => ({
-	type: actionTypes.SAVE,
-	payload: text
+export const openCardModal= (id) => ({
+	type: actionTypes.OPENCARDMODAL,
+	payload: id,
 })
