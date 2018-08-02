@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 import cardBack from '../images/cardBack.png'
 
-import {Card} from '../containers'
+import {Card, CardModal} from '../containers'
 import {getCookie, getMatchPlayers} from '../utils'
 
 
@@ -16,7 +16,7 @@ const players= getMatchPlayers(matchId);
 const Match= ({cardModalActions, cardModalId, cardModalVis, currentPlayer, history, market, marketDeck, trashPile, userHand}) => (
 	<div className="App container-fluid" style={{"height": "99vh"}}>
    		<div className="row testingMatch" style={{"height": "100%"}}>
-	   		<div className="col-sm-2">
+	   		<div className="col-sm-2 column">
 	   			<div style={{"height": "45%"}}>
 					<img className="field" src="https://preview.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
 	    			<img className="field" src="https://preview.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
@@ -28,7 +28,7 @@ const Match= ({cardModalActions, cardModalId, cardModalVis, currentPlayer, histo
 	    		</div>
 	    		<div style={{"height": "5%"}}>Player 2 Info</div>
 	   		</div>
-	    	<div className="col-sm-7">
+	    	<div className="col-sm-7 column">
 	    		<div style= {{"height": "30%"}} className="market">
 	    			<Card key={market[0]} place="market" id={market[0]} />
 	    			<Card key={market[1]} place="market" id={market[1]} />
@@ -50,7 +50,7 @@ const Match= ({cardModalActions, cardModalId, cardModalVis, currentPlayer, histo
 	    			<Card key={userHand[4]} place="userHand" id={userHand[4]} />
 	    		</div>
 	    	</div>
-	    	<div className="col-sm-3">
+	    	<div className="col-sm-3 column">
 	    		<div style= {{"height": "25%"}}>
 	    			<img className="communityField" src="https://preview.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
 	    		</div>
@@ -64,6 +64,7 @@ const Match= ({cardModalActions, cardModalId, cardModalVis, currentPlayer, histo
 	    			<img className="yourDiscard" src="https://preview.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
 	    		</div>
 	    	</div>
+	    	<CardModal id= {cardModalId} vis= {cardModalVis} />
 	    </div>
 	</div>
 )

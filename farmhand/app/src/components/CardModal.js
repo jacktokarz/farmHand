@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import {} from '../utils'
 
 
-const CardModal= ({id}) => (
-  <div className="">THIS IS A MODAL for card {id}!</div>
+const CardModal= ({actions, closeModal, id, vis}) => (
+	<div style={{display: vis}} onClick= {closeModal}>A thing is here! {id}</div>
 )
 
 CardModal.propTypes = {

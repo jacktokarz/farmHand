@@ -8,12 +8,13 @@ import {} from '../utils'
 const mapStateToProps= (state, ownProps) => (
 	{
 		id: ownProps.id,
+		vis: ownProps.vis,
 	}
 )
 
-const mapDispatchToProps= dispatch => {
-	
-}
+const mapDispatchToProps= dispatch => ({
+	closeModal: () => dispatch(fromMatch.closeCardModal()),
+})
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(CardModal)

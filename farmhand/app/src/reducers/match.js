@@ -18,6 +18,12 @@ export default (state=initState, action) => {
 				cardModalId: action.payload,
 				cardModalVis: "block",
 			};
+		case fromMatch.actionTypes.CLOSECARDMODAL:
+			return {...state, 
+				cardModalId: 0,
+				cardModalVis: "none",
+			};
+
 	}
 	return state;
 }
