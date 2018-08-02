@@ -9,6 +9,7 @@ const mapStateToProps= (state, ownProps) => (
 	{
 		id: ownProps.id,
 		vis: ownProps.vis,
+		data: ownProps.data,
 	}
 )
 

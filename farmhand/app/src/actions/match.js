@@ -4,9 +4,9 @@ export const actionTypes= {
 }
 
 
-export const openCardModal= (id) => ({
+export const openCardModal= (data) => ({
 	type: actionTypes.OPENCARDMODAL,
-	payload: id,
+	payload: data,
 })
 
 

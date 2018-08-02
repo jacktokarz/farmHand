@@ -6,14 +6,15 @@ import {Card} from '../components'
 import {} from '../utils'
 
 
-const mapStateToProps= (state, ownProps) => (
+const mapStateToProps= (state, ownProps) => { console.log("own props in card: "+JSON.stringify(ownProps)); return (
 	{
 		handSize: ownProps.place==="market" ? 6 : getHandSize(state),
+		data: ownProps.data,
 	}
-)
+) }
 
 const mapDispatchToProps= (dispatch, ownProps) => ({
-	openCardModal: (id) => dispatch(fromMatch.openCardModal(ownProps.id)),
+	openCardModal: () => dispatch(fromMatch.openCardModal(ownProps.id)),
 })
 
 

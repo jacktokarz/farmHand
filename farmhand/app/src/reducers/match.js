@@ -1,26 +1,26 @@
 import {fromMatch} from '../actions'
-import {} from '../utils'
+import {marketArray, shuffleArray, startingHandArray} from '../utils'
 
 const initState= 
 	{
 		cardModalActions: [],
 		cardModalVis: "none",
-		cardModalId: 0,
+		cardModalData: {},
 		handSize: 5,
-		market: [1,2,3,4,5,6],
-		userHand: [11, 15, 28, 7, 3],
+		market: shuffleArray(marketArray),
+		userHand: shuffleArray(startingHandArray),
 	};
 
 export default (state=initState, action) => {
 	switch(action.type) {
 		case fromMatch.actionTypes.OPENCARDMODAL:
 			return {...state, 
-				cardModalId: action.payload,
+				cardModalData: action.payload,
 				cardModalVis: "block",
 			};
 		case fromMatch.actionTypes.CLOSECARDMODAL:
 			return {...state, 
-				cardModalId: 0,
+				cardModalData: {},
 				cardModalVis: "none",
 			};
 

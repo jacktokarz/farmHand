@@ -133,6 +133,10 @@ export function getMatchPlayers(matchId) {
     });
 }
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
 export function joinMatch(key, playerList) {
   console.log("joining match "+key);
   const players= playerList.split(", ");
@@ -212,6 +216,21 @@ export function registerUser(username, password, dispatch) {
 export function setCookie(cname, cvalue) {
     document.cookie = cname + "=" + cvalue + ";expires=Thu, 21 July 2050 01:00:00 UTC;";
     console.log(cname+" cookie set as "+cvalue);
+}
+
+export function shuffleArray(initialArray) {
+  var randomIndex;
+  var finalArray= [];
+  while(initialArray.length > 0) {
+    randomIndex= getRandomInt(initialArray.length);
+    finalArray.push(initialArray[randomIndex]);
+    // this is going to move the value of the final entry into the selected entry, so I can pop the final entry. If the selected one is the final one, no need to swap.
+    if(randomIndex != initialArray.length-1) {
+      initialArray[randomIndex]= initialArray[initialArray.length-1];
+    }
+    initialArray.pop();
+  }
+  return finalArray;
 }
 
 export function startMatch(key) {

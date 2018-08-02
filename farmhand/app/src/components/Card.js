@@ -3,15 +3,15 @@ import PropTypes from 'prop-types'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 import {CardModal} from '../containers'
-import {} from '../utils'
+import {cardBackSrc} from '../utils'
 
 
-const Card= ({openCardModal, handSize}) => (
+const Card= ({data, handSize, openCardModal}) => (
     <img 
       className="card" 
       style={{"maxWidth": (100/handSize-1)+"%"}} 
       onClick={openCardModal} 
-      src="https://preview.ibb.co/eoVC8o/cardBack.png" alt="cardBack"
+      src={data.picture} alt={data.title}
     />
 
 )

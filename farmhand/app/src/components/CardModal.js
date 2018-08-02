@@ -4,10 +4,7 @@ import PropTypes from 'prop-types'
 import {} from '../utils'
 
 
-const CardModal= ({actions, closeModal, id, vis}) => (
-
-
-
+const CardModal= ({actions, closeModal, data, vis}) => (
 
 	<div style={{display: vis}} className="modal">
 		<div className="modal-content">
@@ -15,7 +12,7 @@ const CardModal= ({actions, closeModal, id, vis}) => (
     			<span onClick={closeModal} className="close">&times;</span>
     		</div>
     		<div className="modal-body">
-				<div>Here's the info for {id}</div>
+				<img src={data.picture} alt={data.title} />					
 			</div>
     	</div>
     </div>
