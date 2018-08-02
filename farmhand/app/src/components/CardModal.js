@@ -5,7 +5,20 @@ import {} from '../utils'
 
 
 const CardModal= ({actions, closeModal, id, vis}) => (
-	<div style={{display: vis}} onClick= {closeModal}>A thing is here! {id}</div>
+
+
+
+
+	<div style={{display: vis}} className="modal">
+		<div className="modal-content">
+    		<div className="modal-header">
+    			<span onClick={closeModal} className="close">&times;</span>
+    		</div>
+    		<div className="modal-body">
+				<div>Here's the info for {id}</div>
+			</div>
+    	</div>
+    </div>
 )
 
 CardModal.propTypes = {
