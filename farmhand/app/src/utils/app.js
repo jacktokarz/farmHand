@@ -1,5 +1,6 @@
 import firebase from 'firebase';
-import { fromHeader, fromLobby } from '../actions'
+import { fromHeader, fromLobby, fromMatch } from '../actions'
+import { defaultMarketArray } from './'
 
 
 var user= getCookie('user');
@@ -41,13 +42,6 @@ export function checkLogin(dispatch, un, pw) {
   }
 }
 
-export function loginUser(un, dispatch) {
-  setCookie("user", un);
-  user= un;
-  listenForMatches(dispatch);
-  dispatch(fromHeader.logIn(un));
-}
-
 export function checkRegister(dispatch, un, pw, cp) {
   if(un.length < 2) {
     dispatch(fromHeader.setRegisterErrorMessage("You must submit a username of at least 2 characters"));
@@ -86,6 +80,7 @@ export function createMatch() {
           playerThree: null,
           status: "pending",
           date: todayDate,
+          market: shuffleArray(defaultMarketArray),
         }, function(error) {
           if(error) {
             console.log("match submission error");
@@ -123,7 +118,6 @@ export function getCookie(cname) {
 }
 
 export function getMatchPlayers(matchId) {
-  console.log("getting match players");
   database.ref('matches/'+matchId).once('value')
     .then(function(snapshot) {
       const pOne= snapshot.child('/playerOne').val();
@@ -154,19 +148,16 @@ export function joinMatch(key, playerList) {
 }
 
 export function listenForMatches(dispatch) {
-  console.log("retrieving matches");
   database.ref('matches/').on('value', snapshot => {
     const matchList= [];
     snapshot.forEach(function(childSnapshot) {
       const pOne= childSnapshot.child('/playerOne').val();
       const pTwo= childSnapshot.child('/playerTwo').val();
       const pThree= childSnapshot.child('/playerThree').val();
-      console.log("this match has p1- "+pOne+" and p2 "+pTwo+" and p3 "+pThree+'\n'+"And the user is: "+user);
       const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n != undefined }).join(', ');
       const inMatch= (user === pOne || user === pTwo || user === pThree);
       const matchFull= (pOne!==null && pTwo!==null && pThree!==null);
       const status= childSnapshot.child('/status').val();
-  console.log("in match? "+inMatch+"... full? "+matchFull+"... status: "+status);
       var label= "";
       if(inMatch) {
         if(status === "pending") {
@@ -189,6 +180,23 @@ export function listenForMatches(dispatch) {
     matchList.reverse();
     dispatch(fromLobby.save(matchList));
   });
+}
+
+export function listenForMatchMarketArray(dispatch) {
+  const matchId= getCookie("match");
+  console.log("going to get match market array for match "+matchId);
+  database.ref('/matches/'+matchId+'/market/').once("value")
+    .then(function(snapshot) {
+      console.log("market array from matches is: "+JSON.stringify(snapshot.val()));
+      dispatch(fromMatch.saveMarketArray(snapshot.val()));
+    } );
+}
+
+export function loginUser(un, dispatch) {
+  setCookie("user", un);
+  user= un;
+  listenForMatches(dispatch);
+  dispatch(fromHeader.logIn(un));
 }
 
 export function openRules() {

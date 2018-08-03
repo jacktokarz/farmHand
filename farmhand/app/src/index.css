@@ -169,19 +169,32 @@ body {
     color: white;
 }
 
-.modal-body {padding: 2px 16px;}
+.modal-body {
+	padding: 2px 16px;
+}
 
 .modal-content {
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 60%;
+    max-width: 60%;
+    max-height: 60%;
+    width: auto;
+    height: auto;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
     animation-duration: 0.4s
+}
+
+.modal-img {
+	max-height: 50%;
+	height: auto;
+	max-width: 50%;
+	width: auto;
+	display: inline-block;
 }
 
 /* Add Animation */

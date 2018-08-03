@@ -11,8 +11,8 @@ const CardModal= ({actions, closeModal, data, vis}) => (
     		<div className="modal-header">
     			<span onClick={closeModal} className="close">&times;</span>
     		</div>
-    		<div className="modal-body">
-				<img src={data.picture} alt={data.title} />					
+    		<div className="modal-body justify-content-around">
+				<img className="modal-img" src={data.picture} alt={data.title} />					
 			</div>
     	</div>
     </div>

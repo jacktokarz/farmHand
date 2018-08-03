@@ -1,5 +1,6 @@
 import {fromMatch} from '../actions'
-import {marketArray, shuffleArray, startingHandArray} from '../utils'
+import {getMatchMarketArray, shuffleArray, oneStartingHandMap} from '../utils'
+
 
 const initState= 
 	{
@@ -7,8 +8,8 @@ const initState=
 		cardModalVis: "none",
 		cardModalData: {},
 		handSize: 5,
-		market: shuffleArray(marketArray),
-		userHand: shuffleArray(startingHandArray),
+		marketArray: [0,0,0,0,0,0],
+		userHandArray: [0,0,0,0,0,0],
 	};
 
 export default (state=initState, action) => {
@@ -22,6 +23,10 @@ export default (state=initState, action) => {
 			return {...state, 
 				cardModalData: {},
 				cardModalVis: "none",
+			};
+		case fromMatch.actionTypes.SAVEMARKETARRAY:
+			return {...state, 
+				marketArray: action.payload,
 			};
 
 	}

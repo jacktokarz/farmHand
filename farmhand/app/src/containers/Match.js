@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {getCardModalActions, getCardModalData, getCardModalVis, getHandSize, getMarket, getUserHand} from '../selectors'
+import {getCardModalActions, getCardModalData, getCardModalVis, getHandSize, getMarketArray, getUserHandArray} from '../selectors'
 import {fromMatch} from '../actions'
 import {Match} from '../components'
 import {} from '../utils'
@@ -11,8 +11,8 @@ const mapStateToProps= state => ({
 	cardModalData: getCardModalData(state),
 	cardModalVis: getCardModalVis(state),
 	handSize: getHandSize(state),
-	market: getMarket(state),
-	userHand: getUserHand(state),
+	marketArray: getMarketArray(state),
+	userHandArray: getUserHandArray(state),
 })
 
 const mapDispatchToProps= dispatch => ({

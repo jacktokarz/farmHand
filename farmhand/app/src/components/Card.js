@@ -10,8 +10,8 @@ const Card= ({data, handSize, openCardModal}) => (
     <img 
       className="card" 
       style={{"maxWidth": (100/handSize-1)+"%"}} 
-      onClick={openCardModal} 
-      src={data.picture} alt={data.title}
+      onClick={() => openCardModal(data)} 
+      src={data.picture}
     />
 
 )

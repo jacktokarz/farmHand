@@ -10,13 +10,13 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
-import { listenForMatches } from './utils';
+import { listenForMatches, listenForMatchMarketArray } from './utils';
 
 
 const storeInstance= Store({});
 
 listenForMatches(storeInstance.dispatch);
-
+listenForMatchMarketArray(storeInstance.dispatch);
 
 ReactDOM.render(
 	<Provider store={storeInstance}>
