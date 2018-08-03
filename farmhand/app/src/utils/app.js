@@ -1,9 +1,10 @@
 import firebase from 'firebase';
 import { fromHeader, fromLobby, fromMatch } from '../actions'
-import { defaultMarketArray } from './'
+import { defaultMarketArray, defaultStartingArray } from './'
 
 
 var user= getCookie('user');
+let matchId= getCookie("match");
 
 const config = {
     apiKey: "AIzaSyBreOUIUqC9gFC2pX5VrcsvTaHqVwpTJWI",
@@ -74,8 +75,13 @@ export function createMatch() {
   keyQuery.once("value")
     .then(function(snapshot) {
       snapshot.forEach(function(childSnapshot) {
+        const pOneDeck= shuffleArray(defaultStartingArray);
         database.ref('matches/'+(parseInt(childSnapshot.key)+1)).set({
-          playerOne: user,
+          playerOne: {
+            user: user,
+            deck: pOneDeck,
+            hand: [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()],
+          },
           playerTwo: null,
           playerThree: null,
           status: "pending",
@@ -94,8 +100,26 @@ export function createMatch() {
 }
 
 export function deleteCookie(cname) {
-    document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+  document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
 }
+
+// export function drawFromDeck(deck, discard) {
+//   if(deck.length > 0) {
+//     return deck.pop();
+//   }
+//   else {
+//     console.log("discard is: "+JSON.stringify(discard));
+//     const shuffledDiscard= shuffleArray(discard);
+//     deck= ...shuffledDiscard;
+//     return deck.pop();
+//   }
+// }
+
+// export function endTurn(dispatch, deck, discard) {
+//   console.log("ending turn");
+//   const hand= [drawFromDeck(deck, discard), drawFromDeck(deck, discard), drawFromDeck(deck, discard), drawFromDeck(deck, discard), drawFromDeck(deck, discard)];
+//   dispatch(fromMatch.endTurn(deck, discard, hand));
+// }
 
 export function getCardInfo(id) {
   console.log("gonna get the info for card "+id);
@@ -118,11 +142,13 @@ export function getCookie(cname) {
 }
 
 export function getMatchPlayers(matchId) {
-  database.ref('matches/'+matchId).once('value')
+  database.ref('matches/'+matchId+'/').once('value')
     .then(function(snapshot) {
-      const pOne= snapshot.child('/playerOne').val();
-      const pTwo= snapshot.child('/playerTwo').val();
-      const pThree= snapshot.child('/playerThree').val();
+      const pOne= snapshot.child('playerOne/').child('/user').val();
+      const pTwo= snapshot.child('playerTwo/').child('/user').val();
+      const pThree= snapshot.child('playerThree/').child('/user').val();
+
+      console.log("match players: "+[pOne, pTwo, pThree]);
       return [pOne, pTwo, pThree];
     });
 }
@@ -134,15 +160,21 @@ function getRandomInt(max) {
 export function joinMatch(key, playerList) {
   console.log("joining match "+key);
   const players= playerList.split(", ");
+  const deck= shuffleArray(defaultStartingArray);
+  const updateObject= {
+      user: user, 
+      deck: deck,
+      hand: [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()],
+    };
   for(var i=0; i < players.length; i++) {
     console.log("player "+i+" of players: "+players[i]);
   }
   var updates= {};
   if(players.length > 1) {
-    updates['matches/'+key+'/playerThree']= user;
+    updates['matches/'+key+'/playerThree']= updateObject;
   }
   else {
-    updates['matches/'+key+'/playerTwo']= user;
+    updates['matches/'+key+'/playerTwo']= updateObject;
   }
   database.ref().update(updates);
 }
@@ -151,9 +183,9 @@ export function listenForMatches(dispatch) {
   database.ref('matches/').on('value', snapshot => {
     const matchList= [];
     snapshot.forEach(function(childSnapshot) {
-      const pOne= childSnapshot.child('/playerOne').val();
-      const pTwo= childSnapshot.child('/playerTwo').val();
-      const pThree= childSnapshot.child('/playerThree').val();
+      const pOne= childSnapshot.child('/playerOne').child('/user').val();
+      const pTwo= childSnapshot.child('/playerTwo').child('/user').val();
+      const pThree= childSnapshot.child('/playerThree').child('/user').val();
       const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n != undefined }).join(', ');
       const inMatch= (user === pOne || user === pTwo || user === pThree);
       const matchFull= (pOne!==null && pTwo!==null && pThree!==null);
@@ -183,13 +215,35 @@ export function listenForMatches(dispatch) {
 }
 
 export function listenForMatchMarketArray(dispatch) {
-  const matchId= getCookie("match");
   console.log("going to get match market array for match "+matchId);
   database.ref('/matches/'+matchId+'/market/').once("value")
     .then(function(snapshot) {
       console.log("market array from matches is: "+JSON.stringify(snapshot.val()));
       dispatch(fromMatch.saveMarketArray(snapshot.val()));
     } );
+}
+
+export function listenForMatchUpdates(dispatch) {
+  listenForMatchMarketArray(dispatch);
+  listenForPlayerOneUpdates(dispatch);
+}
+
+export function listenForPlayerOneUpdates(dispatch) {
+  database.ref('/matches/'+matchId+'/playerOne/user').once("value")
+    .then(function(snapshot) {
+      console.log("player One from matches is: "+JSON.stringify(snapshot.val()));
+      dispatch(fromMatch.savePlayerOneUser(snapshot.val()));
+    } );
+  database.ref('/matches/'+matchId+'/playerOne/deck/').on("value", snapshot => {
+    dispatch(fromMatch.savePlayerOneDeck(snapshot.val()));
+  });
+  database.ref('/matches/'+matchId+'/playerOne/discard/').on("value", snapshot => {
+    dispatch(fromMatch.savePlayerOneDiscard(snapshot.val()));
+  });
+  database.ref('/matches/'+matchId+'/playerOne/hand/').on("value", snapshot => {
+    console.log("!!!!!!!!!!!!! hand: "+snapshot.val());
+    dispatch(fromMatch.savePlayerOneHand(snapshot.val()));
+  });
 }
 
 export function loginUser(un, dispatch) {
@@ -203,8 +257,10 @@ export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
 }
 
-export function playMatch(key) {
+export function playMatch(key, dispatch) {
   console.log("playing match "+key);
+  setCookie("match", key);
+  matchId= key;
 }
 
 export function registerUser(username, password, dispatch) {
@@ -243,7 +299,6 @@ export function shuffleArray(initialArray) {
 
 export function startMatch(key) {
   console.log("starting match "+key);
-  setCookie("match", key);
   var updates= {};
   updates['matches/'+key+'/status']= "in progress";
   database.ref().update(updates);

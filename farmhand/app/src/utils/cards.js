@@ -8,7 +8,20 @@ export let defaultMarketArray= [
 	5
 ]
 
-export const marketMap= {
+export let defaultStartingArray= [
+	1001,
+	1002,
+	1003,
+	1004,
+	1005,
+	1006,
+	1007,
+	1008,
+	1009,
+	1010
+]
+
+export const cardMap= {
 	0: {
 		title: "card back",
 		picture: cardBackSrc
@@ -84,12 +97,9 @@ export const marketMap= {
 		secondary: {
 			scrap: 1		
 		}
-	}
-}
+	},
 
-
-export const oneStartingHandMap= {
-	1: {
+	1001: {
 		title: "Basic Seed",
 		type: "seed",
 		picture: "https://image.ibb.co/jmcC8z/Basic_Seed_3.png",
@@ -101,7 +111,7 @@ export const oneStartingHandMap= {
 			plenty: 1		
 		}
 	},
-	2: {
+	1002: {
 		title: "Basic Seed",
 		type: "seed",
 		picture: "https://image.ibb.co/jeNC8z/Basic_Seed_2.png",
@@ -113,7 +123,7 @@ export const oneStartingHandMap= {
 			plenty: 1		
 		}
 	},
-	3: {
+	1003: {
 		title: "Basic Seed",
 		type: "seed",
 		picture: "https://image.ibb.co/dMhqve/Basic_Seed_1.png",
@@ -125,7 +135,7 @@ export const oneStartingHandMap= {
 			plenty: 1		
 		}
 	},
-	4: {
+	1004: {
 		title: "Wagon",
 		type: "tool",
 		picture: "https://image.ibb.co/cJftFe/Wagon_3.png",
@@ -138,7 +148,7 @@ export const oneStartingHandMap= {
 			coin: 1		
 		}
 	},
-	5: {
+	1005: {
 		title: "Innovation",
 		type: "tool",
 		picture: "https://image.ibb.co/gzVcae/Innovation_1.png",
@@ -152,7 +162,7 @@ export const oneStartingHandMap= {
 			coin: 1		
 		}
 	},
-	6: {
+	1006: {
 		title: "Cleanup",
 		type: "tool",
 		picture: "https://image.ibb.co/m5MTgK/Clean_Up_1.png",
@@ -166,7 +176,7 @@ export const oneStartingHandMap= {
 			plant: 1		
 		}	
 	},
-	7: {
+	1007: {
 		title: "Shovel",
 		type: "tool",
 		picture: "https://image.ibb.co/dumYFe/Shovel_3.png",
@@ -184,7 +194,7 @@ export const oneStartingHandMap= {
 		},
 		secondary: {}
 	},
-	8: {
+	1008: {
 		title: "Rusty Scythe",
 		type: "tool",
 		picture: "https://image.ibb.co/b3aFTz/Rusty_Scythe_1.png",
@@ -203,7 +213,7 @@ export const oneStartingHandMap= {
 		},
 		secondary: {}
 	},
-	9: {
+	1009: {
 		title: "Dull Scythe",
 		type: "tool",
 		picture: "https://image.ibb.co/exGHae/Dull_Scythe_1.png",
@@ -222,7 +232,7 @@ export const oneStartingHandMap= {
 		},
 		secondary: {}
 	},
-	10: {
+	1010: {
 		title: "Fortune",
 		type: "tool",
 		picture: "https://image.ibb.co/ebpEMK/Fortune_1.png",
@@ -242,7 +252,11 @@ export const oneStartingHandMap= {
 		},
 		secondary: {}
 	}
+
+
 }
+
+
 
 /*
 {

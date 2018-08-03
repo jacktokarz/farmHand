@@ -9,10 +9,25 @@ import {cardBackSrc, getCookie, getMatchPlayers} from '../utils'
 
 const user = getCookie('user');
 const matchId= getCookie('match');
-const players= getMatchPlayers(matchId);
 
 
-const Match= ({cardModalActions, cardModalData, cardModalVis, closeModal, currentPlayer, history, market, marketArray, trashPile, userHandArray}) => { console.log("players in match are: "+players); return (
+const Match= ({
+		cardModalActions, 
+		cardModalData, 
+		cardModalVis, 
+		closeModal, 
+		currentPlayer,
+		endTurn,
+		history, 
+		market, 
+		marketArray,
+		playerOneDeck,
+		playerOneDiscard,
+		playerOneHand,
+		playerOneUser, 
+		trashPile, 
+		userHandArray
+	}) => (
 	<div className="App container-fluid" style={{"height": "99vh"}} onClick={() => (cardModalVis != "none" ? closeModal() : "") }>
    		<div className="row testingMatch" style={{"height": "100%"}}>
 	   		<div className="col-sm-2 column">
@@ -40,12 +55,14 @@ const Match= ({cardModalActions, cardModalData, cardModalVis, closeModal, curren
 	    			</div>
 	    		</div>
 	    		<div style= {{"height": "35%"}}>Play Area</div>
-	    		<div style= {{"height": "5%"}}>Stats and Buttons</div>
+	    		<div style= {{"height": "5%"}}>Stats and Buttons
+	    			<button className="btn" onClick={() => endTurn(playerOneDeck, playerOneDiscard, playerOneHand)}>End Turn</button>
+
+	    		</div>
 	    		<div style= {{"height": "30%"}} className="yourHand">
-	    			<Card  place="userHand" id={userHandArray[0]} />
-	    			<Card  place="userHand" id={userHandArray[1]} />
-	    			<Card  place="userHand" id={userHandArray[2]} />
-	    			<Card  place="userHand" id={userHandArray[3]} />
+	    			{playerOneHand.map((i, index) => (
+						<Card  place="userHand" id={i} />
+					))}
 	    		</div>
 	    	</div>
 	    	<div className="col-sm-3 column">
@@ -65,7 +82,7 @@ const Match= ({cardModalActions, cardModalData, cardModalVis, closeModal, curren
 	    	<CardModal data= {cardModalData} vis= {cardModalVis} />
 	    </div>
 	</div>
-) }
+)
 
 Match.propTypes = {
 
