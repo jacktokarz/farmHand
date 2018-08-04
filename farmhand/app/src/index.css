@@ -88,6 +88,19 @@ body {
 	border: 2px black solid;
 }
 
+.textOverImage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.userDeckArea {
+    position: relative;
+    text-align: center;
+    color: gray;
+}
+
 .yourDeck {
 	width: auto;
 	max-width: 30%;
@@ -95,7 +108,7 @@ body {
 	margin-top: 3%;
 	margin-left: 10%;
 	margin-right: 10%;
-	display: inline-block;
+	display: inline-block ;
 }
 
 .yourDiscard {

@@ -6,10 +6,12 @@ import {Card} from '../components'
 import {cardMap} from '../utils'
 
 
-const mapStateToProps= (state, ownProps) => { console.log("own props in card: "+JSON.stringify(ownProps)); const mapId= ownProps.id; console.log("data: "+JSON.stringify(cardMap[mapId])); return (
+
+
+const mapStateToProps= (state, ownProps) => { console.log("own props in card: "+JSON.stringify(ownProps)); return (
 	{
-		handSize: ownProps.place==="market" ? 6 : getHandSize(state),
 		data: cardMap[ownProps.id],
+		handSize: ownProps.place==="market" ? 6 : getHandSize(state),
 	}
 ) }
 

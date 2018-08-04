@@ -4,19 +4,14 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 
 import {Card, CardModal} from '../containers'
-import {cardBackSrc, getCookie, getMatchPlayers} from '../utils'
-
-
-const user = getCookie('user');
-const matchId= getCookie('match');
+import {cardBackSrc} from '../utils'
 
 
 const Match= ({
 		cardModalActions, 
 		cardModalData, 
 		cardModalVis, 
-		closeModal, 
-		currentPlayer,
+		closeModal,
 		endTurn,
 		history, 
 		market, 
@@ -25,7 +20,9 @@ const Match= ({
 		playerOneDiscard,
 		playerOneHand,
 		playerOneUser, 
-		trashPile, 
+		trashPile,
+		user,
+		userPlayerNumber,
 		userHandArray
 	}) => (
 	<div className="App container-fluid" style={{"height": "99vh"}} onClick={() => (cardModalVis != "none" ? closeModal() : "") }>
@@ -55,9 +52,9 @@ const Match= ({
 	    			</div>
 	    		</div>
 	    		<div style= {{"height": "35%"}}>Play Area</div>
-	    		<div style= {{"height": "5%"}}>Stats and Buttons
-	    			<button className="btn" onClick={() => endTurn(playerOneDeck, playerOneDiscard, playerOneHand)}>End Turn</button>
-
+	    		<div style= {{"height": "5%"}}>
+	    			{user}: {userPlayerNumber} 
+	    			<button onClick={() => endTurn(playerOneDeck, playerOneDiscard, playerOneHand)}>End Turn</button>
 	    		</div>
 	    		<div style= {{"height": "30%"}} className="yourHand">
 	    			{playerOneHand.map((i, index) => (
@@ -75,8 +72,11 @@ const Match= ({
 	    		</div>
 	    		<div style={{"height": "5%"}}>Buffer Zone</div>
 	    		<div style= {{"height": "20%"}}>
-	    			<img className="yourDeck" src={cardBackSrc} alt="cardBack" />
-	    			<img className="yourDiscard" src="https://preview.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
+	    			<div className="userDeckArea">
+		    			<img className="yourDeck" src={cardBackSrc} alt="cardBack" />
+		    			<div className="textOverImage">{playerOneDeck===null ? 0 : playerOneDeck.length}</div>
+		    			<img className="yourDiscard" src="https://preview.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
+		    		</div>
 	    		</div>
 	    	</div>
 	    	<CardModal data= {cardModalData} vis= {cardModalVis} />

@@ -3,9 +3,6 @@ import { fromHeader, fromLobby, fromMatch } from '../actions'
 import { defaultMarketArray, defaultStartingArray } from './'
 
 
-var user= getCookie('user');
-let matchId= getCookie("match");
-
 const config = {
     apiKey: "AIzaSyBreOUIUqC9gFC2pX5VrcsvTaHqVwpTJWI",
     authDomain: "farm-hand-dbc33.firebaseapp.com",
@@ -17,6 +14,11 @@ const config = {
   firebase.initializeApp(config);
 
 export const database= firebase.database();
+
+var user= getCookie('user');
+let matchId= getCookie("match");
+let userPlayerNumber= "";
+
 
 
 export function checkLogin(dispatch, un, pw) {
@@ -50,14 +52,14 @@ export function checkRegister(dispatch, un, pw, cp) {
   else if(pw.length < 4) {
     dispatch(fromHeader.setRegisterErrorMessage("You must submit a password of at least 4 characers"));
   }
-  else if(cp != pw) {
+  else if(cp !== pw) {
     dispatch(fromHeader.setRegisterErrorMessage("The confirm password does not match the password!"));
   }
   else {
     database.ref('/users/' + un).on('value', snapshot => {
       console.log("db un: "+snapshot.val());
       const username= snapshot.val();
-      if(username != null) {
+      if(username !== null) {
         dispatch(fromHeader.setRegisterErrorMessage("Username Already Taken"));
       }
       else {
@@ -75,15 +77,15 @@ export function createMatch() {
   keyQuery.once("value")
     .then(function(snapshot) {
       snapshot.forEach(function(childSnapshot) {
-        const pOneDeck= shuffleArray(defaultStartingArray);
+        let pOneDeck= shuffleArray(defaultStartingArray.slice());
+        let hand= [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()];
+      console.log("creating match with deck "+pOneDeck.toString());
         database.ref('matches/'+(parseInt(childSnapshot.key)+1)).set({
           playerOne: {
             user: user,
             deck: pOneDeck,
-            hand: [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()],
+            hand: hand,
           },
-          playerTwo: null,
-          playerThree: null,
           status: "pending",
           date: todayDate,
           market: shuffleArray(defaultMarketArray),
@@ -115,11 +117,36 @@ export function deleteCookie(cname) {
 //   }
 // }
 
-// export function endTurn(dispatch, deck, discard) {
-//   console.log("ending turn");
-//   const hand= [drawFromDeck(deck, discard), drawFromDeck(deck, discard), drawFromDeck(deck, discard), drawFromDeck(deck, discard), drawFromDeck(deck, discard)];
-//   dispatch(fromMatch.endTurn(deck, discard, hand));
-// }
+function displayError(message) {
+  console.log("ERROR ERROR - "+message);
+}
+
+export function endTurn(dispatch, deck, discard, hand) {
+  deck= (deck === null ? [] : deck);
+  discard= (discard === null ? [] : discard);
+  hand= (hand === null ? [] : hand);
+
+  console.log("ending turn with deck "+JSON.stringify(deck)+'\n'+" and discard "+JSON.stringify(discard)+'\n'+" and hand "+JSON.stringify(hand));
+  let newDiscard= discard.concat(hand);
+  let newHand= [];
+  if(deck.length < 5) {
+    while(deck.length > 0) {
+      newHand.push(deck.pop());
+    }
+    deck= shuffleArray(newDiscard);
+    newDiscard= [];
+    while(newHand.length < 5) {
+      newHand.push(deck.pop());
+    }
+  }
+  else {
+    newHand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+  }
+
+  updateMatchPlayerArray("playerOne", "deck", deck);
+  updateMatchPlayerArray("playerOne", "discard", newDiscard);
+  updateMatchPlayerArray("playerOne", "hand", newHand);
+}
 
 export function getCardInfo(id) {
   console.log("gonna get the info for card "+id);
@@ -130,10 +157,10 @@ export function getCookie(cname) {
     var ca = document.cookie.split(';');
     for(var i = 0; i < ca.length; i++) {
         var c = ca[i];
-        while (c.charAt(0) == ' ') {
+        while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) == 0) {
+        if (c.indexOf(name) === 0) {
             console.log("calling get cookie, got: "+c.substring(name.length, c.length));
             return c.substring(name.length, c.length);
         }
@@ -141,15 +168,19 @@ export function getCookie(cname) {
     return null;
 }
 
-export function getMatchPlayers(matchId) {
+export function getMatchPlayers(dispatch, matchId) {
+  console.log("get match players called ##############");
   database.ref('matches/'+matchId+'/').once('value')
     .then(function(snapshot) {
       const pOne= snapshot.child('playerOne/').child('/user').val();
       const pTwo= snapshot.child('playerTwo/').child('/user').val();
       const pThree= snapshot.child('playerThree/').child('/user').val();
 
-      console.log("match players: "+[pOne, pTwo, pThree]);
-      return [pOne, pTwo, pThree];
+      const matchPlayers= [pOne, pTwo, pThree];
+      console.log("match players: "+matchPlayers);
+
+      setUserPlayer(dispatch, matchPlayers);
+      dispatch(fromMatch.saveMatchPlayers(matchPlayers));
     });
 }
 
@@ -160,24 +191,37 @@ function getRandomInt(max) {
 export function joinMatch(key, playerList) {
   console.log("joining match "+key);
   const players= playerList.split(", ");
-  const deck= shuffleArray(defaultStartingArray);
-  const updateObject= {
+  let deck= shuffleArray(defaultStartingArray.slice());
+  console.log("joining match with players: "+players.toString()+'\n'+"From deck: "+deck.toString());
+  const hand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+  console.log("joining with hand: "+hand.toString());
+  const playerInfo= {
       user: user, 
       deck: deck,
-      hand: [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()],
+      hand: hand,
     };
-  for(var i=0; i < players.length; i++) {
-    console.log("player "+i+" of players: "+players[i]);
-  }
-  var updates= {};
+    console.log("player info: "+playerInfo.toString());
+  let playerObject= {playerTwo: playerInfo};
+  let playerNumber= "playerTwo";
   if(players.length > 1) {
-    updates['matches/'+key+'/playerThree']= updateObject;
+    playerObject= {playerThree: playerInfo};
+    playerNumber= "playerThree";
   }
-  else {
-    updates['matches/'+key+'/playerTwo']= updateObject;
-  }
-  database.ref().update(updates);
+  const matchPath= '/matches/'+key+'/'+playerNumber;
+  insertObject(matchPath, playerInfo);
 }
+
+export function insertObject(dbPath, obj) {
+  database.ref(dbPath).set(obj, function(error) {
+    if(error) {
+      console.log("object submission error");
+    }
+    else {
+      console.log("object inserted");
+    }
+  });
+}
+
 
 export function listenForMatches(dispatch) {
   database.ref('matches/').on('value', snapshot => {
@@ -186,7 +230,8 @@ export function listenForMatches(dispatch) {
       const pOne= childSnapshot.child('/playerOne').child('/user').val();
       const pTwo= childSnapshot.child('/playerTwo').child('/user').val();
       const pThree= childSnapshot.child('/playerThree').child('/user').val();
-      const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n != undefined }).join(', ');
+    console.log("retrieving matches, with players: "+pOne+", "+pTwo+", and "+pThree);
+      const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null }).join(', ');
       const inMatch= (user === pOne || user === pTwo || user === pThree);
       const matchFull= (pOne!==null && pTwo!==null && pThree!==null);
       const status= childSnapshot.child('/status').val();
@@ -226,6 +271,8 @@ export function listenForMatchMarketArray(dispatch) {
 export function listenForMatchUpdates(dispatch) {
   listenForMatchMarketArray(dispatch);
   listenForPlayerOneUpdates(dispatch);
+  listenForPlayerTwoUpdates(dispatch);
+  listenForPlayerThreeUpdates(dispatch);
 }
 
 export function listenForPlayerOneUpdates(dispatch) {
@@ -246,6 +293,42 @@ export function listenForPlayerOneUpdates(dispatch) {
   });
 }
 
+export function listenForPlayerTwoUpdates(dispatch) {
+  database.ref('/matches/'+matchId+'/playerTwo/user').once("value")
+    .then(function(snapshot) {
+      console.log("player Two from matches is: "+JSON.stringify(snapshot.val()));
+      dispatch(fromMatch.savePlayerTwoUser(snapshot.val()));
+    } );
+  database.ref('/matches/'+matchId+'/playerTwo/deck/').on("value", snapshot => {
+    dispatch(fromMatch.savePlayerTwoDeck(snapshot.val()));
+  });
+  database.ref('/matches/'+matchId+'/playerTwo/discard/').on("value", snapshot => {
+    dispatch(fromMatch.savePlayerTwoDiscard(snapshot.val()));
+  });
+  database.ref('/matches/'+matchId+'/playerTwo/hand/').on("value", snapshot => {
+    console.log("!!!!!!!!!!!!! hand: "+snapshot.val());
+    dispatch(fromMatch.savePlayerTwoHand(snapshot.val()));
+  });
+}
+
+export function listenForPlayerThreeUpdates(dispatch) {
+  database.ref('/matches/'+matchId+'/playerThree/user').once("value")
+    .then(function(snapshot) {
+      console.log("player Three from matches is: "+JSON.stringify(snapshot.val()));
+      dispatch(fromMatch.savePlayerThreeUser(snapshot.val()));
+    } );
+  database.ref('/matches/'+matchId+'/playerThree/deck/').on("value", snapshot => {
+    dispatch(fromMatch.savePlayerThreeDeck(snapshot.val()));
+  });
+  database.ref('/matches/'+matchId+'/playerThree/discard/').on("value", snapshot => {
+    dispatch(fromMatch.savePlayerThreeDiscard(snapshot.val()));
+  });
+  database.ref('/matches/'+matchId+'/playerThree/hand/').on("value", snapshot => {
+    console.log("!!!!!!!!!!!!! hand: "+snapshot.val());
+    dispatch(fromMatch.savePlayerThreeHand(snapshot.val()));
+  });
+}
+
 export function loginUser(un, dispatch) {
   setCookie("user", un);
   user= un;
@@ -261,6 +344,7 @@ export function playMatch(key, dispatch) {
   console.log("playing match "+key);
   setCookie("match", key);
   matchId= key;
+  getMatchPlayers(dispatch, matchId);
 }
 
 export function registerUser(username, password, dispatch) {
@@ -282,6 +366,24 @@ export function setCookie(cname, cvalue) {
     console.log(cname+" cookie set as "+cvalue);
 }
 
+function setUserPlayer(dispatch, players) {
+  console.log("setting user ^^^^^^ "+players.toString);
+  if(players[0] === user) {
+    userPlayerNumber= "playerOne";
+  }
+  else if(players[1] === user) {
+    userPlayerNumber= 'playerTwo';
+  }
+  else if(players[2] === user) {
+    userPlayerNumber= "playerThree";
+  }
+  else {
+    displayError("You are not a player in this match!");
+    return "";
+  }
+  dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
+}
+
 export function shuffleArray(initialArray) {
   var randomIndex;
   var finalArray= [];
@@ -289,7 +391,7 @@ export function shuffleArray(initialArray) {
     randomIndex= getRandomInt(initialArray.length);
     finalArray.push(initialArray[randomIndex]);
     // this is going to move the value of the final entry into the selected entry, so I can pop the final entry. If the selected one is the final one, no need to swap.
-    if(randomIndex != initialArray.length-1) {
+    if(randomIndex !== initialArray.length-1) {
       initialArray[randomIndex]= initialArray[initialArray.length-1];
     }
     initialArray.pop();
@@ -301,5 +403,11 @@ export function startMatch(key) {
   console.log("starting match "+key);
   var updates= {};
   updates['matches/'+key+'/status']= "in progress";
+  database.ref().update(updates);
+}
+
+export function updateMatchPlayerArray(player, arrayType, array) {
+  var updates= {};
+  updates['matches/'+matchId+'/'+player+'/'+arrayType]= array;
   database.ref().update(updates);
 }

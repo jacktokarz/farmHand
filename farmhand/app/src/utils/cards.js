@@ -1,6 +1,6 @@
 export const cardBackSrc= "https://image.ibb.co/eoVC8o/cardBack.png"
 
-export let defaultMarketArray= [
+export const defaultMarketArray= [
 	1,
 	2,
 	3,
@@ -8,7 +8,7 @@ export let defaultMarketArray= [
 	5
 ]
 
-export let defaultStartingArray= [
+export const defaultStartingArray= [
 	1001,
 	1002,
 	1003,
