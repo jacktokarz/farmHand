@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {getHandSize} from '../selectors'
+import {getUserHand} from '../selectors'
 import {fromMatch}  from '../actions'
 import {Card} from '../components'
 import {cardMap} from '../utils'
@@ -8,15 +8,16 @@ import {cardMap} from '../utils'
 
 
 
-const mapStateToProps= (state, ownProps) => { console.log("own props in card: "+JSON.stringify(ownProps)); return (
+const mapStateToProps= (state, ownProps) => (
 	{
+		actions: ownProps.place==="market" ? ["Buy"] : ["Play", "Plant"],
 		data: cardMap[ownProps.id],
-		handSize: ownProps.place==="market" ? 6 : getHandSize(state),
+		handSize: ownProps.place==="market" ? 6 : getUserHand(state).length,
 	}
-) }
+)
 
 const mapDispatchToProps= (dispatch, ownProps) => ({
-	openCardModal: (data) => dispatch(fromMatch.openCardModal(data)),
+	openCardModal: (actions, data) => dispatch(fromMatch.openCardModal(actions, data)),
 })
 
 

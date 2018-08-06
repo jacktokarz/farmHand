@@ -4,26 +4,23 @@ import {getMatchMarketArray, shuffleArray, oneStartingHandMap} from '../utils'
 
 const initState= 
 	{
-		cardModalActions: [],
+		cardModalActions: ["Example"],
 		cardModalVis: "none",
 		cardModalData: {},
-		handSize: 5,
 		marketArray: [0,0,0,0,0,0],
 		matchPlayers: [],
-		playerOneDeck: [0,0],
-		playerOneDiscard: [],
-		playerOneHand: [0,0,0,0,0],
-		playerOneUser: "",
-		playerTwoDeck: [0,0],
-		playerTwoDiscard: [],
-		playerTwoHand: [0,0,0,0,0],
-		playerTwoUser: "",
-		playerThreeDeck: [0,0],
-		playerThreeDiscard: [],
-		playerThreeHand: [0,0,0,0,0],
-		playerThreeUser: "",
-		userDeckArray: [],
-		userHandArray: [0,0,0,0,0,0],
+		nextPlayerDeck: [0,0],
+		nextPlayerDiscard: [],
+		nextPlayerHand: [0,0,0,0,0],
+		nextPlayerUser: "",
+		previousPlayerDeck: [0,0],
+		previousPlayerDiscard: [],
+		previousPlayerHand: [0,0,0,0,0],
+		previousPlayerUser: "",
+		userDeck: [0,0],
+		userDiscard: [],
+		userHand: [0,0,0,0,0],
+		user: "",
 		userPlayerNumber: "",
 	};
 
@@ -37,19 +34,20 @@ export default (state=initState, action) => {
 		case fromMatch.actionTypes.DISCARDHAND:
 			console.log("discard action: "+JSON.stringify(action));
 			return {...state,
-				playerOneDiscard: action.discard,
-				playerOneHand: action.hand,
+				userDiscard: action.discard,
+				userHand: action.hand,
 			};
 		case fromMatch.actionTypes.DRAWHAND:
 			console.log("draw action: "+JSON.stringify(action));
 			return {...state,
-				playerOneDeck: action.deck,
-				playerOneDiscard: action.discard,
-				playerOneHand: action.hand,
+				userDeck: action.deck,
+				userDiscard: action.discard,
+				userHand: action.hand,
 			};
 		case fromMatch.actionTypes.OPENCARDMODAL:
 			return {...state, 
-				cardModalData: action.payload,
+				cardModalActions: action.actions,
+				cardModalData: action.data,
 				cardModalVis: "block",
 			};
 		case fromMatch.actionTypes.SAVEMARKETARRAY:
@@ -60,59 +58,59 @@ export default (state=initState, action) => {
 			return {...state,
 				matchPlayers: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERONEDECK:
-			console.log("updating player one deck with: "+action.payload);
-			return {...state, 
-				playerOneDeck: action.payload,
-			};
-		case fromMatch.actionTypes.SAVEPLAYERONEDISCARD:
-			return {...state, 
-				playerOneDiscard: action.payload,
-			};
-		case fromMatch.actionTypes.SAVEPLAYERONEHAND:
-			console.log("playerOne hand update: "+action.payload);
-			return {...state, 
-				playerOneHand: action.payload,
-			};
-		case fromMatch.actionTypes.SAVEPLAYERONEUSER:
-			return {...state, 
-				playerOneUser: action.payload,
-			};
-		case fromMatch.actionTypes.SAVEPLAYERTWODECK:
+		case fromMatch.actionTypes.SAVENEXTPLAYERDECK:
 			console.log("updating player Two deck with: "+action.payload);
 			return {...state, 
-				playerTwoDeck: action.payload,
+				nextPlayerDeck: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERTWODISCARD:
+		case fromMatch.actionTypes.SAVENEXTPLAYERDISCARD:
 			return {...state, 
-				playerTwoDiscard: action.payload,
+				nextPlayerDiscard: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERTWOHAND:
-			console.log("playerTwo hand update: "+action.payload);
+		case fromMatch.actionTypes.SAVENEXTPLAYERHAND:
+			console.log("nextPlayer hand update: "+action.payload);
 			return {...state, 
-				playerTwoHand: action.payload,
+				nextPlayerHand: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERTWOUSER:
+		case fromMatch.actionTypes.SAVENEXTPLAYERUSER:
 			return {...state, 
-				playerTwoUser: action.payload,
+				nextPlayerUser: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERTHREEDECK:
+		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERDECK:
 			console.log("updating player Three deck with: "+action.payload);
 			return {...state, 
-				playerThreeDeck: action.payload,
+				previousPlayerDeck: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERTHREEDISCARD:
+		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERDISCARD:
 			return {...state, 
-				playerThreeDiscard: action.payload,
+				previousPlayerDiscard: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERTHREEHAND:
-			console.log("playerThree hand update: "+action.payload);
+		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERHAND:
+			console.log("previousPlayer hand update: "+action.payload);
 			return {...state, 
-				playerThreeHand: action.payload,
+				previousPlayerHand: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPLAYERTHREEUSER:
+		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERUSER:
 			return {...state, 
-				playerThreeUser: action.payload,
+				previousPlayerUser: action.payload,
+			};
+		case fromMatch.actionTypes.SAVEUSERDECK:
+			console.log("updating player one deck with: "+action.payload);
+			return {...state, 
+				userDeck: action.payload,
+			};
+		case fromMatch.actionTypes.SAVEUSERDISCARD:
+			return {...state, 
+				userDiscard: action.payload,
+			};
+		case fromMatch.actionTypes.SAVEUSERHAND:
+			console.log("USER hand update: "+action.payload);
+			return {...state, 
+				userHand: action.payload,
+			};
+		case fromMatch.actionTypes.SAVEUSER:
+			return {...state, 
+				user: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEUSERPLAYERNUMBER:
 			console.log("saving user player number as: "+action.payload);

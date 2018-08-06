@@ -2,23 +2,20 @@ export const actionTypes= {
 	CLOSECARDMODAL: 'match closeCardModal',
 	DRAWHAND: 'match drawHand',
 	OPENCARDMODAL: 'match openCardModal',
-	PLAYERTWODECK: 'match playerTwoDeck',
-	PLAYERTWODISCARD: 'match playerTwoDiscard',
-	PLAYERTWOHAND: 'match playerTwoHand',
 	SAVEMARKETARRAY: 'match saveMarketArray',
 	SAVEMATCHPLAYERS: 'match saveMatchPlayers',
-	SAVEPLAYERONEDECK: 'match savePlayerOneDeck',
-	SAVEPLAYERONEDISCARD: 'match savePlayerOneDiscard',
-	SAVEPLAYERONEHAND: 'match savePlayerOneHand',
-	SAVEPLAYERONEUSER: 'match savePlayerOneUser',
-	SAVEPLAYERTWODECK: 'match savePlayerTwoDeck',
-	SAVEPLAYERTWODISCARD: 'match savePlayerTwoDiscard',
-	SAVEPLAYERTWOHAND: 'match savePlayerTwoHand',
-	SAVEPLAYERTWOUSER: 'match savePlayerTwoUser',
-	SAVEPLAYERTHREEDECK: 'match savePlayerThreeDeck',
-	SAVEPLAYERTHREEDISCARD: 'match savePlayerThreeDiscard',
-	SAVEPLAYERTHREEHAND: 'match savePlayerThreeHand',
-	SAVEPLAYERTHREEUSER: 'match savePlayerThreeUser',
+	SAVEUSERDECK: 'match saveUserDeck',
+	SAVEUSERDISCARD: 'match saveUserDiscard',
+	SAVEUSERHAND: 'match saveUserHand',
+	SAVEUSER: 'match saveUser',
+	SAVENEXTPLAYERDECK: 'match saveNextPlayerDeck',
+	SAVENEXTPLAYERDISCARD: 'match saveNextPlayerDiscard',
+	SAVENEXTPLAYERHAND: 'match saveNextPlayerHand',
+	SAVENEXTPLAYERUSER: 'match saveNextPlayerUser',
+	SAVEPREVIOUSPLAYERDECK: 'match savePreviousPlayerDeck',
+	SAVEPREVIOUSPLAYERDISCARD: 'match savePreviousPlayerDiscard',
+	SAVEPREVIOUSPLAYERHAND: 'match savePreviousPlayerHand',
+	SAVEPREVIOUSPLAYERUSER: 'match savePreviousPlayerUser',
 	SAVEUSERPLAYERNUMBER: 'match saveUserPlayerNumber',
 }
 
@@ -35,9 +32,10 @@ export const drawHand= (deck, discard, hand) => ({
 	hand: hand,
 })
 
-export const openCardModal= (data) => ({
+export const openCardModal= (actions, data) => ({
 	type: actionTypes.OPENCARDMODAL,
-	payload: data,
+	actions: actions,
+	data: data,
 })
 
 export const saveMarketArray= (array) => ({
@@ -50,63 +48,63 @@ export const saveMatchPlayers= (array) => ({
 	payload: array,
 })
 
-export const savePlayerOneDeck= (deck) => ({
-	type: actionTypes.SAVEPLAYERONEDECK,
+export const saveUserDeck= (deck) => ({
+	type: actionTypes.SAVEUSERDECK,
 	payload: deck,
 })
 
-export const savePlayerOneDiscard= (discard) => ({
-	type: actionTypes.SAVEPLAYERONEDISCARD,
+export const saveUserDiscard= (discard) => ({
+	type: actionTypes.SAVEUSERDISCARD,
 	payload: discard,
 })
 
-export const savePlayerOneHand= (hand) => ({
-	type: actionTypes.SAVEPLAYERONEHAND,
+export const saveUserHand= (hand) => ({
+	type: actionTypes.SAVEUSERHAND,
 	payload: hand,
 })
 
-export const savePlayerOneUser= (user) => ({
-	type: actionTypes.SAVEPLAYERONEUSER,
+export const saveUser= (user) => ({
+	type: actionTypes.SAVEUSER,
 	payload: user,
 })
 
-export const savePlayerTwoDeck= (deck) => ({
-	type: actionTypes.SAVEPLAYERTWODECK,
+export const saveNextPlayerDeck= (deck) => ({
+	type: actionTypes.SAVENEXTPLAYERDECK,
 	payload: deck,
 })
 
-export const savePlayerTwoDiscard= (discard) => ({
-	type: actionTypes.SAVEPLAYERTWODISCARD,
+export const saveNextPlayerDiscard= (discard) => ({
+	type: actionTypes.SAVENEXTPLAYERDISCARD,
 	payload: discard,
 })
 
-export const savePlayerTwoHand= (hand) => ({
-	type: actionTypes.SAVEPLAYERTWOHAND,
+export const saveNextPlayerHand= (hand) => ({
+	type: actionTypes.SAVENEXTPLAYERHAND,
 	payload: hand,
 })
 
-export const savePlayerTwoUser= (user) => ({
-	type: actionTypes.SAVEPLAYERTWOUSER,
+export const saveNextPlayerUser= (user) => ({
+	type: actionTypes.SAVENEXTPLAYERUSER,
 	payload: user,
 })
 
-export const savePlayerThreeDeck= (deck) => ({
-	type: actionTypes.SAVEPLAYERTHREEDECK,
+export const savePreviousPlayerDeck= (deck) => ({
+	type: actionTypes.SAVEPREVIOUSPLAYERDECK,
 	payload: deck,
 })
 
-export const savePlayerThreeDiscard= (discard) => ({
-	type: actionTypes.SAVEPLAYERTHREEDISCARD,
+export const savePreviousPlayerDiscard= (discard) => ({
+	type: actionTypes.SAVEPREVIOUSPLAYERDISCARD,
 	payload: discard,
 })
 
-export const savePlayerThreeHand= (hand) => ({
-	type: actionTypes.SAVEPLAYERTHREEHAND,
+export const savePreviousPlayerHand= (hand) => ({
+	type: actionTypes.SAVEPREVIOUSPLAYERHAND,
 	payload: hand,
 })
 
-export const savePlayerThreeUser= (user) => ({
-	type: actionTypes.SAVEPLAYERTHREEUSER,
+export const savePreviousPlayerUser= (user) => ({
+	type: actionTypes.SAVEPREVIOUSPLAYERUSER,
 	payload: user,
 })
 

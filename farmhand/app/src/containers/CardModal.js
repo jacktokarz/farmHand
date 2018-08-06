@@ -7,7 +7,7 @@ import {} from '../utils'
 
 const mapStateToProps= (state, ownProps) => (
 	{
-		id: ownProps.id,
+		actions: ownProps.actions,
 		vis: ownProps.vis,
 		data: ownProps.data,
 	}
@@ -15,6 +15,14 @@ const mapStateToProps= (state, ownProps) => (
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeCardModal()),
+	func: (title) => {
+		if(title === "Example") {
+			console.log("EXAMPLE!");
+		}
+		else {
+			console.log("uh oh...");
+		}
+	}
 })
 
 

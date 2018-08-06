@@ -121,12 +121,12 @@ function displayError(message) {
   console.log("ERROR ERROR - "+message);
 }
 
-export function endTurn(dispatch, deck, discard, hand) {
+export function endTurn(playerNumber, dispatch, deck, discard, hand) {
   deck= (deck === null ? [] : deck);
   discard= (discard === null ? [] : discard);
   hand= (hand === null ? [] : hand);
 
-  console.log("ending turn with deck "+JSON.stringify(deck)+'\n'+" and discard "+JSON.stringify(discard)+'\n'+" and hand "+JSON.stringify(hand));
+  console.log("ending "+playerNumber+"'s turn with deck "+JSON.stringify(deck)+'\n'+" and discard "+JSON.stringify(discard)+'\n'+" and hand "+JSON.stringify(hand));
   let newDiscard= discard.concat(hand);
   let newHand= [];
   if(deck.length < 5) {
@@ -143,9 +143,9 @@ export function endTurn(dispatch, deck, discard, hand) {
     newHand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
   }
 
-  updateMatchPlayerArray("playerOne", "deck", deck);
-  updateMatchPlayerArray("playerOne", "discard", newDiscard);
-  updateMatchPlayerArray("playerOne", "hand", newHand);
+  updateMatchPlayerArray(playerNumber, "deck", deck);
+  updateMatchPlayerArray(playerNumber, "discard", newDiscard);
+  updateMatchPlayerArray(playerNumber, "hand", newHand);
 }
 
 export function getCardInfo(id) {
@@ -168,8 +168,7 @@ export function getCookie(cname) {
     return null;
 }
 
-export function getMatchPlayers(dispatch, matchId) {
-  console.log("get match players called ##############");
+export function getMatchPlayers(dispatch) {
   database.ref('matches/'+matchId+'/').once('value')
     .then(function(snapshot) {
       const pOne= snapshot.child('playerOne/').child('/user').val();
@@ -178,8 +177,7 @@ export function getMatchPlayers(dispatch, matchId) {
 
       const matchPlayers= [pOne, pTwo, pThree];
       console.log("match players: "+matchPlayers);
-
-      setUserPlayer(dispatch, matchPlayers);
+      setMatchPlayerNumbers(dispatch, matchPlayers);
       dispatch(fromMatch.saveMatchPlayers(matchPlayers));
     });
 }
@@ -276,56 +274,110 @@ export function listenForMatchUpdates(dispatch) {
 }
 
 export function listenForPlayerOneUpdates(dispatch) {
-  database.ref('/matches/'+matchId+'/playerOne/user').once("value")
-    .then(function(snapshot) {
-      console.log("player One from matches is: "+JSON.stringify(snapshot.val()));
-      dispatch(fromMatch.savePlayerOneUser(snapshot.val()));
-    } );
   database.ref('/matches/'+matchId+'/playerOne/deck/').on("value", snapshot => {
-    dispatch(fromMatch.savePlayerOneDeck(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.saveUserDeck(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));
+    }
+    else {
+      dispatch(fromMatch.saveNextPlayerDeck(snapshot.val()));
+    }
   });
   database.ref('/matches/'+matchId+'/playerOne/discard/').on("value", snapshot => {
-    dispatch(fromMatch.savePlayerOneDiscard(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.saveUserDiscard(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));
+    }
+    else {
+      dispatch(fromMatch.saveNextPlayerDiscard(snapshot.val()));
+    }
   });
   database.ref('/matches/'+matchId+'/playerOne/hand/').on("value", snapshot => {
-    console.log("!!!!!!!!!!!!! hand: "+snapshot.val());
-    dispatch(fromMatch.savePlayerOneHand(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.saveUserHand(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));
+    }
+    else {
+      dispatch(fromMatch.saveNextPlayerHand(snapshot.val()));
+    }
   });
 }
 
 export function listenForPlayerTwoUpdates(dispatch) {
-  database.ref('/matches/'+matchId+'/playerTwo/user').once("value")
-    .then(function(snapshot) {
-      console.log("player Two from matches is: "+JSON.stringify(snapshot.val()));
-      dispatch(fromMatch.savePlayerTwoUser(snapshot.val()));
-    } );
   database.ref('/matches/'+matchId+'/playerTwo/deck/').on("value", snapshot => {
-    dispatch(fromMatch.savePlayerTwoDeck(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.saveUserDeck(snapshot.val()));    
+    }
+    else {
+      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));
+    }
   });
   database.ref('/matches/'+matchId+'/playerTwo/discard/').on("value", snapshot => {
-    dispatch(fromMatch.savePlayerTwoDiscard(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.saveUserDiscard(snapshot.val()));    
+    }
+    else {
+      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));
+    }  
   });
   database.ref('/matches/'+matchId+'/playerTwo/hand/').on("value", snapshot => {
-    console.log("!!!!!!!!!!!!! hand: "+snapshot.val());
-    dispatch(fromMatch.savePlayerTwoHand(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.saveUserHand(snapshot.val()));    
+    }
+    else {
+      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));
+    }
   });
 }
 
 export function listenForPlayerThreeUpdates(dispatch) {
-  database.ref('/matches/'+matchId+'/playerThree/user').once("value")
-    .then(function(snapshot) {
-      console.log("player Three from matches is: "+JSON.stringify(snapshot.val()));
-      dispatch(fromMatch.savePlayerThreeUser(snapshot.val()));
-    } );
   database.ref('/matches/'+matchId+'/playerThree/deck/').on("value", snapshot => {
-    dispatch(fromMatch.savePlayerThreeDeck(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.saveNextPlayerDeck(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));    
+    }
+    else {
+      dispatch(fromMatch.saveUserDeck(snapshot.val()));
+    }
   });
   database.ref('/matches/'+matchId+'/playerThree/discard/').on("value", snapshot => {
-    dispatch(fromMatch.savePlayerThreeDiscard(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.saveNextPlayerDiscard(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));    
+    }
+    else {
+      dispatch(fromMatch.saveUserDiscard(snapshot.val()));
+    }  
   });
   database.ref('/matches/'+matchId+'/playerThree/hand/').on("value", snapshot => {
-    console.log("!!!!!!!!!!!!! hand: "+snapshot.val());
-    dispatch(fromMatch.savePlayerThreeHand(snapshot.val()));
+    if(userPlayerNumber==='playerOne') {
+      dispatch(fromMatch.saveNextPlayerHand(snapshot.val()));
+    }
+    else if(userPlayerNumber==='playerTwo') {
+      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));    
+    }
+    else {
+      dispatch(fromMatch.saveUserHand(snapshot.val()));
+    }  
   });
 }
 
@@ -336,6 +388,15 @@ export function loginUser(un, dispatch) {
   dispatch(fromHeader.logIn(un));
 }
 
+export function matchMount(dispatch) {
+  console.log("@@@@@@@@@@@@@@@@@@");
+  if(matchId===null) {
+    displayError("Go back to the lobby and select a match!");
+  }
+  getMatchPlayers(dispatch);
+  listenForMatchUpdates(dispatch);
+}
+
 export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
 }
@@ -344,7 +405,6 @@ export function playMatch(key, dispatch) {
   console.log("playing match "+key);
   setCookie("match", key);
   matchId= key;
-  getMatchPlayers(dispatch, matchId);
 }
 
 export function registerUser(username, password, dispatch) {
@@ -366,22 +426,37 @@ export function setCookie(cname, cvalue) {
     console.log(cname+" cookie set as "+cvalue);
 }
 
-function setUserPlayer(dispatch, players) {
+function setMatchPlayerNumbers(dispatch, players) {
   console.log("setting user ^^^^^^ "+players.toString);
+  const threePlayers = players.length === 3;
   if(players[0] === user) {
     userPlayerNumber= "playerOne";
+    dispatch(fromMatch.saveNextPlayerUser(players[1]));
+    if(threePlayers) {
+      dispatch(fromMatch.savePreviousPlayerUser(players[2]));
+    }
   }
   else if(players[1] === user) {
     userPlayerNumber= 'playerTwo';
+    if(threePlayers) {
+       dispatch(fromMatch.saveNextPlayerUser(players[2]));
+       dispatch(fromMatch.savePreviousPlayerUser(players[0]));
+    }
+    else {
+      dispatch(fromMatch.saveNextPlayerUser(players[0]));
+    }
   }
   else if(players[2] === user) {
     userPlayerNumber= "playerThree";
+     dispatch(fromMatch.saveNextPlayerUser(players[0]));
+     dispatch(fromMatch.savePreviousPlayerUser(players[1]));
   }
   else {
     displayError("You are not a player in this match!");
     return "";
   }
   dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
+  dispatch(fromMatch.saveUser(user));
 }
 
 export function shuffleArray(initialArray) {

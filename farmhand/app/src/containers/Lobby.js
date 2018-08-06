@@ -14,12 +14,12 @@ const mapDispatchToProps= dispatch => ({
 	createMatch: () => { createMatch(); },
 	entryAction: (item, history) => {
 		if(item.actionLabel === "Play Match") {
-	    	playMatch(item.key, dispatch);
+	    	playMatch(item.key);
 	    	history.push('/match');
 	    }
 	    else if(item.actionLabel === "Start Match") {
 	    	startMatch(item.key);
-	    	playMatch(item.key, dispatch);
+	    	playMatch(item.key);
 	    	history.push('/match');
 	    }
 	    else if(item.actionLabel === "Join Match") {
