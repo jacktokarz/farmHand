@@ -8,10 +8,6 @@ import {cardBackSrc} from '../utils'
 
 
 const Match= ({
-		cardModalActions,
-		cardModalData, 
-		cardModalVis, 
-		closeModal,
 		endTurn,
 		history, 
 		market, 
@@ -85,7 +81,7 @@ const Match= ({
 		    		</div>
 	    		</div>
 	    	</div>
-	    	<CardModal actions={cardModalActions} data= {cardModalData} vis= {cardModalVis} />
+	    	<CardModal />
 	    </div>
 	</div>
 )

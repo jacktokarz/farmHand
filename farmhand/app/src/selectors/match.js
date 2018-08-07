@@ -5,6 +5,7 @@ const matchState= state => state.match;
 
 export const getCardModalActions= createSelector(matchState, state => state.cardModalActions);
 export const getCardModalData= createSelector(matchState, state => state.cardModalData);
+export const getCardModalId= createSelector(matchState, state => state.cardModalId);
 export const getCardModalVis= createSelector(matchState, state => state.cardModalVis);
 export const getMarketArray= createSelector(matchState, state => state.marketArray);
 export const getMatchPlayers= createSelector(matchState, state => state.matchPlayers);

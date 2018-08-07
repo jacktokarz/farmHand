@@ -1,9 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {
-	getCardModalActions, 
-	getCardModalData, 
-	getCardModalVis, 
+import { 
 	getMarketArray, 
 	getMatchPlayers, 
 	getNextPlayerDeck, 
@@ -26,9 +23,6 @@ import {endTurn, getCookie, matchMount} from '../utils'
 
 
 const mapStateToProps= state => ({
-	cardModalActions: getCardModalActions(state),
-	cardModalData: getCardModalData(state),
-	cardModalVis: getCardModalVis(state),
 	marketArray: getMarketArray(state),
 	nextPlayerDeck: getNextPlayerDeck(state),
 	nextPlayerDiscard: getNextPlayerDiscard(state),
@@ -49,7 +43,6 @@ const mapStateToProps= state => ({
 const mapDispatchToProps= dispatch => {
 	matchMount(dispatch);
 	return {
-		closeModal: () => dispatch(fromMatch.closeCardModal()),
 		endTurn: (playerNumber, deck, discard, hand) => { endTurn(playerNumber, dispatch, deck, discard, hand) },
 	}
 }

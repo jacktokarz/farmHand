@@ -7,6 +7,7 @@ const initState=
 		cardModalActions: ["Example"],
 		cardModalVis: "none",
 		cardModalData: {},
+		cardModalId: 0,
 		marketArray: [0,0,0,0,0,0],
 		matchPlayers: [],
 		nextPlayerDeck: [0,0],
@@ -27,8 +28,7 @@ const initState=
 export default (state=initState, action) => {
 	switch(action.type) {
 		case fromMatch.actionTypes.CLOSECARDMODAL:
-			return {...state, 
-				cardModalData: {},
+			return {...state,
 				cardModalVis: "none",
 			};
 		case fromMatch.actionTypes.DISCARDHAND:
@@ -48,6 +48,7 @@ export default (state=initState, action) => {
 			return {...state, 
 				cardModalActions: action.actions,
 				cardModalData: action.data,
+				cardModalId: action.id,
 				cardModalVis: "block",
 			};
 		case fromMatch.actionTypes.SAVEMARKETARRAY:
@@ -68,7 +69,7 @@ export default (state=initState, action) => {
 				nextPlayerDiscard: action.payload,
 			};
 		case fromMatch.actionTypes.SAVENEXTPLAYERHAND:
-			console.log("nextPlayer hand update: "+action.payload);
+			console.log("reducer, nextPlayer hand: "+action.payload);
 			return {...state, 
 				nextPlayerHand: action.payload,
 			};
@@ -77,7 +78,6 @@ export default (state=initState, action) => {
 				nextPlayerUser: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERDECK:
-			console.log("updating player Three deck with: "+action.payload);
 			return {...state, 
 				previousPlayerDeck: action.payload,
 			};
@@ -86,7 +86,7 @@ export default (state=initState, action) => {
 				previousPlayerDiscard: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERHAND:
-			console.log("previousPlayer hand update: "+action.payload);
+			console.log("reducer, previousPlayer hand: "+action.payload);
 			return {...state, 
 				previousPlayerHand: action.payload,
 			};
@@ -95,7 +95,6 @@ export default (state=initState, action) => {
 				previousPlayerUser: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEUSERDECK:
-			console.log("updating player one deck with: "+action.payload);
 			return {...state, 
 				userDeck: action.payload,
 			};
@@ -104,7 +103,7 @@ export default (state=initState, action) => {
 				userDiscard: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEUSERHAND:
-			console.log("USER hand update: "+action.payload);
+			console.log("reducer, USER hand update: "+action.payload);
 			return {...state, 
 				userHand: action.payload,
 			};

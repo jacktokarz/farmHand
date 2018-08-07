@@ -32,10 +32,11 @@ export const drawHand= (deck, discard, hand) => ({
 	hand: hand,
 })
 
-export const openCardModal= (actions, data) => ({
+export const openCardModal= (actions, data, id) => ({
 	type: actionTypes.OPENCARDMODAL,
 	actions: actions,
 	data: data,
+	id: id,
 })
 
 export const saveMarketArray= (array) => ({

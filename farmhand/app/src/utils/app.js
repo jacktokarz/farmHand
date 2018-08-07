@@ -21,6 +21,27 @@ let userPlayerNumber= "";
 
 
 
+function addPlayerToMatch(path, deck, hand) {
+  insertObject(path+'/user', user);
+  for(var i= 0; i < deck.length; i++) {
+    insertObject(path+'/deck/'+deck[i], deck[i], i);
+  }
+  for(var i= 0; i < hand.length; i++) {
+    insertObject(path+'/hand/'+hand[i], hand[i], i);
+  }
+}
+
+export function buyMarketCard(discard, id, market) {
+  discard= discard === null ? [] : discard;
+  console.log("did I get it all? "+discard+id+market);
+  market.splice(market.indexOf(id), 1);
+  var updates= {};
+  updates['/matches/'+matchId+'/market/'+id]= null;
+  database.ref().update(updates);
+  insertObject('/matches/'+matchId+'/'+userPlayerNumber+'/discard/'+id, id);
+
+}
+
 export function checkLogin(dispatch, un, pw) {
   if(un.length < 2) {
     return dispatch(fromHeader.setErrorMessage("You must submit a username of at least 2 characters"));
@@ -71,32 +92,22 @@ export function checkRegister(dispatch, un, pw, cp) {
 }
 
 export function createMatch() {
-  const today = new Date();
-  const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
   const keyQuery= database.ref('/matches/').orderByKey().limitToLast(1);
   keyQuery.once("value")
     .then(function(snapshot) {
       snapshot.forEach(function(childSnapshot) {
+        const path= 'matches/'+(parseInt(childSnapshot.key)+1);
+        insertObject(path+'/status', "pending");
+        const today = new Date();
+        const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        insertObject(path+'/date', todayDate);
+        const market= shuffleArray(defaultMarketArray);
+        for(var i= 0; i < market.length; i++) {
+          insertObject(path+'/market/'+market[i], market[i], i);
+        }
         let pOneDeck= shuffleArray(defaultStartingArray.slice());
         let hand= [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()];
-      console.log("creating match with deck "+pOneDeck.toString());
-        database.ref('matches/'+(parseInt(childSnapshot.key)+1)).set({
-          playerOne: {
-            user: user,
-            deck: pOneDeck,
-            hand: hand,
-          },
-          status: "pending",
-          date: todayDate,
-          market: shuffleArray(defaultMarketArray),
-        }, function(error) {
-          if(error) {
-            console.log("match submission error");
-          }
-          else {
-            console.log("match should be registered");
-          }
-        });
+        addPlayerToMatch(path+'/playerOne', pOneDeck, hand);
       });
     });
 }
@@ -175,7 +186,7 @@ export function getMatchPlayers(dispatch) {
       const pTwo= snapshot.child('playerTwo/').child('/user').val();
       const pThree= snapshot.child('playerThree/').child('/user').val();
 
-      const matchPlayers= [pOne, pTwo, pThree];
+      const matchPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null });
       console.log("match players: "+matchPlayers);
       setMatchPlayerNumbers(dispatch, matchPlayers);
       dispatch(fromMatch.saveMatchPlayers(matchPlayers));
@@ -187,30 +198,17 @@ function getRandomInt(max) {
 }
 
 export function joinMatch(key, playerList) {
-  console.log("joining match "+key);
   const players= playerList.split(", ");
+  let playerNumber= players.length > 1 ? "playerThree" : "playerTwo";
   let deck= shuffleArray(defaultStartingArray.slice());
-  console.log("joining match with players: "+players.toString()+'\n'+"From deck: "+deck.toString());
   const hand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
-  console.log("joining with hand: "+hand.toString());
-  const playerInfo= {
-      user: user, 
-      deck: deck,
-      hand: hand,
-    };
-    console.log("player info: "+playerInfo.toString());
-  let playerObject= {playerTwo: playerInfo};
-  let playerNumber= "playerTwo";
-  if(players.length > 1) {
-    playerObject= {playerThree: playerInfo};
-    playerNumber= "playerThree";
-  }
-  const matchPath= '/matches/'+key+'/'+playerNumber;
-  insertObject(matchPath, playerInfo);
+  addPlayerToMatch('/matches/'+key+'/'+playerNumber, deck, hand);
 }
 
-export function insertObject(dbPath, obj) {
-  database.ref(dbPath).set(obj, function(error) {
+export function insertObject(dbPath, obj, priority) {
+  priority= priority===undefined?0:priority;
+  console.log("PRIORITY IS: "+priority);
+  database.ref(dbPath).setWithPriority(obj, priority, function(error) {
     if(error) {
       console.log("object submission error");
     }
@@ -259,11 +257,13 @@ export function listenForMatches(dispatch) {
 
 export function listenForMatchMarketArray(dispatch) {
   console.log("going to get match market array for match "+matchId);
-  database.ref('/matches/'+matchId+'/market/').once("value")
-    .then(function(snapshot) {
-      console.log("market array from matches is: "+JSON.stringify(snapshot.val()));
-      dispatch(fromMatch.saveMarketArray(snapshot.val()));
-    } );
+  database.ref('/matches/'+matchId+'/market/').on("value", snapshot => {
+    let market= [];
+    snapshot.forEach(function(childSnapshot) {
+      market.push(childSnapshot.val());
+    });
+    dispatch(fromMatch.saveMarketArray(market));
+  } );
 }
 
 export function listenForMatchUpdates(dispatch) {
@@ -273,110 +273,151 @@ export function listenForMatchUpdates(dispatch) {
   listenForPlayerThreeUpdates(dispatch);
 }
 
+
 export function listenForPlayerOneUpdates(dispatch) {
   database.ref('/matches/'+matchId+'/playerOne/deck/').on("value", snapshot => {
+    let playerOneDeck= [];
+    snapshot.forEach(function(childSnapshot) {
+      console.log("Child of p1 deck: "+childSnapshot.val());
+      playerOneDeck.push(childSnapshot.val());
+    });
+    console.log("full retrieved deck: "+playerOneDeck.toString());
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveUserDeck(snapshot.val()));
+      dispatch(fromMatch.saveUserDeck(playerOneDeck));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerDeck(playerOneDeck));
     }
     else {
-      dispatch(fromMatch.saveNextPlayerDeck(snapshot.val()));
+      dispatch(fromMatch.saveNextPlayerDeck(playerOneDeck));
     }
   });
   database.ref('/matches/'+matchId+'/playerOne/discard/').on("value", snapshot => {
+    let playerOneDiscard= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerOneDiscard.push(childSnapshot.val());
+    });
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveUserDiscard(snapshot.val()));
+      dispatch(fromMatch.saveUserDiscard(playerOneDiscard));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerDiscard(playerOneDiscard));
     }
     else {
-      dispatch(fromMatch.saveNextPlayerDiscard(snapshot.val()));
+      dispatch(fromMatch.saveNextPlayerDiscard(playerOneDiscard));
     }
   });
   database.ref('/matches/'+matchId+'/playerOne/hand/').on("value", snapshot => {
+    let playerOneHand= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerOneHand.push(childSnapshot.val());
+    });
+    console.log("Player One hand is: "+playerOneHand.toString());
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveUserHand(snapshot.val()));
+      dispatch(fromMatch.saveUserHand(playerOneHand));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerHand(playerOneHand));
     }
     else {
-      dispatch(fromMatch.saveNextPlayerHand(snapshot.val()));
+      dispatch(fromMatch.saveNextPlayerHand(playerOneHand));
     }
   });
 }
 
 export function listenForPlayerTwoUpdates(dispatch) {
   database.ref('/matches/'+matchId+'/playerTwo/deck/').on("value", snapshot => {
+    let playerTwoDeck= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerTwoDeck.push(childSnapshot.val());
+    });
+    console.log("Player TWO hand is: "+playerTwoDeck.toString());
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerDeck(playerTwoDeck));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.saveUserDeck(snapshot.val()));    
+      dispatch(fromMatch.saveUserDeck(playerTwoDeck));
     }
     else {
-      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerDeck(playerTwoDeck));
     }
   });
   database.ref('/matches/'+matchId+'/playerTwo/discard/').on("value", snapshot => {
+    let playerTwoDiscard= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerTwoDiscard.push(childSnapshot.val());
+    });
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerDiscard(playerTwoDiscard));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.saveUserDiscard(snapshot.val()));    
+      dispatch(fromMatch.saveUserDiscard(playerTwoDiscard));
     }
     else {
-      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerDiscard(playerTwoDiscard));
     }  
   });
   database.ref('/matches/'+matchId+'/playerTwo/hand/').on("value", snapshot => {
+    let playerTwoHand= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerTwoHand.push(childSnapshot.val());
+    });
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerHand(playerTwoHand));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.saveUserHand(snapshot.val()));    
+      dispatch(fromMatch.saveUserHand(playerTwoHand));
     }
     else {
-      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));
+      dispatch(fromMatch.savePreviousPlayerHand(playerTwoHand));
     }
   });
 }
 
 export function listenForPlayerThreeUpdates(dispatch) {
   database.ref('/matches/'+matchId+'/playerThree/deck/').on("value", snapshot => {
+    let playerThreeDeck= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerThreeDeck.push(childSnapshot.val());
+    });
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveNextPlayerDeck(snapshot.val()));
+      dispatch(fromMatch.saveNextPlayerDeck(playerThreeDeck));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDeck(snapshot.val()));    
+      dispatch(fromMatch.savePreviousPlayerDeck(playerThreeDeck));    
     }
     else {
-      dispatch(fromMatch.saveUserDeck(snapshot.val()));
+      dispatch(fromMatch.saveUserDeck(playerThreeDeck));
     }
   });
   database.ref('/matches/'+matchId+'/playerThree/discard/').on("value", snapshot => {
+    let playerThreeDiscard= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerThreeDiscard.push(childSnapshot.val());
+    });
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveNextPlayerDiscard(snapshot.val()));
+      dispatch(fromMatch.saveNextPlayerDiscard(playerThreeDiscard));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDiscard(snapshot.val()));    
+      dispatch(fromMatch.savePreviousPlayerDiscard(playerThreeDiscard));    
     }
     else {
-      dispatch(fromMatch.saveUserDiscard(snapshot.val()));
+      dispatch(fromMatch.saveUserDiscard(playerThreeDiscard));
     }  
   });
   database.ref('/matches/'+matchId+'/playerThree/hand/').on("value", snapshot => {
+    let playerThreeHand= [];
+    snapshot.forEach(function(childSnapshot) {
+      playerThreeHand.push(childSnapshot.val());
+    });    
     if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveNextPlayerHand(snapshot.val()));
+      dispatch(fromMatch.saveNextPlayerHand(playerThreeHand));
     }
     else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerHand(snapshot.val()));    
+      dispatch(fromMatch.savePreviousPlayerHand(playerThreeHand));    
     }
     else {
-      dispatch(fromMatch.saveUserHand(snapshot.val()));
+      dispatch(fromMatch.saveUserHand(playerThreeHand));
     }  
   });
 }
@@ -394,7 +435,6 @@ export function matchMount(dispatch) {
     displayError("Go back to the lobby and select a match!");
   }
   getMatchPlayers(dispatch);
-  listenForMatchUpdates(dispatch);
 }
 
 export function openRules() {
@@ -427,7 +467,7 @@ export function setCookie(cname, cvalue) {
 }
 
 function setMatchPlayerNumbers(dispatch, players) {
-  console.log("setting user ^^^^^^ "+players.toString);
+  console.log("setting user ^^^^^^ "+players.length+players.toString());
   const threePlayers = players.length === 3;
   if(players[0] === user) {
     userPlayerNumber= "playerOne";
@@ -455,8 +495,10 @@ function setMatchPlayerNumbers(dispatch, players) {
     displayError("You are not a player in this match!");
     return "";
   }
+  console.log("USER PLAYER N SET TO: "+userPlayerNumber);
   dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
   dispatch(fromMatch.saveUser(user));
+  listenForMatchUpdates(dispatch);
 }
 
 export function shuffleArray(initialArray) {

@@ -1,28 +1,30 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {fromMatch}  from '../actions'
+import { getCardModalActions, getCardModalData, getCardModalId, getCardModalVis, getMarketArray, getUserDiscard } from '../selectors'
 import {CardModal} from '../components'
-import {} from '../utils'
+import {buyMarketCard} from '../utils'
 
 
-const mapStateToProps= (state, ownProps) => (
+const mapStateToProps= (state) => (
 	{
-		actions: ownProps.actions,
-		vis: ownProps.vis,
-		data: ownProps.data,
+		actions: getCardModalActions(state),
+		data: getCardModalData(state),
+		vis: getCardModalVis(state),
+		func: (title) => {
+			console.log("pop happening");
+			if(title === "Buy") {
+				buyMarketCard(getUserDiscard(state), getCardModalId(state), getMarketArray(state));
+			}
+			else {
+				console.log("uh oh...");
+			}
+		}
 	}
 )
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeCardModal()),
-	func: (title) => {
-		if(title === "Example") {
-			console.log("EXAMPLE!");
-		}
-		else {
-			console.log("uh oh...");
-		}
-	}
 })
 
 

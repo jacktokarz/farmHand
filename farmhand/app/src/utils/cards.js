@@ -5,7 +5,13 @@ export const defaultMarketArray= [
 	2,
 	3,
 	4,
-	5
+	5,
+	6,
+	7,
+	8,
+	9,
+	10,
+	11
 ]
 
 export const defaultStartingArray= [
@@ -98,6 +104,113 @@ export const cardMap= {
 			scrap: 1		
 		}
 	},
+	6: {
+		title: "Altered Eggplant",
+		type: "seed",
+		picture: "https://image.ibb.co/gV9Oqe/Altered_Eggplant.png",
+		cost: 6,
+		faction: "T",
+		primary: {
+			or: {
+				left: {
+					coin: 2
+				},
+				right: {
+					coin: 4,
+					discard: 1
+				}
+			}
+		},
+		secondary: {
+			plenty: 4,
+			waste: 2
+		}
+	},	
+	7: {
+		title: "A Rye",
+		type: "seed",
+		picture: "https://image.ibb.co/kYq4Ve/A_Rye.png",
+		cost: 2,
+		faction: "C",
+		primary: {
+			coin: 2
+		},
+		secondary: {
+			plenty: 1,
+			draw: 1,
+			opponents: {
+				discard: 1
+			}
+		}
+	},
+	8: {
+		title: "Avocado Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/deTmbK/Avocado_Seed.png",
+		cost: 3,
+		faction: "G",
+		primary: {
+			coin: 2,
+			harvest: 1
+		},
+		secondary: {
+			plenty: 2,
+			plant: 1
+		}
+	},
+	9: {
+		title: "Compost",
+		type: "tool",
+		picture: "https://image.ibb.co/cCTrAe/Compost.png",
+		cost: 2,
+		faction: "G",
+		primary: {
+			coin: 2,
+			plant: 1
+		},
+		secondary: {
+			plant: 1
+		}
+	},
+	10: {
+		title: "Cool Cucumber",
+		type: "seed",
+		picture: "https://image.ibb.co/fOyPVe/Cool_Cucumber.png",
+		cost: 1,
+		faction: "G",
+		primary: {
+			coin: 1,
+			draw: 1
+		},
+		secondary: {
+			plenty: 1,
+			draw: 1
+		}
+	},
+	11: {
+		title: "Corn Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/dDjbbK/Corn_Seed.png",
+		cost: 1,
+		faction: "T",
+		primary: {
+			or: {
+				left: {
+					coin: 1
+				},
+				right: {
+					coin: 3,
+					waste: 1
+				}
+			}
+		},
+		secondary: {
+			plenty: 1,
+			coin: 1,
+			waste: 1
+		}
+	},
+
 
 	1001: {
 		title: "Basic Seed",

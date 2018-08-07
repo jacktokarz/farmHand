@@ -6,13 +6,13 @@ import {} from '../utils'
 
 const CardModal= ({actions, closeModal, data, func, vis}) => (
 
-	<div style={{display: vis}} className="modal">
-		<div className="modal-content">
-    		<div className="modal-header">
+	<div style={{display: vis}} className="modal" onClick={ (event) => (!event.target.classList.contains("inside") ? closeModal() : "" ) }>
+		<div className="modal-content inside" id="modalContent">
+    		<div className="modal-header inside">
     			<span onClick={closeModal} className="close">&times;</span>
     		</div>
-    		<div className="modal-body justify-content-around">
-				<img className="modal-img" src={data.picture} alt={data.title} />
+    		<div className="modal-body justify-content-around inside">
+				<img className="modal-img inside" src={data.picture} alt={data.title} />
 				{actions.map((i, index) => (
 					<button onClick={ () => func(i)} >{i}</button>
 				)) }
