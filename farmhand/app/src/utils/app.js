@@ -202,7 +202,7 @@ function getMatchPlayers(dispatch, matchPath, user) {
       const cThree= snapshot.child('playerThree/').child('/color').val();
 
       const matchPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null });
-      const matchColors= [cOne, cTwo, cThree].filter(function(n){ return n !== null });
+      const matchColors= [cOne, cTwo, cThree];
       console.log("match players: "+matchPlayers);
       setMatchPlayerNumbers(dispatch, matchPath, matchColors, matchPlayers, user);
       dispatch(fromMatch.saveMatchPlayers(matchPlayers));
@@ -262,6 +262,10 @@ export function matchMount(dispatch) {
 
 export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
+}
+
+export function playCard(id, matchPath, playerNumber, hand, counters) {
+  console.log(playerNumber+" played card "+id);
 }
 
 export function playMatch(key, dispatch) {

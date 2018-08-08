@@ -21,6 +21,7 @@ const initState=
 		previousPlayerHand: [0,0,0,0,0],
 		previousPlayer: {color: "grey", user: "", playerNumber: ""},
 		userColor: "grey",
+		userCounters: {plenty: 0, coin: 0, plant: 0, harvest: 0, scrap: 0, marketScrap: 0},
 		userDeck: [0,0],
 		userDiscard: [],
 		userHand: [0,0,0,0,0],
@@ -104,6 +105,12 @@ export default (state=initState, action) => {
 		case fromMatch.actionTypes.SAVEUSERCOLOR:
 			return {...state, 
 				userColor: action.payload,
+			};
+		case fromMatch.actionTypes.SAVEUSERCOUNTERS:
+			console.log("reduced counters: "+action.payload);
+			console.log("just the coin: "+action.payload.coin);
+			return {...state, 
+				userCounters: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEUSERDECK:
 			return {...state, 

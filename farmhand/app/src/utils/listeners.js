@@ -166,6 +166,10 @@ function listenForPlayerTwoUpdates(dispatch, matchPath, userPlayerNumber) {
 }
 
 function listenForPlayerThreeUpdates(dispatch, matchPath, userPlayerNumber) {
+  database.ref(matchPath+'/playerThree/counters/').on("value", snapshot => {
+  	console.log("player three counters are: "+snapshot.val()+" and json'd: "+JSON.stringify(snapshot.val()));
+    dispatch(fromMatch.saveUserCounters(snapshot.val()));
+  });
   database.ref(matchPath+'/playerThree/deck/').on("value", snapshot => {
     let playerThreeDeck= [];
     snapshot.forEach(function(childSnapshot) {

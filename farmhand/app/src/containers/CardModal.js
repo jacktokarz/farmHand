@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {fromMatch}  from '../actions'
-import { getCardModalActions, getCardModalData, getCardModalId, getCardModalVis, getMarketArray, getMatchPath, getUserDiscard, getUserPlayerNumber } from '../selectors'
+import { getCardModalActions, getCardModalData, getCardModalId, getCardModalVis, getMarketArray, getMatchPath, getUserCounters, getUserDiscard, getUserHand, getUserPlayerNumber } from '../selectors'
 import {CardModal} from '../components'
 import {buyMarketCard} from '../utils'
 
@@ -17,7 +17,9 @@ const mapStateToProps= (state) => (
 				buyMarketCard(getUserDiscard(state), getCardModalId(state), getMarketArray(state), getMatchPath(state), getUserPlayerNumber(state));
 			}
 			else {
-				console.log("uh oh...");
+				if(title === "Play") {
+					playCard(getCardModalId(state), getMatchPath(state), getUserPlayerNumber(state), getUserHand(state), getUserCounters(state));
+				}
 			}
 		}
 	}

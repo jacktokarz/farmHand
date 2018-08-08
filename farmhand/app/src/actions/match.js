@@ -6,6 +6,7 @@ export const actionTypes= {
 	SAVEMATCHPATH: 'match saveMatchPath',
 	SAVEMATCHPLAYERS: 'match saveMatchPlayers',
 	SAVEUSERCOLOR: 'match saveUserColor',
+	SAVEUSERCOUNTERS: 'match saveUserCounters',
 	SAVEUSERDECK: 'match saveUserDeck',
 	SAVEUSERDISCARD: 'match saveUserDiscard',
 	SAVEUSERHAND: 'match saveUserHand',
@@ -104,6 +105,11 @@ export const savePreviousPlayer= (color, user, playerNumber) => ({
 export const saveUserColor= (color) => ({
 	type: actionTypes.SAVEUSERCOLOR,
 	payload: color,
+})
+
+export const saveUserCounters= (counters) => ({
+	type: actionTypes.SAVEUSERCOUNTERS,
+	payload: counters,
 })
 
 export const saveUserDeck= (deck) => ({

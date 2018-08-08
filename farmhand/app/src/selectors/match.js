@@ -20,6 +20,7 @@ export const getPreviousPlayerDiscard= createSelector(matchState, state => state
 export const getPreviousPlayerHand= createSelector(matchState, state => state.previousPlayerHand);
 export const getPreviousPlayer= createSelector(matchState, state => state.previousPlayer);
 export const getUserColor= createSelector(matchState, state => state.userColor);
+export const getUserCounters= createSelector(matchState, state => state.userCounters);
 export const getUserDeck= createSelector(matchState, state => state.userDeck);
 export const getUserDiscard= createSelector(matchState, state => state.userDiscard);
 export const getUserHand= createSelector(matchState, state => state.userHand);
