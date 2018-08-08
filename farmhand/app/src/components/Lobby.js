@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 
 
-const Lobby= ({createMatch, entryAction, history, matches}) => (
+const Lobby= ({createMatch, entryAction, history, matches, user}) => (
   <div className="App container-fluid">
 
     <div>
@@ -24,7 +24,7 @@ const Lobby= ({createMatch, entryAction, history, matches}) => (
               <td>
                 <button 
                   className={i.actionLabel=="" ? "hidden": "btn"} 
-                  onClick={() => entryAction(i, history)}
+                  onClick={() => entryAction(i, history, user)}
                 >
                   {i.actionLabel}
                 </button>
@@ -34,7 +34,7 @@ const Lobby= ({createMatch, entryAction, history, matches}) => (
         </tbody>
       </table>
     </div>
-    <button onClick={createMatch}>Create Match</button>
+    <button onClick={() => createMatch(user)}>Create Match</button>
   </div>
 )
 

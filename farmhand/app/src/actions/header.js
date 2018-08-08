@@ -9,6 +9,7 @@ export const actionTypes= {
 	REGISTERUSER: 'header registerUser',
 	SETERRORMESSAGE: 'header setErrorMessage',
 	SETREGISTERERRORMESSAGE: 'header setRegisterErrorMessage',
+	SETUSER: 'header setUser',
 	SETUSERNAME: 'header setUsername',
 	UPDATECONFIRMPASSWORD: 'header updateConfirmPassword',
 	UPDATEUSERNAME: 'header updateUsername',
@@ -64,6 +65,11 @@ export const setErrorMessage= (msg) => ({
 export const setRegisterErrorMessage= (msg) => ({
 	type: actionTypes.SETREGISTERERRORMESSAGE,
 	payload: msg,
+})
+
+export const setUser= (un) => ({
+	type: actionTypes.SETUSER,
+	payload: un,
 })
 
 export const setUsername= (un) => ({

@@ -1,5 +1,5 @@
 import {fromMatch} from '../actions'
-import {getMatchMarketArray, shuffleArray, oneStartingHandMap} from '../utils'
+import {} from '../utils'
 
 
 const initState= 
@@ -8,20 +8,22 @@ const initState=
 		cardModalVis: "none",
 		cardModalData: {},
 		cardModalId: 0,
+		currentPlayer: "playerOne",
 		marketArray: [0,0,0,0,0,0],
+		matchPath: "/matches/0",
 		matchPlayers: [],
 		nextPlayerDeck: [0,0],
 		nextPlayerDiscard: [],
 		nextPlayerHand: [0,0,0,0,0],
-		nextPlayerUser: "",
+		nextPlayer: {color: "grey", user: "", playerNumber: ""},
 		previousPlayerDeck: [0,0],
 		previousPlayerDiscard: [],
 		previousPlayerHand: [0,0,0,0,0],
-		previousPlayerUser: "",
+		previousPlayer: {color: "grey", user: "", playerNumber: ""},
+		userColor: "grey",
 		userDeck: [0,0],
 		userDiscard: [],
 		userHand: [0,0,0,0,0],
-		user: "",
 		userPlayerNumber: "",
 	};
 
@@ -52,8 +54,13 @@ export default (state=initState, action) => {
 				cardModalVis: "block",
 			};
 		case fromMatch.actionTypes.SAVEMARKETARRAY:
+			console.log("updating market array with: "+action.payload.toString());
 			return {...state, 
 				marketArray: action.payload,
+			};
+		case fromMatch.actionTypes.SAVEMATCHPATH:
+			return {...state, 
+				matchPath: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEMATCHPLAYERS:
 			return {...state,
@@ -73,9 +80,9 @@ export default (state=initState, action) => {
 			return {...state, 
 				nextPlayerHand: action.payload,
 			};
-		case fromMatch.actionTypes.SAVENEXTPLAYERUSER:
+		case fromMatch.actionTypes.SAVENEXTPLAYER:
 			return {...state, 
-				nextPlayerUser: action.payload,
+				nextPlayer: {color: action.color, user: action.user, playerNumber: action.playerNumber},
 			};
 		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERDECK:
 			return {...state, 
@@ -90,9 +97,13 @@ export default (state=initState, action) => {
 			return {...state, 
 				previousPlayerHand: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEPREVIOUSPLAYERUSER:
+		case fromMatch.actionTypes.SAVEPREVIOUSPLAYER:
 			return {...state, 
-				previousPlayerUser: action.payload,
+				previousPlayer: {color: action.color, user: action.user, playerNumber: action.playerNumber},
+			};
+		case fromMatch.actionTypes.SAVEUSERCOLOR:
+			return {...state, 
+				userColor: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEUSERDECK:
 			return {...state, 
@@ -107,14 +118,14 @@ export default (state=initState, action) => {
 			return {...state, 
 				userHand: action.payload,
 			};
-		case fromMatch.actionTypes.SAVEUSER:
-			return {...state, 
-				user: action.payload,
-			};
 		case fromMatch.actionTypes.SAVEUSERPLAYERNUMBER:
 			console.log("saving user player number as: "+action.payload);
 			return {...state,
 				userPlayerNumber: action.payload,
+			};
+		case fromMatch.actionTypes.UPDATECURRENTPLAYER:
+			return {...state,
+				currentPlayer: action.payload,
 			};
 
 	}

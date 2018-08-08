@@ -65,6 +65,10 @@ export default (state=initState, action) => {
 			return {...state, 
 				registerErrorMessage: action.payload
 			};
+		case fromHeader.actionTypes.SETUSER:
+			return {...state, 
+				user: action.payload
+			};
 		case fromHeader.actionTypes.SETUSERNAME:
 			return {...state, 
 				username: action.payload

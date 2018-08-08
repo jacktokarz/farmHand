@@ -1,16 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { 
-	getMarketArray, 
-	getMatchPlayers, 
+	getCurrentPlayer,
+	getMarketArray,
+	getMatchPath,
+	getMatchPlayers,
 	getNextPlayerDeck, 
 	getNextPlayerDiscard, 
 	getNextPlayerHand, 
-	getNextPlayerUser, 
+	getNextPlayer,
 	getPreviousPlayerDeck, 
 	getPreviousPlayerDiscard, 
 	getPreviousPlayerHand, 
-	getPreviousPlayerUser, 
+	getPreviousPlayer,
+	getUserColor,
 	getUserDeck, 
 	getUserDiscard, 
 	getUserHand, 
@@ -23,27 +26,30 @@ import {endTurn, getCookie, matchMount} from '../utils'
 
 
 const mapStateToProps= state => ({
+	currentPlayer: getCurrentPlayer(state),
 	marketArray: getMarketArray(state),
+	matchPath: getMatchPath(state),
+	matchPlayers: getMatchPlayers(state),
 	nextPlayerDeck: getNextPlayerDeck(state),
 	nextPlayerDiscard: getNextPlayerDiscard(state),
 	nextPlayerHand: getNextPlayerHand(state),
-	nextPlayerUser: getNextPlayerUser(state),
+	nextPlayer: getNextPlayer(state),
 	previousPlayerDeck: getPreviousPlayerDeck(state),
 	previousPlayerDiscard: getPreviousPlayerDiscard(state),
 	previousPlayerHand: getPreviousPlayerHand(state),
-	previousPlayerUser: getPreviousPlayerUser(state),
+	previousPlayer: getPreviousPlayer(state),
+	userColor: getUserColor(state),
 	userDeck: getUserDeck(state),
 	userDiscard: getUserDiscard(state),
 	userHand: getUserHand(state),
 	user: getUser(state),
-	players: getMatchPlayers(state),
 	userPlayerNumber: getUserPlayerNumber(state),
 })
 
 const mapDispatchToProps= dispatch => {
 	matchMount(dispatch);
 	return {
-		endTurn: (playerNumber, deck, discard, hand) => { endTurn(playerNumber, dispatch, deck, discard, hand) },
+		endTurn: (currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playerNumber) => { endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playerNumber) },
 	}
 }
 
