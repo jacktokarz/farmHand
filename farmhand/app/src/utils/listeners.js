@@ -2,6 +2,13 @@ import { fromLobby, fromMatch } from '../actions'
 import { database, getCookie } from './'
 
 
+function listenForCurrentPlayer(dispatch, matchPath ) {
+  database.ref(matchPath+'/currentPlayer').on("value", snapshot => {
+    console.log("current player is: "+snapshot.val());
+    dispatch(fromMatch.updateCurrentPlayer(snapshot.val()));
+  })
+}
+
 export function listenForMatches(dispatch) {
   database.ref('matches/').on('value', snapshot => {
   	let user= getCookie("user");
@@ -50,23 +57,37 @@ function listenForMatchMarketArray(dispatch, matchPath ) {
   } );
 }
 
-export function listenForMatchUpdates(dispatch, matchPath, userPlayerNumber) {
+export function listenForMatchUpdates(dispatch, matchPath, matchPlayers, userPlayerNumber) {
   listenForCurrentPlayer(dispatch, matchPath);
   listenForMatchMarketArray(dispatch, matchPath);
+  listenForPlayArea(dispatch, matchPath);
   listenForPlayerOneUpdates(dispatch, matchPath, userPlayerNumber);
   listenForPlayerTwoUpdates(dispatch, matchPath, userPlayerNumber);
-  listenForPlayerThreeUpdates(dispatch, matchPath, userPlayerNumber);
+  console.log("listening, match players are: "+matchPlayers.toString());
+  if(matchPlayers.length === 3) {
+	  listenForPlayerThreeUpdates(dispatch, matchPath, userPlayerNumber);
+  }
 }
 
-function listenForCurrentPlayer(dispatch, matchPath ) {
-  database.ref(matchPath+'/currentPlayer').on("value", snapshot => {
-    console.log("current player is: "+snapshot.val());
-    dispatch(fromMatch.updateCurrentPlayer(snapshot.val()));
-  })
+function listenForPlayArea(dispatch, matchPath) {
+	database.ref(matchPath+'/playArea').on("value", snapshot => {
+		let playArea= [];
+	    snapshot.forEach(function(childSnapshot) {
+	      playArea.push(childSnapshot.val());
+		});
+		console.log("new play area is: "+JSON.stringify(playArea));
+		dispatch(fromMatch.updatePlayArea(playArea));
+	});
 }
+
 
 function listenForPlayerOneUpdates(dispatch, matchPath, userPlayerNumber) {
-  database.ref(matchPath+'/playerOne/deck/').on("value", snapshot => {
+	database.ref(matchPath+'/playerOne/counters/').on("value", snapshot => {
+		if(userPlayerNumber==='playerOne') {
+			dispatch(fromMatch.saveUserCounters(snapshot.val()));
+		}
+	});
+	database.ref(matchPath+'/playerOne/deck/').on("value", snapshot => {
     let playerOneDeck= [];
     snapshot.forEach(function(childSnapshot) {
       console.log("Child of p1 deck: "+childSnapshot.val());
@@ -117,6 +138,11 @@ function listenForPlayerOneUpdates(dispatch, matchPath, userPlayerNumber) {
 }
 
 function listenForPlayerTwoUpdates(dispatch, matchPath, userPlayerNumber) {
+	database.ref(matchPath+'/playerTwo/counters/').on("value", snapshot => {
+		if(userPlayerNumber==='playerTwo') {
+			dispatch(fromMatch.saveUserCounters(snapshot.val()));
+		}
+	});
   database.ref(matchPath+'/playerTwo/deck/').on("value", snapshot => {
     let playerTwoDeck= [];
     snapshot.forEach(function(childSnapshot) {
@@ -166,10 +192,11 @@ function listenForPlayerTwoUpdates(dispatch, matchPath, userPlayerNumber) {
 }
 
 function listenForPlayerThreeUpdates(dispatch, matchPath, userPlayerNumber) {
-  database.ref(matchPath+'/playerThree/counters/').on("value", snapshot => {
-  	console.log("player three counters are: "+snapshot.val()+" and json'd: "+JSON.stringify(snapshot.val()));
-    dispatch(fromMatch.saveUserCounters(snapshot.val()));
-  });
+	database.ref(matchPath+'/playerThree/counters/').on("value", snapshot => {
+		if(userPlayerNumber==='playerOne') {
+			dispatch(fromMatch.saveUserCounters(snapshot.val()));  		
+  		}
+	});
   database.ref(matchPath+'/playerThree/deck/').on("value", snapshot => {
     let playerThreeDeck= [];
     snapshot.forEach(function(childSnapshot) {

@@ -16,6 +16,7 @@ const initState=
 		nextPlayerDiscard: [],
 		nextPlayerHand: [0,0,0,0,0],
 		nextPlayer: {color: "grey", user: "", playerNumber: ""},
+		playArea: [],
 		previousPlayerDeck: [0,0],
 		previousPlayerDiscard: [],
 		previousPlayerHand: [0,0,0,0,0],
@@ -107,8 +108,6 @@ export default (state=initState, action) => {
 				userColor: action.payload,
 			};
 		case fromMatch.actionTypes.SAVEUSERCOUNTERS:
-			console.log("reduced counters: "+action.payload);
-			console.log("just the coin: "+action.payload.coin);
 			return {...state, 
 				userCounters: action.payload,
 			};
@@ -134,7 +133,10 @@ export default (state=initState, action) => {
 			return {...state,
 				currentPlayer: action.payload,
 			};
-
+		case fromMatch.actionTypes.UPDATEPLAYAREA:
+			return {...state,
+				playArea: action.payload,
+			};
 	}
 	return state;
 }

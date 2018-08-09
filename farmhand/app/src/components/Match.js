@@ -20,6 +20,7 @@ const Match=
 		nextPlayerDiscard,
 		nextPlayerHand,
 		nextPlayer,
+		playArea,
 		previousPlayerDeck,
 		previousPlayerDiscard,
 		previousPlayerHand,
@@ -54,16 +55,22 @@ const Match=
 	    			<Card  place="market" id={marketArray[2]} />
 	    			<Card  place="market" id={marketArray[3]} />
 	    			<Card  place="market" id={marketArray[4]} />
+	    			<Card place="hiddenMarket" id={marketArray[5]} />
 	    			<div className="starterFieldAndPlenty" style={{"maxWidth": (100/6-1)+"%"}}>
 	    				<div className="marketObject" >Starter Field</div>
 	    				<div className="marketObject" >Plenty</div>
 	    			</div>
 	    		</div>
-	    		<div style= {{height: "35%", "backgroundColor": (currentPlayer===userPlayerNumber?userColor:(currentPlayer===nextPlayer.playerNumber?nextPlayer.color:previousPlayer.color) )}}>Play Area</div>
+	    		<div style= {{height: "35%", "backgroundColor": (currentPlayer===userPlayerNumber?userColor:(currentPlayer===nextPlayer.playerNumber?nextPlayer.color:previousPlayer.color) )}}>
+	    			<div style={{float: "center"}}>{currentPlayer===userPlayerNumber?user:(currentPlayer===nextPlayer.playerNumber?nextPlayer.user:previousPlayer.user)}'s Play Area</div>
+	    			{playArea.map((i, index) => (
+	    				<Card place="playArea" id={i} />
+	    			))}
+	    		</div>
 	    		<div style= {{height: "5%", "backgroundColor": userColor}}>
 	    			<div style={{float: "left", display: "inline-block"}}>{user}: {userPlayerNumber}</div>
 	    			<div style={{display: "inline-block"}}>Plenty: {userCounters.plenty} // Coin: {userCounters.coin} // Plant: {userCounters.plant} // Harvest: {userCounters.harvest} // Scrap: {userCounters.scrap} // MarketScrap: {userCounters.marketScrap}</div>
-	    			<button style={{float: "right", display: userPlayerNumber===currentPlayer ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayer, userDeck, userDiscard, userHand, matchPath, matchPlayers.length, userPlayerNumber)}>End Turn</button>
+	    			<button style={{float: "right", display: userPlayerNumber===currentPlayer ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayer, userDeck, userDiscard, userHand, matchPath, matchPlayers.length, playArea, userPlayerNumber)}>End Turn</button>
 	    		</div>
 	    		<div style= {{"height": "30%", "backgroundColor": userColor}} className="yourHand">
 	    			{userHand.map((i, index) => (

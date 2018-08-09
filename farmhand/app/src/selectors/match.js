@@ -15,6 +15,7 @@ export const getNextPlayerDeck= createSelector(matchState, state => state.nextPl
 export const getNextPlayerDiscard= createSelector(matchState, state => state.nextPlayerDiscard);
 export const getNextPlayerHand= createSelector(matchState, state => state.nextPlayerHand);
 export const getNextPlayer= createSelector(matchState, state => state.nextPlayer);
+export const getPlayArea= createSelector(matchState, state => state.playArea);
 export const getPreviousPlayerDeck= createSelector(matchState, state => state.previousPlayerDeck);
 export const getPreviousPlayerDiscard= createSelector(matchState, state => state.previousPlayerDiscard);
 export const getPreviousPlayerHand= createSelector(matchState, state => state.previousPlayerHand);

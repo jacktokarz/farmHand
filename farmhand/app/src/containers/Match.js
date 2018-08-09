@@ -9,6 +9,7 @@ import {
 	getNextPlayerDiscard, 
 	getNextPlayerHand, 
 	getNextPlayer,
+	getPlayArea,
 	getPreviousPlayerDeck, 
 	getPreviousPlayerDiscard, 
 	getPreviousPlayerHand, 
@@ -35,15 +36,16 @@ const mapStateToProps= state => ({
 	nextPlayerDiscard: getNextPlayerDiscard(state),
 	nextPlayerHand: getNextPlayerHand(state),
 	nextPlayer: getNextPlayer(state),
+	playArea: getPlayArea(state)===null?[]:getPlayArea(state),
 	previousPlayerDeck: getPreviousPlayerDeck(state),
 	previousPlayerDiscard: getPreviousPlayerDiscard(state),
 	previousPlayerHand: getPreviousPlayerHand(state),
 	previousPlayer: getPreviousPlayer(state),
 	userColor: getUserColor(state),
 	userCounters: getUserCounters(state),
-	userDeck: getUserDeck(state),
+	userDeck: getUserDeck(state)===null?[]:getUserDeck(state),
 	userDiscard: getUserDiscard(state),
-	userHand: getUserHand(state),
+	userHand: getUserHand(state)===null?[]:getUserHand(state),
 	user: getUser(state),
 	userPlayerNumber: getUserPlayerNumber(state),
 })
@@ -51,7 +53,7 @@ const mapStateToProps= state => ({
 const mapDispatchToProps= dispatch => {
 	matchMount(dispatch);
 	return {
-		endTurn: (currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playerNumber) => { endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playerNumber) },
+		endTurn: (currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playArea, playerNumber) => { endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playArea, playerNumber) },
 	}
 }
 

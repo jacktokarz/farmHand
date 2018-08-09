@@ -20,6 +20,7 @@ export const actionTypes= {
 	SAVEPREVIOUSPLAYER: 'match savePreviousPlayer',
 	SAVEUSERPLAYERNUMBER: 'match saveUserPlayerNumber',
 	UPDATECURRENTPLAYER: 'match updateCurrentPlayer',
+	UPDATEPLAYAREA: 'match updatePlayArea',
 }
 
 
@@ -135,4 +136,9 @@ export const saveUserPlayerNumber= (playerNumber) => ({
 export const updateCurrentPlayer= (currentPlayer) => ({
 	type: actionTypes.UPDATECURRENTPLAYER,
 	payload: currentPlayer,
+})
+
+export const updatePlayArea= (playArea) => ({
+	type: actionTypes.UPDATEPLAYAREA,
+	payload: playArea,
 })

@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import { fromHeader, fromMatch } from '../actions'
-import { defaultMarketArray, defaultStartingArray, listenForMatches, listenForMatchUpdates } from './'
+import { cardMap, defaultMarketArray, defaultStartingArray, listenForMatches, listenForMatchUpdates } from './'
 
 
 const config = {
@@ -110,6 +110,7 @@ export function createMatch(user) {
         insertObject(path+'/date', todayDate);
         insertObject(path+'/currentPlayer', "playerOne");
         const market= shuffleArray(defaultMarketArray);
+        console.log("inserting market: "+market.toString());
         for(var i= 0; i < market.length; i++) {
           insertObject(path+'/market/'+market[i], market[i], i);
         }
@@ -129,13 +130,15 @@ function displayError(message) {
   console.log("ERROR ERROR - "+message);
 }
 
-export function endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playerNumber) {
+export function endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playArea, playerNumber) {
   deck= (deck === null ? [] : deck);
   discard= (discard === null ? [] : discard);
   hand= (hand === null ? [] : hand);
+  playArea= (playArea === null ? [] : playArea);
 //updates player's hand, deck and discard
   console.log("ending "+playerNumber+"'s turn with deck "+JSON.stringify(deck)+'\n'+" and discard "+JSON.stringify(discard)+'\n'+" and hand "+JSON.stringify(hand));
   let newDiscard= discard.concat(hand);
+  newDiscard= newDiscard.concat(playArea);
   let newHand= [];
   if(deck.length < 5) {
     while(deck.length > 0) {
@@ -150,9 +153,19 @@ export function endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfP
   else {
     newHand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
   }
+  const emptyCounters= {
+    plenty: 0,
+    coin: 0,
+    plant: 0,
+    harvest: 0,
+    scrap: 0,
+    marketScrap: 0
+  };
+  insertObject(matchPath+'/'+playerNumber+"/counters", emptyCounters);
   updateMatchPlayerArray(matchPath, playerNumber, "deck", deck);
   updateMatchPlayerArray(matchPath, playerNumber, "discard", newDiscard);
   updateMatchPlayerArray(matchPath, playerNumber, "hand", newHand);
+  database.ref(matchPath+'/playArea').set(null);
 
 //updates currentPlayer for next player
   if(currentPlayer==="playerOne") {
@@ -264,8 +277,26 @@ export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
 }
 
-export function playCard(id, matchPath, playerNumber, hand, counters) {
-  console.log(playerNumber+" played card "+id);
+export function playCard(id, matchPath, playerNumber, counters, playArea) {
+  console.log(playerNumber+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters));
+  const cardData= cardMap[id];
+  database.ref(matchPath+'/'+playerNumber+'/hand/'+id).set(null);
+  playArea.push(id);
+  let updates= {};
+  updates[matchPath+'/playArea']= playArea;
+  database.ref().update(updates);
+  counters= {
+    plenty: counters.plenty+(cardData.primary.plenty===undefined?0:cardData.primary.plenty),
+    coin: counters.coin+(cardData.primary.coin===undefined?0:cardData.primary.coin),
+    plant: counters.plant+(cardData.primary.plant===undefined?0:cardData.primary.plant),
+    harvest: counters.harvest+(cardData.primary.harvest===undefined?0:cardData.primary.harvest),
+    scrap: counters.scrap+(cardData.primary.scrap===undefined?0:cardData.primary.scrap),
+    marketScrap: counters.marketScrap+(cardData.primary.marketScrap===undefined?0:cardData.primary.marketScrap)
+  };
+  console.log("new counters: "+JSON.stringify(counters));
+  updates= {};
+  updates[matchPath+'/'+playerNumber+'/counters']= counters;
+  database.ref().update(updates);
 }
 
 export function playMatch(key, dispatch) {
@@ -327,10 +358,11 @@ function setMatchPlayerNumbers(dispatch, matchPath, colors, players, user) {
   console.log("USER PLAYER N SET TO: "+userPlayerNumber);
   dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
   dispatch(fromMatch.saveUserColor(userColor));
-  listenForMatchUpdates(dispatch, matchPath, userPlayerNumber);
+  listenForMatchUpdates(dispatch, matchPath, players, userPlayerNumber);
 }
 
-function shuffleArray(initialArray) {
+function shuffleArray(passedArray) {
+  let initialArray= [...passedArray];
   let randomIndex=0;
   let finalArray= [];
   while(initialArray.length > 0) {
@@ -353,7 +385,10 @@ export function startMatch(key) {
 }
 
 function updateMatchPlayerArray(matchPath, player, arrayType, array) {
+  database.ref(matchPath+'/'+player+'/'+arrayType).set(null);
   let updates= {};
-  updates[matchPath+'/'+player+'/'+arrayType]= array;
+  for(var i= 0; i < array.length; i++) {
+    updates[matchPath+'/'+player+'/'+arrayType+'/'+array[i]]= {".value": array[i], ".priority": i};
+  }
   database.ref().update(updates);
 }

@@ -6,11 +6,11 @@ import {CardModal} from '../containers'
 import {cardBackSrc} from '../utils'
 
 
-const Card= ({actions, data, handSize, openCardModal}) => (
+const Card= ({actions, data, handSize, openCardModal, place}) => (
     <img 
       className="card" 
-      style={{"maxWidth": (100/handSize-1)+"%"}} 
-      onClick={() => openCardModal(actions, data)} 
+      style={{"maxWidth": (100/handSize-1)+"%", "display": (place==="hiddenMarket"?"none":"inline-block")}} 
+      onClick={() => (place!=="playArea"?openCardModal(actions, data):null)} 
       src={data.picture}
     />
 
