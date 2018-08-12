@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  background-color: floralwhite;
 }
 
 
@@ -60,6 +61,16 @@ body {
 	visibility: hidden;
 }
 
+.icon {
+	display: inline-flex;
+	max-width: 20%;
+	width: auto;
+	max-height: 40px;
+	height: auto;
+	width: auto;
+	margin-left: 20px;
+}
+
 .inputBox{
 	margin: 4px auto;
 	border-radius: 5px;
@@ -96,6 +107,7 @@ body {
 }
 
 .userDeckArea {
+	max-height: 100%;
     position: relative;
     text-align: center;
     color: gray;

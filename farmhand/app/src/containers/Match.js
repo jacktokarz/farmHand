@@ -1,59 +1,38 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { 
-	getCurrentPlayer,
+	getCurrentPlayerNumber,
 	getMarketArray,
 	getMatchPath,
-	getMatchPlayers,
-	getNextPlayerDeck, 
-	getNextPlayerDiscard, 
-	getNextPlayerHand, 
-	getNextPlayer,
+	getNumberOfPlayers,
 	getPlayArea,
-	getPreviousPlayerDeck, 
-	getPreviousPlayerDiscard, 
-	getPreviousPlayerHand, 
-	getPreviousPlayer,
-	getUserColor,
-	getUserCounters,
-	getUserDeck, 
-	getUserDiscard, 
-	getUserHand, 
+	getPlayerOne,
+	getPlayerTwo,
+	getPlayerThree,
 	getUser, 
 	getUserPlayerNumber, 
 } from '../selectors'
 import {fromMatch} from '../actions'
 import {Match} from '../components'
-import {endTurn, getCookie, matchMount} from '../utils'
+import {endTurn, getCookie, matchMount, playField} from '../utils'
 
 
-const mapStateToProps= state => ({
-	currentPlayer: getCurrentPlayer(state),
+const mapStateToProps= state => { console.log("player one in contianer: "+JSON.stringify(getPlayerOne(state))+'\n'+"and player number: "+getCurrentPlayerNumber(state)); return {
+	currentPlayerNumber: getCurrentPlayerNumber(state),
 	marketArray: getMarketArray(state),
 	matchPath: getMatchPath(state),
-	matchPlayers: getMatchPlayers(state),
-	nextPlayerDeck: getNextPlayerDeck(state),
-	nextPlayerDiscard: getNextPlayerDiscard(state),
-	nextPlayerHand: getNextPlayerHand(state),
-	nextPlayer: getNextPlayer(state),
+	matchPlayers: [getPlayerOne(state), getPlayerTwo(state), getPlayerThree(state)],
+	numberOfPlayers: getNumberOfPlayers(state),
 	playArea: getPlayArea(state)===null?[]:getPlayArea(state),
-	previousPlayerDeck: getPreviousPlayerDeck(state),
-	previousPlayerDiscard: getPreviousPlayerDiscard(state),
-	previousPlayerHand: getPreviousPlayerHand(state),
-	previousPlayer: getPreviousPlayer(state),
-	userColor: getUserColor(state),
-	userCounters: getUserCounters(state),
-	userDeck: getUserDeck(state)===null?[]:getUserDeck(state),
-	userDiscard: getUserDiscard(state),
-	userHand: getUserHand(state)===null?[]:getUserHand(state),
+	playField: (id, matchPath, userPlayerNumber) => {playField(id, matchPath, userPlayerNumber)},
 	user: getUser(state),
 	userPlayerNumber: getUserPlayerNumber(state),
-})
+} }
 
 const mapDispatchToProps= dispatch => {
 	matchMount(dispatch);
 	return {
-		endTurn: (currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playArea, playerNumber) => { endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playArea, playerNumber) },
+		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, userPlayerNumber) => { endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, userPlayerNumber) },
 	}
 }
 

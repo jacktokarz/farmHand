@@ -9,44 +9,40 @@ import {cardBackSrc} from '../utils'
 
 const Match= 
 	({
-		currentPlayer,
+		currentPlayerNumber,
 		endTurn,
 		history, 
 		market, 
 		marketArray,
 		matchPath,
 		matchPlayers,
-		nextPlayerDeck,
-		nextPlayerDiscard,
-		nextPlayerHand,
-		nextPlayer,
+		numberOfPlayers,
 		playArea,
-		previousPlayerDeck,
-		previousPlayerDiscard,
-		previousPlayerHand,
-		previousPlayer,
+		playField,
 		trashPile,
-		userColor,
-		userCounters,
-		userDeck,
-		userDiscard,
-		userHand,
-		user,
 		userPlayerNumber,
 	}) => (
 	<div className="App container-fluid" style={{"height": "99vh"}} >
    		<div className="row testingMatch" style={{"height": "100%"}}>
 	   		<div className="col-sm-2 column">
-	   			<div style={{"height": "45%", "backgroundColor": previousPlayer.color }}>
-					<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
-	    			<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
+	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color }}>
+	   				{matchPlayers[(userPlayerNumber+2)%3].fields.map((i, index) => (
+						<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />				
+	   				))}
 				</div>
-	    		<div style={{"height": "5%", "backgroundColor": previousPlayer.color}}>{previousPlayer.user} Info</div>
-	   			<div style={{"height": "45%", "backgroundColor": nextPlayer.color}}>
-					<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
-	    			<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
+	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color}}>
+	    			{matchPlayers[(userPlayerNumber+2)%3].user} 
+	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[(userPlayerNumber+2)%3].counters.plenty}
 	    		</div>
-	    		<div style={{"height": "5%", "backgroundColor": nextPlayer.color}}>{nextPlayer.user} Info</div>
+	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
+					{matchPlayers[(userPlayerNumber+1)%3].fields.map((i, index) => (
+						<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />				
+	   				))}
+	    		</div>
+	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
+	    			{matchPlayers[(userPlayerNumber+1)%3].user} 
+	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[(userPlayerNumber+1)%3].counters.plenty}
+	    		</div>
 	   		</div>
 	    	<div className="col-sm-7 column">
 	    		<div style= {{"height": "30%"}} className="market">
@@ -61,19 +57,27 @@ const Match=
 	    				<div className="marketObject" >Plenty</div>
 	    			</div>
 	    		</div>
-	    		<div style= {{height: "35%", "backgroundColor": (currentPlayer===userPlayerNumber?userColor:(currentPlayer===nextPlayer.playerNumber?nextPlayer.color:previousPlayer.color) )}}>
-	    			<div style={{float: "center"}}>{currentPlayer===userPlayerNumber?user:(currentPlayer===nextPlayer.playerNumber?nextPlayer.user:previousPlayer.user)}'s Play Area</div>
+	    		<div style= {{height: "35%", "backgroundColor": matchPlayers[currentPlayerNumber].color }}>
+	    			<div style={{display: "flow-root"}}>
+	    				<div style={{float: "left"}}>{matchPlayers[currentPlayerNumber].user}'s Play Area</div>
+	    				<div style={{float: "right"}}>
+	    					<img className="icon" src="https://image.ibb.co/nwjNQp/coin.png" />: {matchPlayers[currentPlayerNumber].counters.coin} 
+	    					<img className="icon" src="https://image.ibb.co/gOBfBU/plant.png" />: {matchPlayers[currentPlayerNumber].counters.plant} 
+	    					<img className="icon" src="https://image.ibb.co/gZzp5p/harvest.png" />: {matchPlayers[currentPlayerNumber].counters.harvest} 
+	    					<img className="icon" src="https://image.ibb.co/ggp0BU/scrap.png" />: {matchPlayers[currentPlayerNumber].counters.scrap} 
+	    					<img className="icon" src="https://image.ibb.co/icF7rU/market_Scrap.png" />: {matchPlayers[currentPlayerNumber].counters.marketScrap}
+	    				</div>
+	    			</div>
 	    			{playArea.map((i, index) => (
 	    				<Card place="playArea" id={i} />
 	    			))}
 	    		</div>
-	    		<div style= {{height: "5%", "backgroundColor": userColor}}>
-	    			<div style={{float: "left", display: "inline-block"}}>{user}: {userPlayerNumber}</div>
-	    			<div style={{display: "inline-block"}}>Plenty: {userCounters.plenty} // Coin: {userCounters.coin} // Plant: {userCounters.plant} // Harvest: {userCounters.harvest} // Scrap: {userCounters.scrap} // MarketScrap: {userCounters.marketScrap}</div>
-	    			<button style={{float: "right", display: userPlayerNumber===currentPlayer ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayer, userDeck, userDiscard, userHand, matchPath, matchPlayers.length, playArea, userPlayerNumber)}>End Turn</button>
+	    		<div style= {{height: "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
+	    			<div style={{float: "left", display: "inline-block"}}>{matchPlayers[userPlayerNumber].user}: {userPlayerNumber}</div>
+	    			<button style={{float: "right", display: userPlayerNumber===currentPlayerNumber ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayerNumber, matchPlayers[userPlayerNumber], matchPath, numberOfPlayers, playArea, userPlayerNumber)}>End Turn</button>
 	    		</div>
-	    		<div style= {{"height": "30%", "backgroundColor": userColor}} className="yourHand">
-	    			{userHand.map((i, index) => (
+	    		<div style= {{"height": "30%", "backgroundColor": matchPlayers[userPlayerNumber].color}} className="yourHand">
+	    			{matchPlayers[userPlayerNumber].hand.map((i, index) => (
 						<Card  place="userHand" id={i} />
 					))}
 	    		</div>
@@ -82,17 +86,20 @@ const Match=
 	    		<div style= {{"height": "25%"}}>
 	    			<img className="communityField" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
 	    		</div>
-	    		<div style= {{"height": "50%", "backgroundColor": userColor}}>
-	    			<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
-	    			<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />	    			
+	    		<div style= {{"height": "50%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
+					{matchPlayers[userPlayerNumber].fields.map((i, index) => (
+						<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />				
+	   				))}	    			
 	    		</div>
-	    		<div style={{"height": "5%", "backgroundColor": userColor}}>Buffer Zone</div>
-	    		<div style= {{"height": "20%", "backgroundColor": userColor}}>
+	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>Buffer Zone</div>
+	    		<div style= {{"height": "20%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
+	    			<img className= "icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[userPlayerNumber].counters.plenty}
 	    			<div className="userDeckArea">
 		    			<img className="yourDeck" src={cardBackSrc} alt="cardBack" />
-		    			<div className="textOverImage">{userDeck===null ? 0 : userDeck.length}</div>
+		    			<div className="textOverImage">{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
 		    			<img className="yourDiscard" src="https://image.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
 		    		</div>
+		    		<button onClick={() => playField(10, matchPath, userPlayerNumber)}>Play Field</button>
 	    		</div>
 	    	</div>
 	    	<CardModal />

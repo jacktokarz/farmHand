@@ -98,6 +98,30 @@ export function checkRegister(dispatch, un, pw, cp) {
   }
 }
 
+export function convertPlayerNumberToWord(number) {
+    if(number === 0) {
+      return 'playerOne';
+    }
+    else if(number === 1) {
+      return 'playerTwo';
+    }
+    else {
+      return 'playerThree';
+    }
+}
+
+export function convertPlayerWordToNumber(word) {
+    if(word === 'playerOne') {
+      return 0;
+    }
+    else if(word === 'playerTwo') {
+      return 1;
+    }
+    else {
+      return 2;
+    }
+}
+
 export function createMatch(user) {
   const keyQuery= database.ref('/matches/').orderByKey().limitToLast(1);
   keyQuery.once("value")
@@ -108,7 +132,7 @@ export function createMatch(user) {
         const today = new Date();
         const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         insertObject(path+'/date', todayDate);
-        insertObject(path+'/currentPlayer', "playerOne");
+        insertObject(path+'/currentPlayerNumber', "playerOne");
         const market= shuffleArray(defaultMarketArray);
         console.log("inserting market: "+market.toString());
         for(var i= 0; i < market.length; i++) {
@@ -130,15 +154,18 @@ function displayError(message) {
   console.log("ERROR ERROR - "+message);
 }
 
-export function endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfPlayers, playArea, playerNumber) {
-  deck= (deck === null ? [] : deck);
-  discard= (discard === null ? [] : discard);
-  hand= (hand === null ? [] : hand);
+export function endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, playerNumber) {
+  let deck= (userPlayer.deck === null ? [] : userPlayer.deck);
+  let discard= (userPlayer.discard === null ? [] : userPlayer.discard);
+  let hand= (userPlayer.hand === null ? [] : userPlayer.hand);
+  console.log("so userPlayer is: "+userPlayer+'\n'+"and now we have: "+deck);
   playArea= (playArea === null ? [] : playArea);
+  const playerWord= convertPlayerNumberToWord(playerNumber);
 //updates player's hand, deck and discard
   console.log("ending "+playerNumber+"'s turn with deck "+JSON.stringify(deck)+'\n'+" and discard "+JSON.stringify(discard)+'\n'+" and hand "+JSON.stringify(hand));
   let newDiscard= discard.concat(hand);
   newDiscard= newDiscard.concat(playArea);
+  console.log("new discard looking like: "+newDiscard.toString());
   let newHand= [];
   if(deck.length < 5) {
     while(deck.length > 0) {
@@ -161,26 +188,16 @@ export function endTurn(currentPlayer, deck, discard, hand, matchPath, numberOfP
     scrap: 0,
     marketScrap: 0
   };
-  insertObject(matchPath+'/'+playerNumber+"/counters", emptyCounters);
-  updateMatchPlayerArray(matchPath, playerNumber, "deck", deck);
-  updateMatchPlayerArray(matchPath, playerNumber, "discard", newDiscard);
-  updateMatchPlayerArray(matchPath, playerNumber, "hand", newHand);
+  insertObject(matchPath+'/'+playerWord+"/counters", emptyCounters);
+  updateMatchPlayerArray(matchPath, playerWord, "deck", deck);
+  updateMatchPlayerArray(matchPath, playerWord, "discard", newDiscard);
+  updateMatchPlayerArray(matchPath, playerWord, "hand", newHand);
   database.ref(matchPath+'/playArea').set(null);
 
 //updates currentPlayer for next player
-  if(currentPlayer==="playerOne") {
-    currentPlayer= "playerTwo";
-  }
-  else {
-    if(numberOfPlayers===2) {
-      currentPlayer= "playerOne";
-    }
-    else {
-      currentPlayer= currentPlayer==="playerTwo" ? "playerThree" : "playerOne";
-    }
-  }
+  currentPlayerNumber= (currentPlayerNumber+1)%numberOfPlayers;
   let updates= {};
-  updates[matchPath+'/currentPlayer']= currentPlayer;
+  updates[matchPath+'/currentPlayerNumber']= currentPlayerNumber;
   database.ref().update(updates);
 }
 
@@ -208,17 +225,21 @@ function getMatchPlayers(dispatch, matchPath, user) {
   database.ref(matchPath+'/').once('value')
     .then(function(snapshot) {
       const pOne= snapshot.child('playerOne/').child('/user').val();
-      const cOne= snapshot.child('playerOne/').child('/color').val();
       const pTwo= snapshot.child('playerTwo/').child('/user').val();
-      const cTwo= snapshot.child('playerTwo/').child('/color').val();
       const pThree= snapshot.child('playerThree/').child('/user').val();
-      const cThree= snapshot.child('playerThree/').child('/color').val();
-
+      let userPlayerNumber=null;
+      if(user===pOne) {
+        userPlayerNumber=0;
+      }
+      else if(user===pTwo) {
+        userPlayerNumber=1;
+      }
+      else if(user===pThree) {
+        userPlayerNumber=2;
+      }
+      dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
       const matchPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null });
-      const matchColors= [cOne, cTwo, cThree];
-      console.log("match players: "+matchPlayers);
-      setMatchPlayerNumbers(dispatch, matchPath, matchColors, matchPlayers, user);
-      dispatch(fromMatch.saveMatchPlayers(matchPlayers));
+      dispatch(fromMatch.saveNumberOfPlayers(matchPlayers.length));
     });
 }
 
@@ -268,7 +289,8 @@ export function matchMount(dispatch) {
     else {
       const matchPath= '/matches/'+matchId;
       dispatch(fromMatch.saveMatchPath(matchPath));
-      getMatchPlayers(dispatch, matchPath, user);  
+      getMatchPlayers(dispatch, matchPath, user);
+      listenForMatchUpdates(dispatch, matchPath);
     }
   }
 }
@@ -277,10 +299,25 @@ export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
 }
 
-export function playCard(id, matchPath, playerNumber, counters, playArea) {
-  console.log(playerNumber+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters));
+export function plantCard(id, fieldId, matchPath, playerNumber) {
+  const playerWord= convertPlayerNumberToWord(playerNumber);
   const cardData= cardMap[id];
-  database.ref(matchPath+'/'+playerNumber+'/hand/'+id).set(null);
+  database.ref(matchPath+'/'+playerWord+'/fields/'+fieldId);
+}
+
+export function playField(id, matchPath, playerNumber) {
+  console.log("playing field: "+id);
+  const playerWord= convertPlayerNumberToWord(playerNumber);
+  const cardData= cardMap[id];
+  const field= {crops: [], available: false};
+  database.ref(matchPath+'/'+playerWord+'/fields/'+id).set(field);
+}
+
+export function playCard(id, matchPath, playerNumber, counters, playArea) {
+  const playerWord= convertPlayerNumberToWord(playerNumber);
+  console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters));
+  const cardData= cardMap[id];
+  database.ref(matchPath+'/'+playerWord+'/hand/'+id).set(null);
   playArea.push(id);
   let updates= {};
   updates[matchPath+'/playArea']= playArea;
@@ -295,7 +332,7 @@ export function playCard(id, matchPath, playerNumber, counters, playArea) {
   };
   console.log("new counters: "+JSON.stringify(counters));
   updates= {};
-  updates[matchPath+'/'+playerNumber+'/counters']= counters;
+  updates[matchPath+'/'+playerWord+'/counters']= counters;
   database.ref().update(updates);
 }
 
@@ -321,44 +358,6 @@ function registerUser(username, password, dispatch) {
 function setCookie(cname, cvalue) {
     document.cookie = cname + "=" + cvalue + ";expires=Thu, 21 July 2050 01:00:00 UTC;";
     console.log(cname+" cookie set as "+cvalue);
-}
-
-function setMatchPlayerNumbers(dispatch, matchPath, colors, players, user) {
-  console.log("setting user ^^^^^^ "+players.length+players.toString());
-  const threePlayers = players.length === 3;
-  let userColor= colors[0];
-  let userPlayerNumber= "playerOne";
-  if(players[0] === user) {
-    dispatch(fromMatch.saveNextPlayer(colors[1], players[1], "playerTwo"));
-    if(threePlayers) {
-      dispatch(fromMatch.savePreviousPlayer(colors[2], players[2], "playerThree"));
-    }
-  }
-  else if(players[1] === user) {
-    userPlayerNumber= 'playerTwo';
-    userColor= colors[1];
-    if(threePlayers) {
-       dispatch(fromMatch.saveNextPlayer(colors[2], players[2], "playerThree"));
-       dispatch(fromMatch.savePreviousPlayer(colors[0], players[0], "playerOne"));
-    }
-    else {
-      dispatch(fromMatch.saveNextPlayer(colors[0], players[0], "playerOne"));
-    }
-  }
-  else if(players[2] === user) {
-    userPlayerNumber= "playerThree";
-    userColor= colors[2];
-     dispatch(fromMatch.saveNextPlayer(colors[0], players[0], "playerOne"));
-     dispatch(fromMatch.savePreviousPlayer(colors[1], players[1], "playerTwo"));
-  }
-  else {
-    displayError("You are not a player in this match!");
-    return "";
-  }
-  console.log("USER PLAYER N SET TO: "+userPlayerNumber);
-  dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
-  dispatch(fromMatch.saveUserColor(userColor));
-  listenForMatchUpdates(dispatch, matchPath, players, userPlayerNumber);
 }
 
 function shuffleArray(passedArray) {

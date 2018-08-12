@@ -6,10 +6,13 @@ import {
 	getCardModalData, 
 	getCardModalId, 
 	getCardModalVis, 
-	getCurrentPlayer, 
+	getCurrentPlayerNumber, 
 	getMarketArray, 
 	getMatchPath, 
 	getPlayArea, 
+	getPlayerOne,
+	getPlayerTwo,
+	getPlayerThree,
 	getUserCounters, 
 	getUserDiscard, 
 	getUserPlayerNumber 
@@ -18,26 +21,36 @@ import {CardModal} from '../components'
 import {buyMarketCard, playCard} from '../utils'
 
 
-const mapStateToProps= (state) => (
-	{
+const mapStateToProps= (state) => {
+	const userPlayerNumber= getUserPlayerNumber(state);
+	let user= {};
+	if(userPlayerNumber===0) {
+		user= getPlayerOne(state);
+	}
+	else if(userPlayerNumber===1) {
+		user= getPlayerTwo(state);
+	}
+	else {
+		user= getPlayerThree(state);
+	}
+	return {
 		actions: getCardModalActions(state),
-		currentPlayer: getCurrentPlayer(state),
+		currentPlayerNumber: getCurrentPlayerNumber(state),
 		data: getCardModalData(state),
-		userPlayerNumber: getUserPlayerNumber(state),
+		userPlayerNumber: userPlayerNumber,
 		vis: getCardModalVis(state),
 		func: (title) => {
-			console.log("pop happening");
 			if(title === "Buy") {
-				buyMarketCard(getUserDiscard(state), getCardModalId(state), getMarketArray(state), getMatchPath(state), getUserPlayerNumber(state));
+				buyMarketCard(user.discard, getCardModalId(state), getMarketArray(state), getMatchPath(state), getUserPlayerNumber(state));
 			}
 			else {
 				if(title === "Play") {
-					playCard(getCardModalId(state), getMatchPath(state), getUserPlayerNumber(state), getUserCounters(state), getPlayArea(state));
+					playCard(getCardModalId(state), getMatchPath(state), getUserPlayerNumber(state), user.counters, getPlayArea(state));
 				}
 			}
 		}
 	}
-)
+}
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeCardModal()),

@@ -1,11 +1,11 @@
 import { fromLobby, fromMatch } from '../actions'
-import { database, getCookie } from './'
+import { convertPlayerWordToNumber, database, getCookie } from './'
 
 
-function listenForCurrentPlayer(dispatch, matchPath ) {
-  database.ref(matchPath+'/currentPlayer').on("value", snapshot => {
+function listenForCurrentPlayerNumber(dispatch, matchPath ) {
+  database.ref(matchPath+'/currentPlayerNumber').on("value", snapshot => {
     console.log("current player is: "+snapshot.val());
-    dispatch(fromMatch.updateCurrentPlayer(snapshot.val()));
+    dispatch(fromMatch.updateCurrentPlayerNumber(snapshot.val()));
   })
 }
 
@@ -57,16 +57,14 @@ function listenForMatchMarketArray(dispatch, matchPath ) {
   } );
 }
 
-export function listenForMatchUpdates(dispatch, matchPath, matchPlayers, userPlayerNumber) {
-  listenForCurrentPlayer(dispatch, matchPath);
-  listenForMatchMarketArray(dispatch, matchPath);
-  listenForPlayArea(dispatch, matchPath);
-  listenForPlayerOneUpdates(dispatch, matchPath, userPlayerNumber);
-  listenForPlayerTwoUpdates(dispatch, matchPath, userPlayerNumber);
-  console.log("listening, match players are: "+matchPlayers.toString());
-  if(matchPlayers.length === 3) {
-	  listenForPlayerThreeUpdates(dispatch, matchPath, userPlayerNumber);
-  }
+export function listenForMatchUpdates(dispatch, matchPath) {
+	database.ref('matches/').off();
+	listenForCurrentPlayerNumber(dispatch, matchPath);
+	listenForMatchMarketArray(dispatch, matchPath);
+	listenForPlayArea(dispatch, matchPath);
+	listenForPlayerUpdates(dispatch, matchPath, "playerOne");
+	listenForPlayerUpdates(dispatch, matchPath, "playerTwo");
+	listenForPlayerUpdates(dispatch, matchPath, "playerThree");
 }
 
 function listenForPlayArea(dispatch, matchPath) {
@@ -81,165 +79,48 @@ function listenForPlayArea(dispatch, matchPath) {
 }
 
 
-function listenForPlayerOneUpdates(dispatch, matchPath, userPlayerNumber) {
-	database.ref(matchPath+'/playerOne/counters/').on("value", snapshot => {
-		if(userPlayerNumber==='playerOne') {
-			dispatch(fromMatch.saveUserCounters(snapshot.val()));
+function listenForPlayerUpdates(dispatch, matchPath, playerNumber) {
+	database.ref(matchPath+'/'+playerNumber).on("value", snapshot => {
+		const user= snapshot.child('user').val();
+		const color= snapshot.child('color').val();
+		const counts= snapshot.child('counters');
+		const counters= {
+			plenty: counts.child('plenty').val(),
+			coin: counts.child('coin').val(),
+			plant: counts.child('plant').val(),
+			harvest: counts.child('harvest').val(),
+			scrap: counts.child('scrap').val(),
+			marketScrap: counts.child('marketScrap').val()
+		}
+		let deck= [];
+		snapshot.child('deck').forEach(function(childSnapshot) {
+			deck.push(childSnapshot.val());
+		});
+		let discard= [];
+		snapshot.child('discard').forEach(function(childSnapshot) {
+			discard.push(childSnapshot.val());
+		});
+		let fields= [];
+		snapshot.child('fields').forEach(function(childSnapshot) {
+			let crops= [];
+			childSnapshot.child('crops').forEach(function(grandchildSnapshot) {
+				crops.push(grandchildSnapshot.val());
+			});
+			fields.push({id: childSnapshot.child('id').val(), crops: crops, available: childSnapshot.child('available').val()})
+		});
+		let hand= [];
+		snapshot.child('hand').forEach(function(childSnapshot) {
+			hand.push(childSnapshot.val());
+		});
+		const player= {user: user, color: color, counters: counters, deck: deck, discard: discard, fields: fields, hand: hand};
+		if(playerNumber==="playerOne") {
+			dispatch(fromMatch.savePlayerOne(player));
+		}
+		else if(playerNumber==="playerTwo") {
+			dispatch(fromMatch.savePlayerTwo(player));
+		}
+		else {
+			dispatch(fromMatch.savePlayerThree(player));
 		}
 	});
-	database.ref(matchPath+'/playerOne/deck/').on("value", snapshot => {
-    let playerOneDeck= [];
-    snapshot.forEach(function(childSnapshot) {
-      console.log("Child of p1 deck: "+childSnapshot.val());
-      playerOneDeck.push(childSnapshot.val());
-    });
-    console.log("full retrieved deck: "+playerOneDeck.toString());
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveUserDeck(playerOneDeck));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDeck(playerOneDeck));
-    }
-    else {
-      dispatch(fromMatch.saveNextPlayerDeck(playerOneDeck));
-    }
-  });
-  database.ref(matchPath+'/playerOne/discard/').on("value", snapshot => {
-    let playerOneDiscard= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerOneDiscard.push(childSnapshot.val());
-    });
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveUserDiscard(playerOneDiscard));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDiscard(playerOneDiscard));
-    }
-    else {
-      dispatch(fromMatch.saveNextPlayerDiscard(playerOneDiscard));
-    }
-  });
-  database.ref(matchPath+'/playerOne/hand/').on("value", snapshot => {
-    let playerOneHand= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerOneHand.push(childSnapshot.val());
-    });
-    console.log("Player One hand is: "+playerOneHand.toString());
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveUserHand(playerOneHand));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerHand(playerOneHand));
-    }
-    else {
-      dispatch(fromMatch.saveNextPlayerHand(playerOneHand));
-    }
-  });
-}
-
-function listenForPlayerTwoUpdates(dispatch, matchPath, userPlayerNumber) {
-	database.ref(matchPath+'/playerTwo/counters/').on("value", snapshot => {
-		if(userPlayerNumber==='playerTwo') {
-			dispatch(fromMatch.saveUserCounters(snapshot.val()));
-		}
-	});
-  database.ref(matchPath+'/playerTwo/deck/').on("value", snapshot => {
-    let playerTwoDeck= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerTwoDeck.push(childSnapshot.val());
-    });
-    console.log("Player TWO hand is: "+playerTwoDeck.toString());
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.savePreviousPlayerDeck(playerTwoDeck));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.saveUserDeck(playerTwoDeck));
-    }
-    else {
-      dispatch(fromMatch.savePreviousPlayerDeck(playerTwoDeck));
-    }
-  });
-  database.ref(matchPath+'/playerTwo/discard/').on("value", snapshot => {
-    let playerTwoDiscard= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerTwoDiscard.push(childSnapshot.val());
-    });
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.savePreviousPlayerDiscard(playerTwoDiscard));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.saveUserDiscard(playerTwoDiscard));
-    }
-    else {
-      dispatch(fromMatch.savePreviousPlayerDiscard(playerTwoDiscard));
-    }  
-  });
-  database.ref(matchPath+'/playerTwo/hand/').on("value", snapshot => {
-    let playerTwoHand= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerTwoHand.push(childSnapshot.val());
-    });
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.savePreviousPlayerHand(playerTwoHand));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.saveUserHand(playerTwoHand));
-    }
-    else {
-      dispatch(fromMatch.savePreviousPlayerHand(playerTwoHand));
-    }
-  });
-}
-
-function listenForPlayerThreeUpdates(dispatch, matchPath, userPlayerNumber) {
-	database.ref(matchPath+'/playerThree/counters/').on("value", snapshot => {
-		if(userPlayerNumber==='playerOne') {
-			dispatch(fromMatch.saveUserCounters(snapshot.val()));  		
-  		}
-	});
-  database.ref(matchPath+'/playerThree/deck/').on("value", snapshot => {
-    let playerThreeDeck= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerThreeDeck.push(childSnapshot.val());
-    });
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveNextPlayerDeck(playerThreeDeck));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDeck(playerThreeDeck));    
-    }
-    else {
-      dispatch(fromMatch.saveUserDeck(playerThreeDeck));
-    }
-  });
-  database.ref(matchPath+'/playerThree/discard/').on("value", snapshot => {
-    let playerThreeDiscard= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerThreeDiscard.push(childSnapshot.val());
-    });
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveNextPlayerDiscard(playerThreeDiscard));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerDiscard(playerThreeDiscard));    
-    }
-    else {
-      dispatch(fromMatch.saveUserDiscard(playerThreeDiscard));
-    }  
-  });
-  database.ref(matchPath+'/playerThree/hand/').on("value", snapshot => {
-    let playerThreeHand= [];
-    snapshot.forEach(function(childSnapshot) {
-      playerThreeHand.push(childSnapshot.val());
-    });    
-    if(userPlayerNumber==='playerOne') {
-      dispatch(fromMatch.saveNextPlayerHand(playerThreeHand));
-    }
-    else if(userPlayerNumber==='playerTwo') {
-      dispatch(fromMatch.savePreviousPlayerHand(playerThreeHand));    
-    }
-    else {
-      dispatch(fromMatch.saveUserHand(playerThreeHand));
-    }  
-  });
 }

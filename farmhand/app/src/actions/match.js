@@ -4,22 +4,12 @@ export const actionTypes= {
 	OPENCARDMODAL: 'match openCardModal',
 	SAVEMARKETARRAY: 'match saveMarketArray',
 	SAVEMATCHPATH: 'match saveMatchPath',
-	SAVEMATCHPLAYERS: 'match saveMatchPlayers',
-	SAVEUSERCOLOR: 'match saveUserColor',
-	SAVEUSERCOUNTERS: 'match saveUserCounters',
-	SAVEUSERDECK: 'match saveUserDeck',
-	SAVEUSERDISCARD: 'match saveUserDiscard',
-	SAVEUSERHAND: 'match saveUserHand',
-	SAVENEXTPLAYERDECK: 'match saveNextPlayerDeck',
-	SAVENEXTPLAYERDISCARD: 'match saveNextPlayerDiscard',
-	SAVENEXTPLAYERHAND: 'match saveNextPlayerHand',
-	SAVENEXTPLAYER: 'match saveNextPlayer',
-	SAVEPREVIOUSPLAYERDECK: 'match savePreviousPlayerDeck',
-	SAVEPREVIOUSPLAYERDISCARD: 'match savePreviousPlayerDiscard',
-	SAVEPREVIOUSPLAYERHAND: 'match savePreviousPlayerHand',
-	SAVEPREVIOUSPLAYER: 'match savePreviousPlayer',
+	SAVENUMBEROFPLAYERS: 'match saveNumberOfPlayers',
+	SAVEPLAYERONE: 'match savePlayerOne',
+	SAVEPLAYERTWO: 'match savePlayerTwo',
+	SAVEPLAYERTHREE: 'match savePlayerThree',
 	SAVEUSERPLAYERNUMBER: 'match saveUserPlayerNumber',
-	UPDATECURRENTPLAYER: 'match updateCurrentPlayer',
+	UPDATECURRENTPLAYERNUMBER: 'match updateCurrentPlayerNumber',
 	UPDATEPLAYAREA: 'match updatePlayArea',
 }
 
@@ -54,78 +44,24 @@ export const saveMatchPath= (path) => ({
 	payload: path,
 })
 
-export const saveMatchPlayers= (array) => ({
-	type: actionTypes.SAVEMATCHPLAYERS,
-	payload: array,
+export const saveNumberOfPlayers= (number) => ({
+	type: actionTypes.SAVENUMBEROFPLAYERS,
+	payload: number,
 })
 
-export const saveNextPlayerDeck= (deck) => ({
-	type: actionTypes.SAVENEXTPLAYERDECK,
-	payload: deck,
+export const savePlayerOne= (player) => ({
+	type: actionTypes.SAVEPLAYERONE,
+	player: player,
 })
 
-export const saveNextPlayerDiscard= (discard) => ({
-	type: actionTypes.SAVENEXTPLAYERDISCARD,
-	payload: discard,
+export const savePlayerTwo= (player) => ({
+	type: actionTypes.SAVEPLAYERTWO,
+	player: player,
 })
 
-export const saveNextPlayerHand= (hand) => ({
-	type: actionTypes.SAVENEXTPLAYERHAND,
-	payload: hand,
-})
-
-export const saveNextPlayer= (color, user, playerNumber) => ({
-	type: actionTypes.SAVENEXTPLAYER,
-	color: color,
-	user: user,
-	playerNumber: playerNumber,
-})
-
-export const savePreviousPlayerDeck= (deck) => ({
-	type: actionTypes.SAVEPREVIOUSPLAYERDECK,
-	payload: deck,
-})
-
-export const savePreviousPlayerDiscard= (discard) => ({
-	type: actionTypes.SAVEPREVIOUSPLAYERDISCARD,
-	payload: discard,
-})
-
-export const savePreviousPlayerHand= (hand) => ({
-	type: actionTypes.SAVEPREVIOUSPLAYERHAND,
-	payload: hand,
-})
-
-export const savePreviousPlayer= (color, user, playerNumber) => ({
-	type: actionTypes.SAVEPREVIOUSPLAYER,
-	color: color,
-	user: user,
-	playerNumber: playerNumber,
-})
-
-export const saveUserColor= (color) => ({
-	type: actionTypes.SAVEUSERCOLOR,
-	payload: color,
-})
-
-export const saveUserCounters= (counters) => ({
-	type: actionTypes.SAVEUSERCOUNTERS,
-	payload: counters,
-})
-
-export const saveUserDeck= (deck) => ({
-	type: actionTypes.SAVEUSERDECK,
-	payload: deck,
-})
-
-export const saveUserDiscard= (discard) => ({
-	type: actionTypes.SAVEUSERDISCARD,
-	payload: discard,
-})
-
-export const saveUserHand= (hand) => ({
-	type: actionTypes.SAVEUSERHAND,
-	payload: hand,
+export const savePlayerThree= (player) => ({
+	type: actionTypes.SAVEPLAYERTHREE,
+	player: player,
 })
 
 export const saveUserPlayerNumber= (playerNumber) => ({
@@ -133,9 +69,9 @@ export const saveUserPlayerNumber= (playerNumber) => ({
 	payload: playerNumber,
 })
 
-export const updateCurrentPlayer= (currentPlayer) => ({
-	type: actionTypes.UPDATECURRENTPLAYER,
-	payload: currentPlayer,
+export const updateCurrentPlayerNumber= (currentPlayerNumber) => ({
+	type: actionTypes.UPDATECURRENTPLAYERNUMBER,
+	payload: currentPlayerNumber,
 })
 
 export const updatePlayArea= (playArea) => ({
