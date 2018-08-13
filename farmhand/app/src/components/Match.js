@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 
-import {Card, CardModal} from '../containers'
+import {Card, CardModal, Field} from '../containers'
 import {cardBackSrc} from '../utils'
 
 
@@ -18,7 +18,6 @@ const Match=
 		matchPlayers,
 		numberOfPlayers,
 		playArea,
-		playField,
 		trashPile,
 		userPlayerNumber,
 	}) => (
@@ -27,7 +26,7 @@ const Match=
 	   		<div className="col-sm-2 column">
 	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color }}>
 	   				{matchPlayers[(userPlayerNumber+2)%3].fields.map((i, index) => (
-						<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />				
+						<Field id={i.id===null?0:i.id} />				
 	   				))}
 				</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color}}>
@@ -36,7 +35,7 @@ const Match=
 	    		</div>
 	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
 					{matchPlayers[(userPlayerNumber+1)%3].fields.map((i, index) => (
-						<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />				
+						<Field id={i.id===null?0:i.id} />
 	   				))}
 	    		</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
@@ -88,7 +87,7 @@ const Match=
 	    		</div>
 	    		<div style= {{"height": "50%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 					{matchPlayers[userPlayerNumber].fields.map((i, index) => (
-						<img className="field" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />				
+						<Field id={i.id===null?0:i.id} />				
 	   				))}	    			
 	    		</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>Buffer Zone</div>
@@ -99,7 +98,6 @@ const Match=
 		    			<div className="textOverImage">{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
 		    			<img className="yourDiscard" src="https://image.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
 		    		</div>
-		    		<button onClick={() => playField(10, matchPath, userPlayerNumber)}>Play Field</button>
 	    		</div>
 	    	</div>
 	    	<CardModal />

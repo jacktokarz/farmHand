@@ -38,15 +38,47 @@ function addPlayerToMatch(path, color, deck, hand, user) {
   }
 }
 
+export function askWhichField() {
+  console.log("which field?");
+}
+
+export function buyField(fieldIdToReplace, newFieldId, matchPath, playerNumber) {
+  console.log("playing field: "+newFieldId);
+  const playerWord= convertPlayerNumberToWord(playerNumber);
+  const playerRef= matchPath+'/'+playerWord;
+  const newField= {id: newFieldId, crops: [], available: false};
+  if(fieldIdToReplace!==null) {
+    const query= database.ref(playerRef);
+    query.once("value")
+      .then(function(snapshot) {
+        let crops= [];
+        snapshot.child('/fields').child(fieldIdToReplace).child('/crops').forEach(function(childSnapshot) {
+          crops.push(childSnapshot.val());
+        });
+        let oldDiscard= [];
+        snapshot.child('/discard').forEach(function(childSnapshot) {
+          oldDiscard.push(childSnapshot.val());
+        });
+        oldDiscard.concat(crops);
+        database.ref(playerRef+'/discard').set(oldDiscard);
+        database.ref(playerRef+'/fields/'+newFieldId).set(newField);
+        removeFromDatabase(matchPath+'/market/'+newFieldId);
+      });
+  }
+  else {
+    database.ref(playerRef+'/fields/'+newFieldId).set(newField);
+    removeFromDatabase(matchPath+'/market/'+newFieldId);
+  }
+}
+
 export function buyMarketCard(discard, id, market, matchPath, userPlayerNumber) {
-  discard= discard === null ? [] : discard;
+  console.log("original discard "+discard+'\n'+" and id: "+id);
+  discard= discard===null ? [] : discard;
   console.log("did I get it all? "+discard+id+market);
   market.splice(market.indexOf(id), 1);
-  let updates= {};
-  updates[ matchPath+'/market/'+id]= null;
-  database.ref().update(updates);
-  insertObject( matchPath+'/'+userPlayerNumber+'/discard/'+id, id);
-
+  const userWord= convertPlayerNumberToWord(userPlayerNumber);
+  insertObject( matchPath+'/'+userWord+'/discard/'+id, id);
+  removeFromDatabase(matchPath+'/market/'+id);
 }
 
 export function checkLogin(dispatch, un, pw) {
@@ -132,7 +164,7 @@ export function createMatch(user) {
         const today = new Date();
         const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         insertObject(path+'/date', todayDate);
-        insertObject(path+'/currentPlayerNumber', "playerOne");
+        insertObject(path+'/currentPlayerNumber', 0);
         const market= shuffleArray(defaultMarketArray);
         console.log("inserting market: "+market.toString());
         for(var i= 0; i < market.length; i++) {
@@ -305,14 +337,6 @@ export function plantCard(id, fieldId, matchPath, playerNumber) {
   database.ref(matchPath+'/'+playerWord+'/fields/'+fieldId);
 }
 
-export function playField(id, matchPath, playerNumber) {
-  console.log("playing field: "+id);
-  const playerWord= convertPlayerNumberToWord(playerNumber);
-  const cardData= cardMap[id];
-  const field= {crops: [], available: false};
-  database.ref(matchPath+'/'+playerWord+'/fields/'+id).set(field);
-}
-
 export function playCard(id, matchPath, playerNumber, counters, playArea) {
   const playerWord= convertPlayerNumberToWord(playerNumber);
   console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters));
@@ -353,6 +377,12 @@ function registerUser(username, password, dispatch) {
       console.log("user should be registered");
     }
   });
+}
+
+function removeFromDatabase(path) {
+  let updates= {};
+  updates[ path ]= null;
+  database.ref().update(updates);
 }
 
 function setCookie(cname, cvalue) {

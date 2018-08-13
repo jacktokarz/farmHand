@@ -12,9 +12,8 @@ import {
 	getUser, 
 	getUserPlayerNumber, 
 } from '../selectors'
-import {fromMatch} from '../actions'
 import {Match} from '../components'
-import {endTurn, getCookie, matchMount, playField} from '../utils'
+import {endTurn, matchMount} from '../utils'
 
 
 const mapStateToProps= state => { console.log("player one in contianer: "+JSON.stringify(getPlayerOne(state))+'\n'+"and player number: "+getCurrentPlayerNumber(state)); return {
@@ -24,7 +23,6 @@ const mapStateToProps= state => { console.log("player one in contianer: "+JSON.s
 	matchPlayers: [getPlayerOne(state), getPlayerTwo(state), getPlayerThree(state)],
 	numberOfPlayers: getNumberOfPlayers(state),
 	playArea: getPlayArea(state)===null?[]:getPlayArea(state),
-	playField: (id, matchPath, userPlayerNumber) => {playField(id, matchPath, userPlayerNumber)},
 	user: getUser(state),
 	userPlayerNumber: getUserPlayerNumber(state),
 } }

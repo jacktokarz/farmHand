@@ -8,10 +8,20 @@ import {cardMap} from '../utils'
 
 
 
-const mapStateToProps= (state, ownProps) => { console.log("own props in card: "+JSON.stringify(ownProps)); return (
+const mapStateToProps= (state, ownProps) => { 
+	console.log("own props in card: "+JSON.stringify(ownProps)); 
+	const cardData= cardMap[ownProps.id];
+	let actions=[];
+	if(ownProps.place==="userHand") {
+		actions= ["Play", "Plant"];
+	}
+	else if(ownProps.place==="market" && ownProps.coin >= cardData.cost) {
+		actions= ["Buy"];
+	}
+	return (
 	{
-		actions: ownProps.place==="market" ? ["Buy"] : ["Play", "Plant"],
-		data: cardMap[ownProps.id],
+		actions: actions,
+		data: cardData,
 		handSize: ownProps.place==="market" ? 6 : getUserHandSize(state),
 		place: ownProps.place,
 	}

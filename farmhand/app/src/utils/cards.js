@@ -11,7 +11,8 @@ export const defaultMarketArray= [
 	8,
 	9,
 	10,
-	11
+	11,
+	12
 ]
 
 export const defaultStartingArray= [
@@ -30,7 +31,7 @@ export const defaultStartingArray= [
 export const cardMap= {
 	0: {
 		title: "card back",
-		picture: cardBackSrc
+		picture: ""
 	},
 	1: {
 		title: "Massive Mint",
@@ -208,6 +209,21 @@ export const cardMap= {
 			plenty: 1,
 			coin: 1,
 			waste: 1
+		}
+	},
+	12: {
+		title: "All-Natural Farm",
+		type: "field",
+		picture: "https://image.ibb.co/jZiOo9/All_Natural_Farm.png",
+		cost: 6,
+		faction: "G",
+		primary: {
+			plenty: 2,
+			plant: 1
+		},
+		secondary: {
+			plenty: 2,
+			discard: 1
 		}
 	},
 
