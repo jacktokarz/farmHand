@@ -8,6 +8,10 @@ const initState=
 		cardModalVis: "none",
 		cardModalData: {},
 		cardModalId: 0,
+		choiceModalOptions: ["Example"],
+		choiceModalParentInfo: "",
+		choiceModalTitle: "",
+		choiceModalVis: "none",
 		currentPlayerNumber: 1,
 		marketArray: [0,0,0,0,0,0],
 		matchPath: "/matches/0",
@@ -53,6 +57,10 @@ export default (state=initState, action) => {
 			return {...state,
 				cardModalVis: "none",
 			};
+		case fromMatch.actionTypes.CLOSECHOICEMODAL:
+			return {...state,
+				choiceModalVis: "none",
+			};
 		case fromMatch.actionTypes.DISCARDHAND:
 			console.log("discard action: "+JSON.stringify(action));
 			return {...state,
@@ -72,6 +80,13 @@ export default (state=initState, action) => {
 				cardModalData: action.data,
 				cardModalId: action.id,
 				cardModalVis: "block",
+			};
+		case fromMatch.actionTypes.OPENCHOICEMODAL:
+			return {...state, 
+				choiceModalOptions: action.options,
+				choiceModalParentInfo: action.parentInfo,
+				choiceModalTitle: action.title,
+				choiceModalVis: "block",
 			};
 		case fromMatch.actionTypes.SAVEMARKETARRAY:
 			console.log("updating market array with: "+action.payload.toString());

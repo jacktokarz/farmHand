@@ -5,7 +5,7 @@ import {
 	getCardModalActions, 
 	getCardModalData, 
 	getCardModalId,
-	getCardModalVis, 
+	getCardModalVis,
 	getCurrentPlayerNumber, 
 	getMarketArray, 
 	getMatchPath,
@@ -16,11 +16,10 @@ import {
 	getUserPlayerNumber 
 } from '../selectors'
 import {CardModal} from '../components'
-import {askWhichField, buyField, buyMarketCard, playCard} from '../utils'
+import {askWhichField, buyField, buyMarketCard, cardMap, plantCard, playCard} from '../utils'
 
 
 const mapStateToProps= (state) => {
-	const data= getCardModalData(state);
 	const userPlayerNumber= getUserPlayerNumber(state);
 	let user= {};
 	if(userPlayerNumber===0) {
@@ -34,36 +33,66 @@ const mapStateToProps= (state) => {
 	}
 	return {
 		actions: getCardModalActions(state),
+		cardId: getCardModalId(state),
 		currentPlayerNumber: getCurrentPlayerNumber(state),
-		data: data,
+		data: getCardModalData(state),
+		marketArray: getMarketArray(state),
+		matchPath: getMatchPath(state),
+		playArea: getPlayArea(state),
 		user: user,
 		userPlayerNumber: userPlayerNumber,
 		vis: getCardModalVis(state),
-		func: (actionTitle) => {
-			if(actionTitle === "Buy") {
-				if(data.type==="field") {
-					if(user.fields.length===2) {
-						askWhichField();
-					}
-					else {
-						buyField(null, getCardModalId(state), getMatchPath(state), userPlayerNumber);
-					}
-				}
-				else {
-					buyMarketCard(user.discard, getCardModalId(state), getMarketArray(state), getMatchPath(state), userPlayerNumber);
-				}
-			}
-			else {
-				if(actionTitle === "Play") {
-					playCard(getCardModalId(state), getMatchPath(state), userPlayerNumber, user.counters, getPlayArea(state));
-				}
-			}
-		}
 	}
 }
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeCardModal()),
+	func: (actionTitle, cardId, data, marketArray, matchPath, playArea, user, userPlayerNumber) => {
+		console.log("Card modal id: "+JSON.stringify(cardId));
+		if(actionTitle === "Buy") {
+			if(data.type==="field") {
+				if(user.fields.length===2) {
+					askWhichField();
+				}
+				else {
+					buyField(null, cardId, matchPath, user.counters.coin - data.cost, userPlayerNumber);
+					dispatch(fromMatch.closeCardModal());
+				}
+			}
+			else {
+				buyMarketCard(cardId, marketArray, matchPath, user.counters.coin - data.cost, userPlayerNumber);
+				dispatch(fromMatch.closeCardModal());
+			}
+		}
+		else if(actionTitle === "Play") {
+			let activatedArea= cardMap[cardId].primary;
+			if(activatedArea.or === undefined) {
+				playCard(cardMap[cardId].primary, cardId, matchPath, playArea, userPlayerNumber, user);
+				dispatch(fromMatch.closeCardModal());				
+			}
+			else {
+				const title= "Play which side of the 'OR' statement?";
+				const parentInfo= cardId;
+				const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
+				console.log("choice modal called! "+JSON.stringify(options));
+				dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+			}
+		}
+		else if(actionTitle === "Plant") {
+			console.log("user data for planting: "+JSON.stringify(user));
+			if(user.fields.length === 1) {
+				plantCard(cardId, user.fields[0], matchPath, user.counters.plant, userPlayerNumber);
+				dispatch(fromMatch.closeCardModal());
+			}
+			else {
+				const title= "Plant "+data.title+" in which field?";
+				const parentInfo= cardId;
+				const options= [{id: user.fields[0].id, title: cardMap[user.fields[0].id].title}, {id: user.fields[1].id, title: cardMap[user.fields[1].id].title}]; 
+				console.log("choice modal called! "+JSON.stringify(options));
+				dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+			}
+		}
+	}
 })
 
 

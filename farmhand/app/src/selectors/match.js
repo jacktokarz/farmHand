@@ -7,6 +7,10 @@ export const getCardModalActions= createSelector(matchState, state => state.card
 export const getCardModalData= createSelector(matchState, state => state.cardModalData);
 export const getCardModalId= createSelector(matchState, state => state.cardModalId);
 export const getCardModalVis= createSelector(matchState, state => state.cardModalVis);
+export const getChoiceModalOptions= createSelector(matchState, state => state.choiceModalOptions);
+export const getChoiceModalParentInfo= createSelector(matchState, state => state.choiceModalParentInfo);
+export const getChoiceModalTitle= createSelector(matchState, state => state.choiceModalTitle);
+export const getChoiceModalVis= createSelector(matchState, state => state.choiceModalVis);
 export const getCurrentPlayerNumber= createSelector(matchState, state => state.currentPlayerNumber);
 export const getMatchPath= createSelector(matchState, state => state.matchPath);
 export const getMarketArray= createSelector(matchState, state => state.marketArray);

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 
-import {Card, CardModal, Field} from '../containers'
+import {Card, CardModal, ChoiceModal, Field} from '../containers'
 import {cardBackSrc} from '../utils'
 
 
@@ -26,7 +26,7 @@ const Match=
 	   		<div className="col-sm-2 column">
 	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color }}>
 	   				{matchPlayers[(userPlayerNumber+2)%3].fields.map((i, index) => (
-						<Field id={i.id===null?0:i.id} />				
+						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===(userPlayerNumber+2)%3} player={matchPlayers[(userPlayerNumber+2)%3]} />				
 	   				))}
 				</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color}}>
@@ -35,7 +35,7 @@ const Match=
 	    		</div>
 	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
 					{matchPlayers[(userPlayerNumber+1)%3].fields.map((i, index) => (
-						<Field id={i.id===null?0:i.id} />
+						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===(userPlayerNumber+1)%3} player={matchPlayers[(userPlayerNumber+1)%3]} />
 	   				))}
 	    		</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
@@ -45,11 +45,11 @@ const Match=
 	   		</div>
 	    	<div className="col-sm-7 column">
 	    		<div style= {{"height": "30%"}} className="market">
-	    			<Card  place="market" id={marketArray[0]} />
-	    			<Card  place="market" id={marketArray[1]} />
-	    			<Card  place="market" id={marketArray[2]} />
-	    			<Card  place="market" id={marketArray[3]} />
-	    			<Card  place="market" id={marketArray[4]} />
+	    			<Card  place="market" id={marketArray[0]} counters= {matchPlayers[userPlayerNumber].counters} />
+	    			<Card  place="market" id={marketArray[1]} counters= {matchPlayers[userPlayerNumber].counters} />
+	    			<Card  place="market" id={marketArray[2]} counters= {matchPlayers[userPlayerNumber].counters} />
+	    			<Card  place="market" id={marketArray[3]} counters= {matchPlayers[userPlayerNumber].counters} />
+	    			<Card  place="market" id={marketArray[4]} counters= {matchPlayers[userPlayerNumber].counters} />
 	    			<Card place="hiddenMarket" id={marketArray[5]} />
 	    			<div className="starterFieldAndPlenty" style={{"maxWidth": (100/6-1)+"%"}}>
 	    				<div className="marketObject" >Starter Field</div>
@@ -73,11 +73,11 @@ const Match=
 	    		</div>
 	    		<div style= {{height: "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 	    			<div style={{float: "left", display: "inline-block"}}>{matchPlayers[userPlayerNumber].user}: {userPlayerNumber}</div>
-	    			<button style={{float: "right", display: userPlayerNumber===currentPlayerNumber ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayerNumber, matchPlayers[userPlayerNumber], matchPath, numberOfPlayers, playArea, userPlayerNumber)}>End Turn</button>
+	    			<button style={{cursor: "pointer", float: "right", display: userPlayerNumber===currentPlayerNumber ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayerNumber, matchPlayers[userPlayerNumber], matchPath, numberOfPlayers, playArea, userPlayerNumber)}>End Turn</button>
 	    		</div>
 	    		<div style= {{"height": "30%", "backgroundColor": matchPlayers[userPlayerNumber].color}} className="yourHand">
 	    			{matchPlayers[userPlayerNumber].hand.map((i, index) => (
-						<Card  place="userHand" id={i} />
+						<Card  place="userHand" id={i} counters= {matchPlayers[userPlayerNumber].counters} />
 					))}
 	    		</div>
 	    	</div>
@@ -87,7 +87,7 @@ const Match=
 	    		</div>
 	    		<div style= {{"height": "50%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 					{matchPlayers[userPlayerNumber].fields.map((i, index) => (
-						<Field id={i.id===null?0:i.id} />				
+						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===userPlayerNumber} player={matchPlayers[userPlayerNumber]} />
 	   				))}	    			
 	    		</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>Buffer Zone</div>
@@ -101,6 +101,7 @@ const Match=
 	    		</div>
 	    	</div>
 	    	<CardModal />
+			<ChoiceModal />
 	    </div>
 	</div>
 	)

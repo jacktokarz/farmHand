@@ -9,14 +9,17 @@ import {cardMap} from '../utils'
 
 
 const mapStateToProps= (state, ownProps) => { 
-	console.log("own props in card: "+JSON.stringify(ownProps)); 
 	const cardData= cardMap[ownProps.id];
+	const counts= ownProps.counters===undefined?{}:ownProps.counters;
 	let actions=[];
 	if(ownProps.place==="userHand") {
-		actions= ["Play", "Plant"];
+		actions.push("Play");
+		if(counts.plant>0) {
+			actions.push("Plant");
+		}
 	}
-	else if(ownProps.place==="market" && ownProps.coin >= cardData.cost) {
-		actions= ["Buy"];
+	else if(ownProps.place==="market" && counts.coin >= cardData.cost) {
+		actions.push("Buy");
 	}
 	return (
 	{

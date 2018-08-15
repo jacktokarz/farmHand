@@ -16,7 +16,7 @@ import {Match} from '../components'
 import {endTurn, matchMount} from '../utils'
 
 
-const mapStateToProps= state => { console.log("player one in contianer: "+JSON.stringify(getPlayerOne(state))+'\n'+"and player number: "+getCurrentPlayerNumber(state)); return {
+const mapStateToProps= state => { return {
 	currentPlayerNumber: getCurrentPlayerNumber(state),
 	marketArray: getMarketArray(state),
 	matchPath: getMatchPath(state),

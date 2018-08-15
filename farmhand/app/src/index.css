@@ -50,11 +50,9 @@ body {
 }
 
 .field {
-	height: auto;
-	max-height: 45%;
-	max-width: 80%;
-	width: auto;
-	margin-bottom: 10%;
+	max-width: fit-content;
+    height: auto;
+    width: 90%;
 }
 
 .hidden {
@@ -97,6 +95,14 @@ body {
 .testingMatch div{
 	text-align: center;
 	border: 2px black solid;
+}
+
+.textOverField {
+	color: white;
+    font-weight: bold;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -100%);
 }
 
 .textOverImage {

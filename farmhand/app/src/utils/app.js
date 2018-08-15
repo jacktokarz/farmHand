@@ -22,7 +22,7 @@ function addPlayerToMatch(path, color, deck, hand, user) {
   const counters= {
     plenty: 0,
     coin: 0,
-    plant: 0,
+    plant: 1,
     harvest: 0,
     scrap: 0,
     marketScrap: 0
@@ -42,7 +42,7 @@ export function askWhichField() {
   console.log("which field?");
 }
 
-export function buyField(fieldIdToReplace, newFieldId, matchPath, playerNumber) {
+export function buyField(fieldIdToReplace, newFieldId, matchPath, newCoin, playerNumber) {
   console.log("playing field: "+newFieldId);
   const playerWord= convertPlayerNumberToWord(playerNumber);
   const playerRef= matchPath+'/'+playerWord;
@@ -55,30 +55,27 @@ export function buyField(fieldIdToReplace, newFieldId, matchPath, playerNumber) 
         snapshot.child('/fields').child(fieldIdToReplace).child('/crops').forEach(function(childSnapshot) {
           crops.push(childSnapshot.val());
         });
-        let oldDiscard= [];
-        snapshot.child('/discard').forEach(function(childSnapshot) {
-          oldDiscard.push(childSnapshot.val());
-        });
-        oldDiscard.concat(crops);
-        database.ref(playerRef+'/discard').set(oldDiscard);
         database.ref(playerRef+'/fields/'+newFieldId).set(newField);
-        removeFromDatabase(matchPath+'/market/'+newFieldId);
+        buyWrapUp(newFieldId, matchPath, newCoin, crops, playerWord);
       });
   }
   else {
     database.ref(playerRef+'/fields/'+newFieldId).set(newField);
-    removeFromDatabase(matchPath+'/market/'+newFieldId);
+    buyWrapUp(newFieldId, matchPath, newCoin, [], playerWord);
   }
 }
 
-export function buyMarketCard(discard, id, market, matchPath, userPlayerNumber) {
-  console.log("original discard "+discard+'\n'+" and id: "+id);
-  discard= discard===null ? [] : discard;
-  console.log("did I get it all? "+discard+id+market);
-  market.splice(market.indexOf(id), 1);
+export function buyMarketCard(id, market, matchPath, newCoin, userPlayerNumber) {
   const userWord= convertPlayerNumberToWord(userPlayerNumber);
-  insertObject( matchPath+'/'+userWord+'/discard/'+id, id);
+  buyWrapUp(id, matchPath, newCoin, [id], userWord);
+}
+
+function buyWrapUp(id, matchPath, newCoin, newDiscard, userWord) {
+  for(var i=0; i<newDiscard.length; i++) {
+    insertObject( matchPath+'/'+userWord+'/discard/'+newDiscard[i], newDiscard[i]);
+  }
   removeFromDatabase(matchPath+'/market/'+id);
+  insertObject( matchPath+'/'+userWord+'/counters/coin', newCoin);
 }
 
 export function checkLogin(dispatch, un, pw) {
@@ -186,51 +183,62 @@ function displayError(message) {
   console.log("ERROR ERROR - "+message);
 }
 
+function drawCards(matchPath, numberOfCards, playerNumber, playerObject) {
+
+  const playerWord= convertPlayerNumberToWord(playerNumber);
+  if(playerObject.deck.length < numberOfCards) {
+    while(playerObject.deck.length > 0) {
+      playerObject.hand.push(playerObject.deck.pop());
+    }
+    playerObject.deck= shuffleArray(playerObject.discard);    
+    while(playerObject.hand.length < numberOfCards) {
+      playerObject.hand.push(playerObject.deck.pop());
+      if(playerObject.deck.length === 0) {
+        break;
+      }
+    }
+    updateMatchArray(matchPath+'/'+playerWord+'/discard', null);
+  }
+  else {
+    for(var i=0; i<numberOfCards; i++) {
+      playerObject.hand.push(playerObject.deck.pop());
+    }
+  }
+
+  updateMatchArray(matchPath+'/'+playerWord+'/hand', playerObject.hand);
+  updateMatchArray(matchPath+'/'+playerWord+'/deck', playerObject.deck);
+}
+
 export function endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, playerNumber) {
-  let deck= (userPlayer.deck === null ? [] : userPlayer.deck);
   let discard= (userPlayer.discard === null ? [] : userPlayer.discard);
-  let hand= (userPlayer.hand === null ? [] : userPlayer.hand);
-  console.log("so userPlayer is: "+userPlayer+'\n'+"and now we have: "+deck);
   playArea= (playArea === null ? [] : playArea);
   const playerWord= convertPlayerNumberToWord(playerNumber);
 //updates player's hand, deck and discard
-  console.log("ending "+playerNumber+"'s turn with deck "+JSON.stringify(deck)+'\n'+" and discard "+JSON.stringify(discard)+'\n'+" and hand "+JSON.stringify(hand));
-  let newDiscard= discard.concat(hand);
+  let newDiscard= discard.concat(userPlayer.hand);
   newDiscard= newDiscard.concat(playArea);
+  userPlayer.discard= newDiscard;
   console.log("new discard looking like: "+newDiscard.toString());
-  let newHand= [];
-  if(deck.length < 5) {
-    while(deck.length > 0) {
-      newHand.push(deck.pop());
-    }
-    deck= shuffleArray(newDiscard);
-    newDiscard= [];
-    while(newHand.length < 5) {
-      newHand.push(deck.pop());
-    }
-  }
-  else {
-    newHand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
-  }
-  const emptyCounters= {
+  userPlayer.hand= [];
+  drawCards(matchPath, 5, playerNumber, userPlayer);
+  
+  const newTurnCounters= {
     plenty: 0,
     coin: 0,
-    plant: 0,
+    plant: 1,
     harvest: 0,
     scrap: 0,
     marketScrap: 0
   };
-  insertObject(matchPath+'/'+playerWord+"/counters", emptyCounters);
-  updateMatchPlayerArray(matchPath, playerWord, "deck", deck);
-  updateMatchPlayerArray(matchPath, playerWord, "discard", newDiscard);
-  updateMatchPlayerArray(matchPath, playerWord, "hand", newHand);
+  insertObject(matchPath+'/'+playerWord+"/counters", newTurnCounters);
+  for(var i=0; i<userPlayer.fields.length; i++) {
+    database.ref(matchPath+'/'+playerWord+'/fields/'+userPlayer.fields[i].id+'/available').set(true);
+  console.log(matchPath+'/'+playerWord+'/fields/'+userPlayer.fields[i].id+'/available should now be true');
+  }
   database.ref(matchPath+'/playArea').set(null);
 
 //updates currentPlayer for next player
   currentPlayerNumber= (currentPlayerNumber+1)%numberOfPlayers;
-  let updates= {};
-  updates[matchPath+'/currentPlayerNumber']= currentPlayerNumber;
-  database.ref().update(updates);
+  insertObject(matchPath+'/currentPlayerNumber', currentPlayerNumber);
 }
 
 export function getCardInfo(id) {
@@ -279,6 +287,37 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+export function harvestCrop(cropId, fieldData, matchPath, playArea, playerNumber, userData) {
+  console.log("Harvesting "+cropId);
+  const cropData= cardMap[cropId];
+  //harvest effect of card is played as if from hand (counters updated, goes into play area)
+  if(cropData.type==="seed") {
+    playCard(cropData.secondary, cropId, matchPath, playerNumber, userData.counters, playArea);
+  }
+  //or, it just goes in play area if not a selected
+  else {
+    playArea.push(cropId);
+    updateMatchArray(matchPath+'/playArea', playArea);
+  }
+  const playerWord= convertPlayerNumberToWord(playerNumber);
+  //for counter: take away a harvest...
+  let counters= userData.counters;
+  counters.harvest = counters.harvest-1;
+  //add in the field's primary effect...
+  const fieldCard= cardMap[fieldData.id];
+  console.log("harvest from field: "+JSON.stringify(fieldCard));
+  counters= updateUserCounters(fieldCard.primary, userData.counters);
+  //and maybe secondary
+  if(cropData.faction===fieldCard.faction) {
+    counters= updateUserCounters(fieldCard.secondary, userData.counters);
+  }
+  updateDatabaseCounters(counters, matchPath, playerWord);
+  //remove the id from the crop array
+  fieldData.crops.splice(fieldData.crops.indexOf(cropId), 1);
+  console.log("new crop array without "+cropId+": "+fieldData.crops);
+  updateMatchArray(matchPath+'/'+playerWord+'/fields/'+fieldData.id+'/crops', fieldData.crops);
+}
+
 function insertObject(dbPath, obj, priority) {
   priority= priority===undefined?0:priority;
   console.log("PRIORITY FOR "+obj+" IS: "+priority);
@@ -287,7 +326,7 @@ function insertObject(dbPath, obj, priority) {
       console.log("object submission error");
     }
     else {
-      console.log("object inserted");
+      console.log(JSON.stringify(obj)+" inserted");
     }
   });
 }
@@ -331,33 +370,27 @@ export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
 }
 
-export function plantCard(id, fieldId, matchPath, playerNumber) {
+export function plantCard(cardId, field, matchPath, plantCounter, playerNumber) {
+  console.log("Planting "+cardId+" in: "+JSON.stringify(field));
   const playerWord= convertPlayerNumberToWord(playerNumber);
-  const cardData= cardMap[id];
-  database.ref(matchPath+'/'+playerWord+'/fields/'+fieldId);
+  field.crops.push(cardId);
+  insertObject(matchPath+'/'+playerWord+'/fields/'+field.id+'/crops', field.crops);
+  database.ref(matchPath+'/'+playerWord+'/fields/'+field.id+'/available').set(false);
+  removeFromDatabase(matchPath+'/'+playerWord+'/hand/'+cardId);
+  insertObject(matchPath+'/'+playerWord+'/counters/plant', plantCounter-1);
 }
 
-export function playCard(id, matchPath, playerNumber, counters, playArea) {
+export function playCard(activatedArea, id, matchPath, playArea, playerNumber, playerObject) {
   const playerWord= convertPlayerNumberToWord(playerNumber);
-  console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters));
-  const cardData= cardMap[id];
+  console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(playerObject.counters));
   database.ref(matchPath+'/'+playerWord+'/hand/'+id).set(null);
   playArea.push(id);
-  let updates= {};
-  updates[matchPath+'/playArea']= playArea;
-  database.ref().update(updates);
-  counters= {
-    plenty: counters.plenty+(cardData.primary.plenty===undefined?0:cardData.primary.plenty),
-    coin: counters.coin+(cardData.primary.coin===undefined?0:cardData.primary.coin),
-    plant: counters.plant+(cardData.primary.plant===undefined?0:cardData.primary.plant),
-    harvest: counters.harvest+(cardData.primary.harvest===undefined?0:cardData.primary.harvest),
-    scrap: counters.scrap+(cardData.primary.scrap===undefined?0:cardData.primary.scrap),
-    marketScrap: counters.marketScrap+(cardData.primary.marketScrap===undefined?0:cardData.primary.marketScrap)
-  };
-  console.log("new counters: "+JSON.stringify(counters));
-  updates= {};
-  updates[matchPath+'/'+playerWord+'/counters']= counters;
-  database.ref().update(updates);
+  updateMatchArray(matchPath+'/playArea', playArea);
+  counters= updateUserCounters(activatedArea, playerObject.counters);
+  if(activatedArea.draw > 0) {
+    drawCards(matchPath, activatedArea.numberOfCards, playerNumber, playerObject);
+  }
+  updateDatabaseCounters(counters, matchPath, playerWord);
 }
 
 export function playMatch(key, dispatch) {
@@ -408,16 +441,32 @@ function shuffleArray(passedArray) {
 
 export function startMatch(key) {
   console.log("starting match "+key);
+  insertObject('matches/'+key+'/status', "in progress");
+}
+
+function updateMatchArray(matchPath, array) {
+  database.ref(matchPath).set(null);
   let updates= {};
-  updates['matches/'+key+'/status']= "in progress";
+  for(var i= 0; i < array.length; i++) {
+    updates[matchPath+'/'+array[i]]= {".value": array[i], ".priority": i};
+  }
   database.ref().update(updates);
 }
 
-function updateMatchPlayerArray(matchPath, player, arrayType, array) {
-  database.ref(matchPath+'/'+player+'/'+arrayType).set(null);
+function updateUserCounters(activatedArea, counters) {
+  return counters= {
+    plenty: counters.plenty+(activatedArea.plenty===undefined?0:activatedArea.plenty),
+    coin: counters.coin+(activatedArea.coin===undefined?0:activatedArea.coin),
+    plant: counters.plant+(activatedArea.plant===undefined?0:activatedArea.plant),
+    harvest: counters.harvest+(activatedArea.harvest===undefined?0:activatedArea.harvest),
+    scrap: counters.scrap+(activatedArea.scrap===undefined?0:activatedArea.scrap),
+    marketScrap: counters.marketScrap+(activatedArea.marketScrap===undefined?0:activatedArea.marketScrap)
+  };
+}
+
+function updateDatabaseCounters(counters, matchPath, playerWord) {
+  console.log("new counters: "+JSON.stringify(counters));
   let updates= {};
-  for(var i= 0; i < array.length; i++) {
-    updates[matchPath+'/'+player+'/'+arrayType+'/'+array[i]]= {".value": array[i], ".priority": i};
-  }
+  updates[matchPath+'/'+playerWord+'/counters']= counters;
   database.ref().update(updates);
 }

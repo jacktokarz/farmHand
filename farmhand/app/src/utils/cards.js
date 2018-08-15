@@ -1,4 +1,5 @@
 export const cardBackSrc= "https://image.ibb.co/eoVC8o/cardBack.png"
+export const cropPicture= "https://image.ibb.co/kLAVWU/cropBack.png"
 
 export const defaultMarketArray= [
 	1,
@@ -12,7 +13,8 @@ export const defaultMarketArray= [
 	9,
 	10,
 	11,
-	12
+	12,
+	13
 ]
 
 export const defaultStartingArray= [
@@ -224,6 +226,20 @@ export const cardMap= {
 		secondary: {
 			plenty: 2,
 			discard: 1
+		}
+	},
+	13: {
+		title: "Historical Plot",
+		type: "field",
+		picture: "https://image.ibb.co/kb3jT9/Historical_Plot.png",
+		cost: 3,
+		faction: "C",
+		primary: {
+			plenty: 1,
+			draw: 2
+		},
+		secondary: {
+			plenty: 1
 		}
 	},
 

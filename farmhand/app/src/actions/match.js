@@ -1,7 +1,9 @@
 export const actionTypes= {
 	CLOSECARDMODAL: 'match closeCardModal',
+	CLOSECHOICEMODAL: 'match closeChoiceModal',
 	DRAWHAND: 'match drawHand',
 	OPENCARDMODAL: 'match openCardModal',
+	OPENCHOICEMODAL: 'match openChoiceModal',
 	SAVEMARKETARRAY: 'match saveMarketArray',
 	SAVEMATCHPATH: 'match saveMatchPath',
 	SAVENUMBEROFPLAYERS: 'match saveNumberOfPlayers',
@@ -17,7 +19,10 @@ export const actionTypes= {
 
 export const closeCardModal= () => ({
 	type: actionTypes.CLOSECARDMODAL,
+})
 
+export const closeChoiceModal= () => ({
+	type: actionTypes.CLOSECHOICEMODAL,
 })
 
 export const drawHand= (deck, discard, hand) => ({
@@ -32,6 +37,13 @@ export const openCardModal= (actions, data, id) => ({
 	actions: actions,
 	data: data,
 	id: id,
+})
+
+export const openChoiceModal= (options, parentInfo, title) => ({
+	type: actionTypes.OPENCHOICEMODAL,
+	options: options,
+	parentInfo: parentInfo,
+	title: title,
 })
 
 export const saveMarketArray= (array) => ({
