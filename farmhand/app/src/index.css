@@ -110,6 +110,9 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    color: white;
+    text-shadow: 2px 1px 2px black;
+    font-size: 24px;
 }
 
 .userDeckArea {
@@ -117,12 +120,17 @@ body {
     position: relative;
     text-align: center;
     color: gray;
+    width: 48%;
+    float: left;
 }
 
 .yourDeck {
+	height: auto;
+	max-height: 90%;
 	width: auto;
-	max-width: 30%;
-	max-height: 96%;
+	margin-right: 1%;
+	display: inline-block;
+	max-width: 80%;
 	margin-top: 3%;
 	margin-left: 10%;
 	margin-right: 10%;
@@ -130,9 +138,10 @@ body {
 }
 
 .yourDiscard {
+	height: auto;
+	max-height: 90%;
 	width: auto;
-	max-width: 30%;
-	max-height: 96%;
+	max-width: 80%;
 	margin-top: 3%;
 	margin-left: 5%;
 	margin-right: 5%;
@@ -213,12 +222,35 @@ body {
 	padding: 2px 16px;
 }
 
-.modal-content {
-    background-color: #fefefe;
+.modal-button {
+	width: auto;
+	height: auto;
+	border-radius: 8px;
+	font-size: 28px;
+	margin: 10px;
+}
+
+
+.clear-modal-content {
+    background-color: initial;
+    margin: auto;
+    padding: 20px;
+    max-width: 40%;
+    max-height: 60%;
+    width: auto;
+    height: auto;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+.visible-modal-content {
+    background-color: floralwhite;
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    max-width: 60%;
+    max-width: 40%;
     max-height: 60%;
     width: auto;
     height: auto;
@@ -229,13 +261,15 @@ body {
     animation-duration: 0.4s
 }
 
+
 .modal-img {
 	max-height: 50%;
 	height: auto;
-	max-width: 50%;
+	max-width: 80%;
 	width: auto;
 	display: inline-block;
 }
+
 
 /* Add Animation */
 @-webkit-keyframes animatetop {

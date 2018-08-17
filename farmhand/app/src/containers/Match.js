@@ -30,7 +30,7 @@ const mapStateToProps= state => { return {
 const mapDispatchToProps= dispatch => {
 	matchMount(dispatch);
 	return {
-		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, userPlayerNumber) => { endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, userPlayerNumber) },
+		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) => { endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) },
 	}
 }
 

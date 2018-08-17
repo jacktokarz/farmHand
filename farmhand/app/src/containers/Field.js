@@ -7,7 +7,7 @@ import {cardMap, harvestCrop} from '../utils'
 
 
 
-const mapStateToProps= (state, ownProps) => { console.log("own props in field: "+JSON.stringify(ownProps));
+const mapStateToProps= (state, ownProps) => { 
 	return {
 		crops: ownProps.fieldData.crops,
 		data: cardMap[ownProps.fieldData.id],

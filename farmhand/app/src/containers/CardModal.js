@@ -16,7 +16,7 @@ import {
 	getUserPlayerNumber 
 } from '../selectors'
 import {CardModal} from '../components'
-import {askWhichField, buyField, buyMarketCard, cardMap, plantCard, playCard} from '../utils'
+import {askWhichField, buyField, buyMarketCard, cardMap, plantCard, playCard, scrapCard, scrapMarketCard} from '../utils'
 
 
 const mapStateToProps= (state) => {
@@ -91,6 +91,15 @@ const mapDispatchToProps= dispatch => ({
 				console.log("choice modal called! "+JSON.stringify(options));
 				dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
 			}
+		}
+		else if(actionTitle === "Scrap") {
+			if(marketArray.includes(cardId)) {
+				scrapMarketCard(cardId, user.counters.marketScrap, matchPath, userPlayerNumber);
+			}
+			else {
+				scrapCard(cardId, user.counters.scrap, matchPath, userPlayerNumber);
+			}
+			dispatch(fromMatch.closeCardModal());
 		}
 	}
 })

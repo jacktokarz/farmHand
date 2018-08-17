@@ -73,7 +73,7 @@ const Match=
 	    		</div>
 	    		<div style= {{height: "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 	    			<div style={{float: "left", display: "inline-block"}}>{matchPlayers[userPlayerNumber].user}: {userPlayerNumber}</div>
-	    			<button style={{cursor: "pointer", float: "right", display: userPlayerNumber===currentPlayerNumber ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayerNumber, matchPlayers[userPlayerNumber], matchPath, numberOfPlayers, playArea, userPlayerNumber)}>End Turn</button>
+	    			<button style={{cursor: "pointer", float: "right", display: userPlayerNumber===currentPlayerNumber ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayerNumber, matchPlayers[userPlayerNumber], matchPath, numberOfPlayers, playArea)}>End Turn</button>
 	    		</div>
 	    		<div style= {{"height": "30%", "backgroundColor": matchPlayers[userPlayerNumber].color}} className="yourHand">
 	    			{matchPlayers[userPlayerNumber].hand.map((i, index) => (
@@ -93,10 +93,15 @@ const Match=
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>Buffer Zone</div>
 	    		<div style= {{"height": "20%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 	    			<img className= "icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[userPlayerNumber].counters.plenty}
-	    			<div className="userDeckArea">
-		    			<img className="yourDeck" src={cardBackSrc} alt="cardBack" />
-		    			<div className="textOverImage">{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
-		    			<img className="yourDiscard" src="https://image.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
+	    			<div >
+	    				<div className="userDeckArea">
+			    			<img className="yourDeck" src={cardBackSrc} alt="cardBack" />
+			    			<div className="textOverImage">{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
+						</div>
+						<div className="userDeckArea">
+			    			<img className="yourDiscard" src="https://image.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
+		    				<div className="textOverImage">{matchPlayers[userPlayerNumber].discard===null ? 0 : matchPlayers[userPlayerNumber].discard.length}</div>
+		    			</div>
 		    		</div>
 	    		</div>
 	    	</div>

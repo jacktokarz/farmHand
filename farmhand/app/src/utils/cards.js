@@ -1,5 +1,6 @@
 export const cardBackSrc= "https://image.ibb.co/eoVC8o/cardBack.png"
 export const cropPicture= "https://image.ibb.co/kLAVWU/cropBack.png"
+export const wasteKey= 666
 
 export const defaultMarketArray= [
 	1,
@@ -31,6 +32,15 @@ export const defaultStartingArray= [
 ]
 
 export const cardMap= {
+	666: {
+		title: "waste",
+		type: "tool",
+		picture: "https://image.ibb.co/cEoG0z/Waste_Template1.png",
+		cost: 0,
+		faction: "",
+		primary: {},
+		secondary: {}
+	},
 	0: {
 		title: "card back",
 		picture: ""

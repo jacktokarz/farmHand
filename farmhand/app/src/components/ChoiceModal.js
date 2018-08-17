@@ -7,7 +7,7 @@ import {} from '../utils'
 const ChoiceModal= ({cardModalId, closeModal, func, matchPath, options, parentInfo, playArea, title, user, userPlayerNumber, vis}) => (
 
 	<div style={{display: vis}} className="modal" onClick={ (event) => (!event.target.classList.contains("inside") ? closeModal() : "" ) }>
-		<div className="modal-content inside" id="modalContent">
+		<div className="visible-modal-content inside" id="modalContent">
     		<div className="modal-header inside">
     			<span onClick={closeModal} className="close">&times;</span>
     		</div>
