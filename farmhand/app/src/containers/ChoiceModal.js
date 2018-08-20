@@ -7,6 +7,7 @@ import {
 	getChoiceModalTitle,
 	getChoiceModalParentInfo,
 	getChoiceModalVis,
+	getMarketArray,
 	getMatchPath,
 	getPlayArea,
 	getPlayerOne,
@@ -15,7 +16,7 @@ import {
 	getUserPlayerNumber,
 } from '../selectors'
 import {ChoiceModal} from '../components'
-import {cardMap, chooseOption, harvestCrop, playCard, plantCard} from '../utils'
+import {buyField, cardMap, chooseOption, harvestCrop, playCard, plantCard} from '../utils'
 
 
 const mapStateToProps= (state) => { console.log("choice modal: "+getChoiceModalOptions(state));
@@ -32,6 +33,7 @@ const mapStateToProps= (state) => { console.log("choice modal: "+getChoiceModalO
 	}
 	return {
 		cardModalId: getCardModalId(state),
+		marketArray: getMarketArray(state),
 		matchPath: getMatchPath(state),
 		options: getChoiceModalOptions(state),
 		parentInfo: getChoiceModalParentInfo(state),
@@ -45,7 +47,7 @@ const mapStateToProps= (state) => { console.log("choice modal: "+getChoiceModalO
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeChoiceModal()),
-	func: (option, cardModalId, matchPath, parentInfo, playArea, title, user, playerNumber) => {
+	func: (option, cardModalId, marketArray, matchPath, parentInfo, playArea, title, user, playerNumber) => {
 		console.log("Option selected! "+JSON.stringify(parentInfo));
 		if(title.startsWith("Play")) {
 		    let cardData= cardMap[option.id];
@@ -62,10 +64,13 @@ const mapDispatchToProps= dispatch => ({
 			if(field.id !== option.id) {
 				field= user.fields[1];
 			}
-		    plantCard(parentInfo, field, matchPath, user.counters.plant, playerNumber);
+		    plantCard(parentInfo, field, matchPath, user.counters.plant, playerNumber, user);
 		}
 		else if(title.startsWith("Harvest")) {
 			harvestCrop(option.id, parentInfo, matchPath, playArea, playerNumber, user);
+		}
+		else if(title.startsWith("Replace")) {
+			buyField(parentInfo, marketArray, matchPath, user.counters.coin - cardMap[option.id].cost, option.id, playerNumber)
 		}
 		dispatch(fromMatch.closeChoiceModal());
 		dispatch(fromMatch.closeCardModal());

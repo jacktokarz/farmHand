@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import {} from '../utils'
 
 
-const ChoiceModal= ({cardModalId, closeModal, func, matchPath, options, parentInfo, playArea, title, user, userPlayerNumber, vis}) => (
+const ChoiceModal= ({cardModalId, closeModal, func, marketArray, matchPath, options, parentInfo, playArea, title, user, userPlayerNumber, vis}) => (
 
 	<div style={{display: vis}} className="modal" onClick={ (event) => (!event.target.classList.contains("inside") ? closeModal() : "" ) }>
 		<div className="visible-modal-content inside" id="modalContent">
@@ -18,7 +18,7 @@ const ChoiceModal= ({cardModalId, closeModal, func, matchPath, options, parentIn
 				{options.map((i, index) => (
 					<button 
 						style={{cursor: "pointer"}} 
-						onClick={ () => func(i, cardModalId, matchPath, parentInfo, playArea, title, user, userPlayerNumber)}
+						onClick={ () => func(i, cardModalId, marketArray, matchPath, parentInfo, playArea, title, user, userPlayerNumber)}
 					>
 						{i.title}
 					</button>

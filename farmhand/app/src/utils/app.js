@@ -30,19 +30,11 @@ function addPlayerToMatch(path, color, deck, hand, user) {
   insertObject(path+'/counters', counters);
   insertObject(path+'/color', color);
   insertObject(path+'/user', user);
-  for(var i= 0; i < deck.length; i++) {
-    insertObject(path+'/deck/'+deck[i], deck[i], i);
-  }
-  for(var i= 0; i < hand.length; i++) {
-    insertObject(path+'/hand/'+hand[i], hand[i], i);
-  }
+  insertObject(path+'/deck', deck);
+  insertObject(path+'/hand', hand);
 }
 
-export function askWhichField() {
-  console.log("which field?");
-}
-
-export function buyField(fieldIdToReplace, newFieldId, matchPath, newCoin, playerNumber) {
+export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldId, playerNumber) {
   console.log("playing field: "+newFieldId);
   const playerWord= convertPlayerNumberToWord(playerNumber);
   const playerRef= matchPath+'/'+playerWord;
@@ -61,20 +53,18 @@ export function buyField(fieldIdToReplace, newFieldId, matchPath, newCoin, playe
   }
   else {
     database.ref(playerRef+'/fields/'+newFieldId).set(newField);
-    buyWrapUp(newFieldId, matchPath, newCoin, [], playerWord);
+    buyWrapUp(newFieldId, market, matchPath, newCoin, [], playerWord);
   }
 }
 
 export function buyMarketCard(id, market, matchPath, newCoin, userPlayerNumber) {
   const userWord= convertPlayerNumberToWord(userPlayerNumber);
-  buyWrapUp(id, matchPath, newCoin, [id], userWord);
+  buyWrapUp(id, market, matchPath, newCoin, [id], userWord);
 }
 
-function buyWrapUp(id, matchPath, newCoin, newDiscard, userWord) {
-  for(var i=0; i<newDiscard.length; i++) {
-    insertObject( matchPath+'/'+userWord+'/discard/'+newDiscard[i], newDiscard[i]);
-  }
-  removeFromDatabase(matchPath+'/market/'+id);
+function buyWrapUp(id, market, matchPath, newCoin, newDiscard, userWord) {
+  insertObject( matchPath+'/'+userWord+'/discard', newDiscard);
+  removeAndInsertArray(market, id, matchPath+'/market');
   insertObject( matchPath+'/'+userWord+'/counters/coin', newCoin);
 }
 
@@ -164,9 +154,7 @@ export function createMatch(user) {
         insertObject(path+'/currentPlayerNumber', 0);
         const market= shuffleArray(defaultMarketArray);
         console.log("inserting market: "+market.toString());
-        for(var i= 0; i < market.length; i++) {
-          insertObject(path+'/market/'+market[i], market[i], i);
-        }
+        insertObject(path+'/market', market);
         let pOneDeck= shuffleArray(defaultStartingArray.slice());
         let hand= [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()];
         const color= "lightcyan";
@@ -207,8 +195,8 @@ function drawCards(matchPath, numberOfCards, playerNumber, playerObject) {
   }
   console.log("after drawing: "+JSON.stringify(playerObject));
 
-  updateMatchArray(matchPath+'/'+playerWord+'/hand', playerObject.hand);
-  updateMatchArray(matchPath+'/'+playerWord+'/deck', playerObject.deck);
+  insertObject(matchPath+'/'+playerWord+'/hand', playerObject.hand);
+  insertObject(matchPath+'/'+playerWord+'/deck', playerObject.deck);
 }
 
 export function endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) {
@@ -221,7 +209,7 @@ console.log("their info: "+JSON.stringify(userPlayer));
   newDiscard= newDiscard.concat(playArea);
   userPlayer.discard= newDiscard;
   console.log("new discard looking like: "+newDiscard.toString());
-  updateMatchArray(matchPath+'/'+playerWord+'/discard', newDiscard);
+  insertObject(matchPath+'/'+playerWord+'/discard', newDiscard);
   userPlayer.hand= [];
   drawCards(matchPath, 5, currentPlayerNumber, userPlayer);
   
@@ -300,7 +288,7 @@ export function harvestCrop(cropId, fieldData, matchPath, playArea, playerNumber
   //or, it just goes in play area if not a selected
   else {
     playArea.push(cropId);
-    updateMatchArray(matchPath+'/playArea', playArea);
+    insertObject(matchPath+'/playArea', playArea);
   }
   const playerWord= convertPlayerNumberToWord(playerNumber);
   //for counter: take away a harvest...
@@ -318,13 +306,11 @@ export function harvestCrop(cropId, fieldData, matchPath, playArea, playerNumber
   //remove the id from the crop array
   fieldData.crops.splice(fieldData.crops.indexOf(cropId), 1);
   console.log("new crop array without "+cropId+": "+fieldData.crops);
-  updateMatchArray(matchPath+'/'+playerWord+'/fields/'+fieldData.id+'/crops', fieldData.crops);
+  insertObject(matchPath+'/'+playerWord+'/fields/'+fieldData.id+'/crops', fieldData.crops);
 }
 
-function insertObject(dbPath, obj, priority) {
-  priority= priority===undefined?0:priority;
-  console.log("PRIORITY FOR "+obj+" IS: "+priority);
-  database.ref(dbPath).setWithPriority(obj, priority, function(error) {
+function insertObject(dbPath, obj) {
+  database.ref(dbPath).set(obj, function(error) {
     if(error) {
       console.log("object submission error");
     }
@@ -373,29 +359,30 @@ export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
 }
 
-export function plantCard(cardId, field, matchPath, plantCounter, playerNumber) {
+export function plantCard(cardId, field, matchPath, plantCounter, playerNumber, playerObject) {
   console.log("Planting "+cardId+" in: "+JSON.stringify(field));
   const playerWord= convertPlayerNumberToWord(playerNumber);
   field.crops.push(cardId);
   insertObject(matchPath+'/'+playerWord+'/fields/'+field.id+'/crops', field.crops);
   database.ref(matchPath+'/'+playerWord+'/fields/'+field.id+'/available').set(false);
-  removeFromDatabase(matchPath+'/'+playerWord+'/hand/'+cardId);
+  removeAndInsertArray(playerObject.hand, cardId, matchPath+'/'+playerWord+'/hand');
   insertObject(matchPath+'/'+playerWord+'/counters/plant', plantCounter-1);
 }
 
-export function playCard(activatedArea, id, matchPath, playArea, playerNumber, playerObject, wasteCount) {
+export function playCard(activatedArea, id, matchPath, playArea, playerNumber, playerObject) {
   const playerWord= convertPlayerNumberToWord(playerNumber);
   console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(playerObject.counters)+'\n'+" and are about to add "+JSON.stringify(activatedArea));
   database.ref(matchPath+'/'+playerWord+'/hand/'+id).set(null);
   playArea.push(id);
-  updateMatchArray(matchPath+'/playArea', playArea);
+  insertObject(matchPath+'/playArea', playArea);
   if(activatedArea.draw > 0) {
     drawCards(matchPath, activatedArea.draw, playerNumber, playerObject);
   }
   if(activatedArea.waste > 0) {
-    insertObject(matchPath+'/'+playerWord+'/discard/'+wasteKey, wasteKey);
+    playerObject.discard.push(wasteKey);
+    insertObject(matchPath+'/'+playerWord+'/discard', playerObject.discard);
   }
-  removeFromDatabase(matchPath+'/'+playerWord+'/hand/'+id);
+  removeAndInsertArray(playerObject.hand, id, matchPath+'/'+playerWord+'/hand');
   playerObject.counters= updateUserCounters(activatedArea, playerObject.counters);
   updateDatabaseCounters(playerObject.counters, matchPath, playerWord);
 }
@@ -419,23 +406,32 @@ function registerUser(username, password, dispatch) {
   });
 }
 
+function removeAndInsertArray(array, id, path) {
+  console.log("hand before splicing "+id+'\n'+JSON.stringify(array));
+  array.splice(array.indexOf(id), 1);
+  console.log("And after: "+JSON.stringify(array));
+  insertObject(path, array);
+}
+
 function removeFromDatabase(path) {
   let updates= {};
   updates[ path ]= null;
   database.ref().update(updates);
 }
 
-export function scrapCard(cardId, scrapCounter, matchPath, playerNumber) {
+export function scrapCard(cardId, scrapCounter, matchPath, playerNumber, playerObject, trashArray) {
   const playerWord= convertPlayerNumberToWord(playerNumber);
-  insertObject(matchPath+'/trashPile/'+cardId, cardId, 0);
-  removeFromDatabase(matchPath+'/'+playerWord+'/hand/'+cardId);
+  trashArray.push(cardId);
+  insertObject(matchPath+'/trashPile', trashArray);
+  removeAndInsertArray(playerObject.hand, cardId, matchPath+'/'+playerWord+'/hand');
   insertObject(matchPath+'/'+playerWord+'/counters/scrap', scrapCounter-1);
 }
 
-export function scrapMarketCard(cardId, scrapCounter, matchPath, playerNumber) {
+export function scrapMarketCard(cardId, scrapCounter, market, matchPath, playerNumber, trashArray) {
   const playerWord= convertPlayerNumberToWord(playerNumber);
-  insertObject(matchPath+'/trashPile/'+cardId, cardId, 0);
-  removeFromDatabase(matchPath+'/market/'+cardId);
+  trashArray.push(cardId);
+  insertObject(matchPath+'/trashPile', trashArray);
+  removeAndInsertArray(market, cardId, matchPath+'/market');
   insertObject(matchPath+'/'+playerWord+'/counters/marketScrap', scrapCounter-1);
 }
 
