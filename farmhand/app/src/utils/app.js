@@ -65,6 +65,12 @@ export function buyMarketCard(id, market, matchPath, newCoin, userWord) {
   buyWrapUp(id, market, matchPath, newCoin, [id], userWord);
 }
 
+export function buyMarketPlenty(matchPath, playerWord, userPlayer) {
+  userPlayer.counters.coin= userPlayer.counters.coin-5;
+  userPlayer.counters.plenty= userPlayer.counters.plenty+1;
+  insertObject(matchPath+'/'+playerWord+'/counters', userPlayer.counters);
+}
+
 function buyWrapUp(id, market, matchPath, newCoin, newDiscard, userWord) {
   insertObject( matchPath+'/'+userWord+'/discard', newDiscard);
   removeAndInsertArray(market, id, matchPath+'/market');

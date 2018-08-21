@@ -13,7 +13,7 @@ import {
 	getUserPlayerNumber, 
 } from '../selectors'
 import {Match} from '../components'
-import {endTurn, matchMount} from '../utils'
+import {buyMarketPlenty, convertPlayerNumberToWord, endTurn, matchMount} from '../utils'
 
 
 const mapStateToProps= state => { return {
@@ -30,6 +30,10 @@ const mapStateToProps= state => { return {
 const mapDispatchToProps= dispatch => {
 	matchMount(dispatch);
 	return {
+		buyMarketPlenty: (matchPath, currentPlayerNumber, userPlayer) => { 
+			const playerWord= convertPlayerNumberToWord(currentPlayerNumber);
+			buyMarketPlenty(matchPath, playerWord, userPlayer);
+		},
 		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) => { endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) },
 	}
 }

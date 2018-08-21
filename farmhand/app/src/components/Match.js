@@ -9,6 +9,7 @@ import {cardBackSrc, cardMap} from '../utils'
 
 const Match= 
 	({
+		buyMarketPlenty,
 		currentPlayerNumber,
 		endTurn,
 		history, 
@@ -55,7 +56,13 @@ const Match=
 	    			<Card place="hiddenMarket" id={marketArray[5]} />
 	    			<div className="starterFieldAndPlenty" style={{"maxWidth": (100/6-1)+"%"}}>
 	    				<div className="marketObject" >Starter Field</div>
-	    				<div className="marketObject" >Plenty</div>
+	    				<div 
+	    					className="marketObject"
+	    					style={{cursor: matchPlayers[userPlayerNumber].counters.coin<5?"default":"pointer"}}
+	    					onClick={() => matchPlayers[userPlayerNumber].counters.coin<5?"":buyMarketPlenty(matchPath, currentPlayerNumber, matchPlayers[userPlayerNumber])}
+	    				>
+	    					Plenty
+	    				</div>
 	    			</div>
 	    		</div>
 	    		<div className="playArea" style= {{height: "35%", "backgroundColor": matchPlayers[currentPlayerNumber].color }}>
