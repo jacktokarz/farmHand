@@ -65,6 +65,7 @@ export function listenForMatchUpdates(dispatch, matchPath) {
 	listenForPlayerUpdates(dispatch, matchPath, "playerOne");
 	listenForPlayerUpdates(dispatch, matchPath, "playerTwo");
 	listenForPlayerUpdates(dispatch, matchPath, "playerThree");
+	listenForTrash(dispatch, matchPath);
 }
 
 function listenForPlayArea(dispatch, matchPath) {
@@ -122,5 +123,16 @@ function listenForPlayerUpdates(dispatch, matchPath, playerNumber) {
 		else {
 			dispatch(fromMatch.savePlayerThree(player));
 		}
+	});
+}
+
+function listenForTrash(dispatch, matchPath) {
+	database.ref(matchPath+'/trashPile').on("value", snapshot => {
+		let trashArray= [];
+	    snapshot.forEach(function(childSnapshot) {
+	      trashArray.push(childSnapshot.val());
+		});
+		console.log("new trash array is: "+JSON.stringify(trashArray));
+		dispatch(fromMatch.saveTrashArray(trashArray));
 	});
 }

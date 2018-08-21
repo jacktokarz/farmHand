@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import {getPlayArea, getPlayerOne, getPlayerTwo, getPlayerThree, getUserHandSize, getUserPlayerNumber} from '../selectors'
 import {fromMatch}  from '../actions'
 import {Card} from '../components'
-import {cardMap} from '../utils'
+import {cardMap, isCardPlayable} from '../utils'
 
 
 
@@ -24,7 +24,10 @@ const mapStateToProps= (state, ownProps) => {
 
 	let actions=[];
 	if(ownProps.place==="userHand") {
-		actions.push("Play");
+		console.log("data for card "+ownProps.id+": "+cardData);
+		if(isCardPlayable(cardData, user)) {
+			actions.push("Play");
+		}
 		if(counts.plant>0 && user.fields.length > 0) {
 			actions.push("Plant");
 		}

@@ -17,6 +17,7 @@ const ChoiceModal= ({cardModalId, closeModal, func, marketArray, matchPath, opti
 				</div>
 				{options.map((i, index) => (
 					<button 
+						className= "inside"
 						style={{cursor: "pointer"}} 
 						onClick={ () => func(i, cardModalId, marketArray, matchPath, parentInfo, playArea, title, user, userPlayerNumber)}
 					>

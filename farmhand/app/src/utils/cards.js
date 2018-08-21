@@ -31,6 +31,17 @@ export const defaultStartingArray= [
 	1010
 ]
 
+export const starterFields= [
+	2001,
+	2002,
+	2003,
+	2004,
+	2005,
+	2006,
+	2007,
+	2008
+]
+
 export const cardMap= {
 	666: {
 		title: "waste",
@@ -43,7 +54,9 @@ export const cardMap= {
 	},
 	0: {
 		title: "card back",
-		picture: ""
+		picture: "",
+		primary: {},
+		secondary: {}
 	},
 	1: {
 		title: "Massive Mint",
@@ -406,8 +419,140 @@ export const cardMap= {
 			}
 		},
 		secondary: {}
-	}
+	},
 
+	2001: {
+		title: "Abandoned Plot",
+		type: "field",
+		picture: "https://image.ibb.co/gWHSfz/Abandoned_Plot.png",
+		cost: 0,
+		faction: "C",
+		primary: {
+			plenty: 1,
+			draw: 1,
+			discard: 1
+		},
+		secondary: {
+			attack: {
+				discard: 2
+			}
+		}
+	},
+	2002: {
+		title: "Makeshift Field",
+		type: "field",
+		picture: "https://image.ibb.co/gwLDLz/Makeshift_Field.png",
+		cost: 0,
+		faction: "C",
+		primary: {
+			plenty: 1,
+			draw: 1,
+			discard: 1
+		},
+		secondary: {
+			attack: {
+				discard: 2
+			}
+		}
+	},
+	2003: {
+		title: "Botanical Facilities",
+		type: "field",
+		picture: "https://image.ibb.co/ivKetK/Botanical_Facilities.png",
+		cost: 0,
+		faction: "T",
+		primary: {
+			plenty: 2,
+			waste: 1
+		},
+		secondary: {
+			coin: 4
+		}
+	},
+	2004: {
+		title: "Experimental Field",
+		type: "field",
+		picture: "https://image.ibb.co/fv0f0z/Experimental_Field.png",
+		cost: 0,
+		faction: "T",
+		primary: {
+			plenty: 2,
+			waste: 1
+		},
+		secondary: {
+			coin: 4
+		}
+	},
+	2005: {
+		title: "Hilltop Field",
+		type: "field",
+		picture: "https://image.ibb.co/e3kPSe/Hilltop_Field.png",
+		cost: 0,
+		faction: "O",
+		primary: {
+			plenty: 1,
+			coin: 1
+		},
+		secondary: {
+			plenty: 1,
+			plant: 1
+		}
+	},
+	2006: {
+		title: "Quaint Field",
+		type: "field",
+		picture: "https://image.ibb.co/h0X4Se/Quaint_Field.png",
+		cost: 0,
+		faction: "O",
+		primary: {
+			plenty: 1,
+			coin: 1
+		},
+		secondary: {
+			plenty: 1,
+			plant: 1
+		}
+	},
+	2007: {
+		title: "Verdant Field",
+		type: "field",
+		picture: "https://image.ibb.co/bQ3uSe/Verdant_Field.png",
+		cost: 0,
+		faction: "G",
+		primary: {
+			cropCount: 2,
+			lower: {
+				plenty: 1
+			},
+			higher: {
+				plenty: 2,
+				coin: 2
+			}
+		},
+		secondary: {
+			plenty: 1
+		}
+	},
+	2008: {
+		title: "Green Field",
+		type: "field",
+		picture: "https://image.ibb.co/gD0DLz/Green_Field.png",
+		cost: 0,
+		faction: "G",
+		primary: {
+			cropCount: 2,
+			lower: {
+				plenty: 1
+			},
+			higher: {
+				plenty: 2,
+				coin: 2
+			}
+		},
+		secondary: {
+			plenty: 1
+		}
+	}
 
 }
 

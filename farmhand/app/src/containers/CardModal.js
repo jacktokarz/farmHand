@@ -13,10 +13,11 @@ import {
 	getPlayerOne,
 	getPlayerTwo,
 	getPlayerThree,
+	getTrashArray,
 	getUserPlayerNumber 
 } from '../selectors'
 import {CardModal} from '../components'
-import {buyField, buyMarketCard, cardMap, plantCard, playCard, scrapCard, scrapMarketCard} from '../utils'
+import {buyField, buyMarketCard, cardMap, combineCounters, convertPlayerNumberToWord, isThereADefaultChoice, plantCard, playCard, scrapCard, scrapMarketCard} from '../utils'
 
 
 const mapStateToProps= (state) => {
@@ -39,6 +40,7 @@ const mapStateToProps= (state) => {
 		marketArray: getMarketArray(state),
 		matchPath: getMatchPath(state),
 		playArea: getPlayArea(state),
+		trashArray: getTrashArray(state),
 		user: user,
 		userPlayerNumber: userPlayerNumber,
 		vis: getCardModalVis(state),
@@ -47,7 +49,8 @@ const mapStateToProps= (state) => {
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeCardModal()),
-	func: (actionTitle, cardId, data, marketArray, matchPath, playArea, user, userPlayerNumber) => {
+	func: (actionTitle, cardId, data, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber) => {
+		const playerWord= convertPlayerNumberToWord(userPlayerNumber);
 		console.log("Card modal id: "+JSON.stringify(cardId));
 		if(actionTitle === "Buy") {
 			if(data.type==="field") {
@@ -58,20 +61,38 @@ const mapDispatchToProps= dispatch => ({
 					dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
 				}
 				else {
-					buyField(null, marketArray, matchPath, user.counters.coin - data.cost, cardId, userPlayerNumber);
+					buyField(null, marketArray, matchPath, user.counters.coin - data.cost, cardId, playerWord);
 					dispatch(fromMatch.closeCardModal());
 				}
 			}
 			else {
-				buyMarketCard(cardId, marketArray, matchPath, user.counters.coin - data.cost, userPlayerNumber);
+				buyMarketCard(cardId, marketArray, matchPath, user.counters.coin - data.cost, playerWord);
 				dispatch(fromMatch.closeCardModal());
 			}
 		}
 		else if(actionTitle === "Play") {
-			let activatedArea= cardMap[cardId].primary;
-			if(activatedArea.or === undefined) {
-				playCard(cardMap[cardId].primary, cardId, matchPath, playArea, userPlayerNumber, user);
-				dispatch(fromMatch.closeCardModal());				
+			const cardData= cardMap[cardId];
+			let activatedCounters= isThereADefaultChoice(cardData, user);
+			if(activatedCounters !== null) {
+				user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
+				if(user.activatedFactions.includes(cardData.faction)) {
+					activatedCounters= combineCounters(activatedCounters, cardData.secondary);
+				}
+
+				if(activatedCounters.discard > 0) {
+					const title= "Discard which card from your hand?";
+					const parentInfo= {data: activatedCounters, cardId: cardId};
+					let options= [];
+					for(var i=0; i<user.hand.length; i++) {
+						options.push({id: user.hand[i].id, title: user.hand[i].title});
+					}
+					options.splice(options.indexOf(cardId), 1);
+					dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+				}
+				else {
+					playCard(activatedCounters, user.counters, cardId, matchPath, playArea, playerWord, user);
+					dispatch(fromMatch.closeCardModal());					
+				}
 			}
 			else {
 				const title= "Play which side of the 'OR' statement?";
@@ -84,7 +105,7 @@ const mapDispatchToProps= dispatch => ({
 		else if(actionTitle === "Plant") {
 			console.log("user data for planting: "+JSON.stringify(user));
 			if(user.fields.length === 1) {
-				plantCard(cardId, user.fields[0], matchPath, user.counters.plant, userPlayerNumber, user);
+				plantCard(cardId, user.fields[0], matchPath, user.counters.plant, playerWord, user);
 				dispatch(fromMatch.closeCardModal());
 			}
 			else {
@@ -97,10 +118,10 @@ const mapDispatchToProps= dispatch => ({
 		}
 		else if(actionTitle === "Scrap") {
 			if(marketArray.includes(cardId)) {
-				scrapMarketCard(cardId, user.counters.marketScrap, marketArray, matchPath, userPlayerNumber);
+				scrapMarketCard(cardId, user.counters.marketScrap, marketArray, matchPath, playerWord, trashArray);
 			}
 			else {
-				scrapCard(cardId, user.counters.scrap, matchPath, userPlayerNumber, user);
+				scrapCard(cardId, user.counters.scrap, matchPath, playerWord, user, trashArray);
 			}
 			dispatch(fromMatch.closeCardModal());
 		}

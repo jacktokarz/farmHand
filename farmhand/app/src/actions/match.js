@@ -11,6 +11,8 @@ export const actionTypes= {
 	SAVEPLAYERTWO: 'match savePlayerTwo',
 	SAVEPLAYERTHREE: 'match savePlayerThree',
 	SAVEUSERPLAYERNUMBER: 'match saveUserPlayerNumber',
+	SAVETRASHARRAY: 'match saveTrashArray',
+	UPDATEACTIVATEDFACTIONS: 'match updateActivateFactions',
 	UPDATECURRENTPLAYERNUMBER: 'match updateCurrentPlayerNumber',
 	UPDATEPLAYAREA: 'match updatePlayArea',
 }
@@ -76,9 +78,19 @@ export const savePlayerThree= (player) => ({
 	player: player,
 })
 
+export const saveTrashArray= (trashArray) => ({
+	type: actionTypes.SAVETRASHARRAY,
+	trashArray: trashArray,
+})
+
 export const saveUserPlayerNumber= (playerNumber) => ({
 	type: actionTypes.SAVEUSERPLAYERNUMBER,
 	payload: playerNumber,
+})
+
+export const updateActivatedFactions= (activatedFactions) => ({
+	type: actionTypes.UPDATEACTIVATEDFACTIONS,
+	payload: activatedFactions,
 })
 
 export const updateCurrentPlayerNumber= (currentPlayerNumber) => ({

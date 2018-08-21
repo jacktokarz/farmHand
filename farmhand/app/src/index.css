@@ -9,7 +9,7 @@ body {
 
 .card {
 	height: auto;
-	max-height: 90%;
+	max-height: 80%;
 	width: auto;
 	margin-right: 1%;
 	display: inline-block;
@@ -107,12 +107,11 @@ body {
 
 .textOverImage {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 92%;
     transform: translate(-50%, -50%);
-    color: white;
-    text-shadow: 2px 1px 2px black;
-    font-size: 24px;
+    color: black;
+    text-shadow: 3px 2px 2px gray;
+    font-size: 28px;
 }
 
 .userDeckArea {
@@ -126,7 +125,7 @@ body {
 
 .yourDeck {
 	height: auto;
-	max-height: 90%;
+	max-height: 80%;
 	width: auto;
 	margin-right: 1%;
 	display: inline-block;

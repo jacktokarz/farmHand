@@ -3,6 +3,7 @@ import { createSelector } from 'reselect';
 const matchState= state => state.match;
 
 
+export const getActivatedFactions= createSelector(matchState, state => state.activatedFactions);
 export const getCardModalActions= createSelector(matchState, state => state.cardModalActions);
 export const getCardModalData= createSelector(matchState, state => state.cardModalData);
 export const getCardModalId= createSelector(matchState, state => state.cardModalId);
@@ -19,5 +20,6 @@ export const getPlayArea= createSelector(matchState, state => state.playArea);
 export const getPlayerOne= createSelector(matchState, state => state.playerOne);
 export const getPlayerTwo= createSelector(matchState, state => state.playerTwo);
 export const getPlayerThree= createSelector(matchState, state => state.playerThree);
+export const getTrashArray= createSelector(matchState, state => state.trashArray);
 export const getUserHandSize= createSelector(matchState, state => state.userHandSize);
 export const getUserPlayerNumber= createSelector(matchState, state => state.userPlayerNumber);

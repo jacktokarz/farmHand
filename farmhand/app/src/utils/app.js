@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import { fromHeader, fromMatch } from '../actions'
-import { cardMap, defaultMarketArray, defaultStartingArray, listenForMatches, listenForMatchUpdates, wasteKey } from './'
+import { cardMap, defaultMarketArray, defaultStartingArray, listenForMatches, listenForMatchUpdates, starterFields, wasteKey } from './'
 
 
 const config = {
@@ -27,16 +27,19 @@ function addPlayerToMatch(path, color, deck, hand, user) {
     scrap: 0,
     marketScrap: 0
   };
+  const fieldId= starterFields[getRandomInt(starterFields.length)];
+  const field= {id: fieldId, crops: [], available: true};
+
   insertObject(path+'/counters', counters);
   insertObject(path+'/color', color);
   insertObject(path+'/user', user);
   insertObject(path+'/deck', deck);
   insertObject(path+'/hand', hand);
+  insertObject(path+'/fields/'+fieldId, field);
 }
 
-export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldId, playerNumber) {
+export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldId, playerWord) {
   console.log("playing field: "+newFieldId);
-  const playerWord= convertPlayerNumberToWord(playerNumber);
   const playerRef= matchPath+'/'+playerWord;
   const newField= {id: newFieldId, crops: [], available: false};
   if(fieldIdToReplace!==null) {
@@ -57,8 +60,7 @@ export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldI
   }
 }
 
-export function buyMarketCard(id, market, matchPath, newCoin, userPlayerNumber) {
-  const userWord= convertPlayerNumberToWord(userPlayerNumber);
+export function buyMarketCard(id, market, matchPath, newCoin, userWord) {
   buyWrapUp(id, market, matchPath, newCoin, [id], userWord);
 }
 
@@ -66,6 +68,17 @@ function buyWrapUp(id, market, matchPath, newCoin, newDiscard, userWord) {
   insertObject( matchPath+'/'+userWord+'/discard', newDiscard);
   removeAndInsertArray(market, id, matchPath+'/market');
   insertObject( matchPath+'/'+userWord+'/counters/coin', newCoin);
+}
+
+export function combineCounters(one, two) {
+  return {
+    plenty: one.plenty + two.plenty,
+    coin: one.coin + two.coin,
+    plant: one.plant + two.plant,
+    harvest: one.harvest + two.harvest,
+    scrap: one.scrap + two.scrap,
+    marketScrap: one.marketScrap + two.marketScrap
+  }
 }
 
 export function checkLogin(dispatch, un, pw) {
@@ -171,10 +184,9 @@ function displayError(message) {
   console.log("ERROR ERROR - "+message);
 }
 
-function drawCards(matchPath, numberOfCards, playerNumber, playerObject) {
+function drawCards(matchPath, numberOfCards, playerWord, playerObject) {
   console.log(playerObject.user+" is about to draw "+numberOfCards);
   const originalHandSize= playerObject.hand.length;
-  const playerWord= convertPlayerNumberToWord(playerNumber);
   if(playerObject.deck.length < numberOfCards) {
     while(playerObject.deck.length > 0) {  
       playerObject.hand.push(playerObject.deck.pop());
@@ -211,9 +223,10 @@ console.log("their info: "+JSON.stringify(userPlayer));
   console.log("new discard looking like: "+newDiscard.toString());
   insertObject(matchPath+'/'+playerWord+'/discard', newDiscard);
   userPlayer.hand= [];
-  drawCards(matchPath, 5, currentPlayerNumber, userPlayer);
+  drawCards(matchPath, 5, playerWord, userPlayer);
   
   const newTurnCounters= {
+    plenty: userPlayer.counters.plenty,
     coin: 0,
     plant: 1,
     harvest: 0,
@@ -221,10 +234,12 @@ console.log("their info: "+JSON.stringify(userPlayer));
     marketScrap: 0
   };
   insertObject(matchPath+'/'+playerWord+"/counters", newTurnCounters);
+  let newlyActivatedFactions= [];
   for(var i=0; i<userPlayer.fields.length; i++) {
     database.ref(matchPath+'/'+playerWord+'/fields/'+userPlayer.fields[i].id+'/available').set(true);
-  console.log(matchPath+'/'+playerWord+'/fields/'+userPlayer.fields[i].id+'/available should now be true');
+    newlyActivatedFactions.push(cardMap[userPlayer.fields[i].id].faction);
   }
+  insertObject(matchPath+'/'+playerWord+'/activatedFactions', newlyActivatedFactions);
   database.ref(matchPath+'/playArea').set(null);
 
 //updates currentPlayer for next player
@@ -278,38 +293,51 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-export function harvestCrop(cropId, fieldData, matchPath, playArea, playerNumber, userData) {
+export function harvestCrop(cropId, fieldData, matchPath, playArea, playerWord, userData) {
   console.log("Harvesting "+cropId);
   const cropData= cardMap[cropId];
-  //harvest effect of card is played as if from hand (counters updated, goes into play area)
-  if(cropData.type==="seed") {
-    playCard(cropData.secondary, cropId, matchPath, playArea, playerNumber, userData);
-  }
-  //or, it just goes in play area if not a selected
-  else {
-    playArea.push(cropId);
-    insertObject(matchPath+'/playArea', playArea);
-  }
-  const playerWord= convertPlayerNumberToWord(playerNumber);
+
   //for counter: take away a harvest...
   let counters= userData.counters;
   counters.harvest = counters.harvest-1;
   //add in the field's primary effect...
   const fieldCard= cardMap[fieldData.id];
   console.log("harvest from field: "+JSON.stringify(fieldCard));
-  counters= updateUserCounters(fieldCard.primary, userData.counters);
-  //and maybe secondary
-  if(cropData.faction===fieldCard.faction) {
-    counters= updateUserCounters(fieldCard.secondary, userData.counters);
+  if(fieldCard.primary.cropCount !== undefined) {
+    console.log("SPECIAL HARVEST SITUATION!");
+    if(fieldData.crops.length > fieldCard.primary.cropCount) {
+      counters= updateUserCounters(fieldCard.primary.higher, counters);
+    }
+    else {
+      counters= updateUserCounters(fieldCard.primary.lower, counters);
+    }
   }
-  updateDatabaseCounters(counters, matchPath, playerWord);
+  else {
+    counters= updateUserCounters(fieldCard.primary, counters);
+  }
+  //and maybe secondary
+  console.log("so crop faction is "+cropData.faction+'\n'+"and field faction is: "+fieldCard.faction);
+  if(cropData.faction===fieldCard.faction) {
+    counters= updateUserCounters(fieldCard.secondary, counters);
+  }
+
+  //harvest effect of card is played as if from hand (counters updated, goes into play area)
+  if(cropData.type==="seed") {
+    playCard(cropData.secondary, counters, cropId, matchPath, playArea, playerWord, userData);
+  }
+  //or, it just goes in play area if not a selected
+  else {
+    playArea.push(cropId);
+    insertObject(matchPath+'/playArea', playArea);
+    updateDatabaseCounters(counters, matchPath, playerWord);
+  }
   //remove the id from the crop array
   fieldData.crops.splice(fieldData.crops.indexOf(cropId), 1);
   console.log("new crop array without "+cropId+": "+fieldData.crops);
   insertObject(matchPath+'/'+playerWord+'/fields/'+fieldData.id+'/crops', fieldData.crops);
 }
 
-function insertObject(dbPath, obj) {
+export function insertObject(dbPath, obj) {
   database.ref(dbPath).set(obj, function(error) {
     if(error) {
       console.log("object submission error");
@@ -318,6 +346,44 @@ function insertObject(dbPath, obj) {
       console.log(JSON.stringify(obj)+" inserted");
     }
   });
+}
+
+export function isCardPlayable(cardData, userData) {
+  let primary= false;
+  let secondary= true;
+  if(cardData.primary.or !== undefined) {
+    primary= (isAreaPlayable(cardData.primary.or.left, userData)===true || isAreaPlayable(cardData.primary.or.right, userData) === true);
+  }
+  else {
+    primary= isAreaPlayable(cardData.primary, userData);
+  }
+  userData.activatedFactions = userData.activatedFactions===undefined?[]:userData.activatedFactions;
+  if(userData.activatedFactions.includes(cardData.faction)) {
+    secondary= isAreaPlayable(cardData.secondary, userData);
+  }
+  return (primary && secondary);
+}
+
+export function isAreaPlayable(area, userData) {
+  area.discard= area.discard===undefined?0:area.discard;
+  if(area.discard <= userData.hand.length-1) {
+    return true;
+  }
+  return false; 
+}
+
+export function isThereADefaultChoice(cardData, user) {
+  let activatedCounters= null;
+    if(cardData.primary.or === undefined) {
+      activatedCounters= cardData.primary;
+    }
+    else if(isAreaPlayable(cardData.primary.or.left, user) === false) {
+      activatedCounters= cardData.primary.or.right;
+    }
+    else if(isAreaPlayable(cardData.primary.or.right, user) === false) {
+      activatedCounters= cardData.primary.or.left;
+    }
+  return activatedCounters;
 }
 
 export function joinMatch(key, playerList, user) {
@@ -359,9 +425,8 @@ export function openRules() {
   window.open("https://docs.google.com/document/d/1L2AIySPlRm0gVUJXQpAMcdTZ-I4zT8VYX3ef21cu3mE/edit?usp=sharing", "_blank", "location=yes");
 }
 
-export function plantCard(cardId, field, matchPath, plantCounter, playerNumber, playerObject) {
+export function plantCard(cardId, field, matchPath, plantCounter, playerWord, playerObject) {
   console.log("Planting "+cardId+" in: "+JSON.stringify(field));
-  const playerWord= convertPlayerNumberToWord(playerNumber);
   field.crops.push(cardId);
   insertObject(matchPath+'/'+playerWord+'/fields/'+field.id+'/crops', field.crops);
   database.ref(matchPath+'/'+playerWord+'/fields/'+field.id+'/available').set(false);
@@ -369,22 +434,20 @@ export function plantCard(cardId, field, matchPath, plantCounter, playerNumber, 
   insertObject(matchPath+'/'+playerWord+'/counters/plant', plantCounter-1);
 }
 
-export function playCard(activatedArea, id, matchPath, playArea, playerNumber, playerObject) {
-  const playerWord= convertPlayerNumberToWord(playerNumber);
-  console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(playerObject.counters)+'\n'+" and are about to add "+JSON.stringify(activatedArea));
-  database.ref(matchPath+'/'+playerWord+'/hand/'+id).set(null);
+export function playCard(activatedArea, counters, id, matchPath, playArea, playerWord, playerObject) {
+  console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters)+'\n'+" and are about to add "+JSON.stringify(activatedArea));
   playArea.push(id);
   insertObject(matchPath+'/playArea', playArea);
   if(activatedArea.draw > 0) {
-    drawCards(matchPath, activatedArea.draw, playerNumber, playerObject);
+    drawCards(matchPath, activatedArea.draw, playerWord, playerObject);
   }
   if(activatedArea.waste > 0) {
     playerObject.discard.push(wasteKey);
     insertObject(matchPath+'/'+playerWord+'/discard', playerObject.discard);
   }
   removeAndInsertArray(playerObject.hand, id, matchPath+'/'+playerWord+'/hand');
-  playerObject.counters= updateUserCounters(activatedArea, playerObject.counters);
-  updateDatabaseCounters(playerObject.counters, matchPath, playerWord);
+  counters= updateUserCounters(activatedArea, counters);
+  updateDatabaseCounters(counters, matchPath, playerWord);
 }
 
 export function playMatch(key, dispatch) {
@@ -419,16 +482,14 @@ function removeFromDatabase(path) {
   database.ref().update(updates);
 }
 
-export function scrapCard(cardId, scrapCounter, matchPath, playerNumber, playerObject, trashArray) {
-  const playerWord= convertPlayerNumberToWord(playerNumber);
+export function scrapCard(cardId, scrapCounter, matchPath, playerWord, playerObject, trashArray) {
   trashArray.push(cardId);
   insertObject(matchPath+'/trashPile', trashArray);
   removeAndInsertArray(playerObject.hand, cardId, matchPath+'/'+playerWord+'/hand');
   insertObject(matchPath+'/'+playerWord+'/counters/scrap', scrapCounter-1);
 }
 
-export function scrapMarketCard(cardId, scrapCounter, market, matchPath, playerNumber, trashArray) {
-  const playerWord= convertPlayerNumberToWord(playerNumber);
+export function scrapMarketCard(cardId, scrapCounter, market, matchPath, playerWord, trashArray) {
   trashArray.push(cardId);
   insertObject(matchPath+'/trashPile', trashArray);
   removeAndInsertArray(market, cardId, matchPath+'/market');

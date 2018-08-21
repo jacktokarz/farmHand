@@ -20,6 +20,7 @@ const initState=
 			{
 				user: "",
 				color: "floralwhite",
+				activatedFactions: [],
 				counters: {plenty: 0, coin: 0, plant: 0, harvest: 0, scrap: 0, marketScrap: 0},
 				deck: [0],
 				discard: [0],
@@ -30,6 +31,7 @@ const initState=
 			{
 				user: "",
 				color: "floralwhite",
+				activatedFactions: [],
 				counters: {plenty: 0, coin: 0, plant: 0, harvest: 0, scrap: 0, marketScrap: 0},
 				deck: [0],
 				discard: [0],
@@ -40,6 +42,7 @@ const initState=
 			{
 				user: "",
 				color: "floralwhite",
+				activatedFactions: [],
 				counters: {plenty: 0, coin: 0, plant: 0, harvest: 0, scrap: 0, marketScrap: 0},
 				deck: [0],
 				discard: [0],
@@ -47,6 +50,7 @@ const initState=
 				hand: [0,0,0,0,0]
 			},
 		playArea: [],
+		trashArray: [],
 		userHandSize: 5,
 		userPlayerNumber: 0,
 	};
@@ -113,10 +117,18 @@ export default (state=initState, action) => {
 			return {...state, 
 				playerThree: action.player,
 			};
+		case fromMatch.actionTypes.SAVETRASHARRAY:
+			return {...state, 
+				trashArray: action.trashArray,
+			};
 		case fromMatch.actionTypes.SAVEUSERPLAYERNUMBER:
 			console.log("saving user player number as: "+action.payload);
 			return {...state,
 				userPlayerNumber: action.payload,
+			};
+		case fromMatch.actionTypes.UPDATEACTIVATEDFACTIONS:
+			return {...state,
+				activatedFactions: action.payload,
 			};
 		case fromMatch.actionTypes.UPDATECURRENTPLAYERNUMBER:
 			return {...state,

@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 
 import {Card, CardModal, ChoiceModal, Field} from '../containers'
-import {cardBackSrc} from '../utils'
+import {cardBackSrc, cardMap} from '../utils'
 
 
 const Match= 
@@ -31,7 +31,8 @@ const Match=
 				</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color}}>
 	    			{matchPlayers[(userPlayerNumber+2)%3].user} 
-	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[(userPlayerNumber+2)%3].counters.plenty}
+	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" style={{"display": matchPlayers[(userPlayerNumber+2)%3].user===null?"none":"inline-flex"}}/>
+	    				: {matchPlayers[(userPlayerNumber+2)%3].counters.plenty}
 	    		</div>
 	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
 					{matchPlayers[(userPlayerNumber+1)%3].fields.map((i, index) => (
@@ -40,7 +41,8 @@ const Match=
 	    		</div>
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
 	    			{matchPlayers[(userPlayerNumber+1)%3].user} 
-	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[(userPlayerNumber+1)%3].counters.plenty}
+	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" style={{"display": matchPlayers[(userPlayerNumber+1)%3].user===null?"none":"inline-flex"}} />
+	    				: {matchPlayers[(userPlayerNumber+1)%3].counters.plenty}
 	    		</div>
 	   		</div>
 	    	<div className="col-sm-7 column">
@@ -93,16 +95,11 @@ const Match=
 	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>Buffer Zone</div>
 	    		<div style= {{"height": "20%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 	    			<img className= "icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[userPlayerNumber].counters.plenty}
-	    			<div >
-	    				<div className="userDeckArea">
-			    			<img className="yourDeck" src={cardBackSrc} alt="cardBack" />
-			    			<div className="textOverImage">{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
-						</div>
-						<div className="userDeckArea">
-			    			<img className="yourDiscard" src="https://image.ibb.co/j6WSR8/Recycle.png" alt="Recycle" />
-		    				<div className="textOverImage">{matchPlayers[userPlayerNumber].discard===null ? 0 : matchPlayers[userPlayerNumber].discard.length}</div>
-		    			</div>
-		    		</div>
+	    			<br />
+	    			<img className="card" src={cardBackSrc} style={{"marginRight": "5%"}} alt="deck" />
+	    			<div className="textOverImage" style={{"left": "33%"}}>{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
+	    			<img className="card" src={(matchPlayers[userPlayerNumber].discard===undefined || matchPlayers[userPlayerNumber].discard.length===0)?cardBackSrc:cardMap[matchPlayers[userPlayerNumber].discard[matchPlayers[userPlayerNumber].discard.length-1]].picture} alt="Discard" />
+    				<div className="textOverImage" style={{"left": "67%"}}>{matchPlayers[userPlayerNumber].discard===null ? 0 : matchPlayers[userPlayerNumber].discard.length}</div>
 	    		</div>
 	    	</div>
 	    	<CardModal />

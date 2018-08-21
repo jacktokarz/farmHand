@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import {fromMatch} from '../actions'
 import {getMatchPath, getCurrentPlayerNumber, getPlayArea} from '../selectors'
 import {Field} from '../components'
-import {cardMap, harvestCrop} from '../utils'
+import {cardMap, convertPlayerNumberToWord, harvestCrop} from '../utils'
 
 
 
@@ -11,7 +11,7 @@ const mapStateToProps= (state, ownProps) => {
 	return {
 		crops: ownProps.fieldData.crops,
 		data: cardMap[ownProps.fieldData.id],
-		harvestable: (ownProps.isCurrentPlayer) && (ownProps.player.counters.harvest > 0) && (ownProps.fieldData.crops.length > 0) && (ownProps.fieldData.available),
+		harvestable: (ownProps.isCurrentPlayer) && (ownProps.player.counters.harvest > 0) && (ownProps.fieldData.crops.length > 0) && (ownProps.fieldData.available), // && (cardMap[ownProps.fieldData.id].primary.discard===undefined || cardMap[ownProps.fieldData.id].primary.discard <= ownProps.player.hand.length)
 		matchPath: getMatchPath(state),
 		playArea: getPlayArea(state),
 		playerNumber: getCurrentPlayerNumber(state),
@@ -20,6 +20,7 @@ const mapStateToProps= (state, ownProps) => {
 
 const mapDispatchToProps= (dispatch, ownProps) => ({
 	harvestCrop: (matchPath, playArea, playerNumber) => {
+		const playerWord= convertPlayerNumberToWord(playerNumber);
 		console.log("Harvesting from: "+JSON.stringify(ownProps.fieldData));
 		if(ownProps.fieldData.crops.length > 1) {
 			let options= [];
@@ -32,7 +33,7 @@ const mapDispatchToProps= (dispatch, ownProps) => ({
 		}
 		else {
 			console.log("Going with the only crop in "+cardMap[ownProps.fieldData.id].title);
-			harvestCrop(ownProps.fieldData.crops[0], ownProps.fieldData, matchPath, playArea, playerNumber, ownProps.player);
+			harvestCrop(ownProps.fieldData.crops[0], ownProps.fieldData, matchPath, playArea, playerWord, ownProps.player);
 		}
 	}
 })
