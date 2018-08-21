@@ -23,7 +23,7 @@ const Match=
 	}) => (
 	<div className="App container-fluid" style={{"height": "99vh"}} >
    		<div className="row testingMatch" style={{"height": "100%"}}>
-	   		<div className="col-sm-2 column">
+	   		<div className="col-sm-2 column noPadding">
 	   			<div style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color }}>
 	   				{matchPlayers[(userPlayerNumber+2)%3].fields.map((i, index) => (
 						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===(userPlayerNumber+2)%3} player={matchPlayers[(userPlayerNumber+2)%3]} />				
@@ -45,7 +45,7 @@ const Match=
 	    				: {matchPlayers[(userPlayerNumber+1)%3].counters.plenty}
 	    		</div>
 	   		</div>
-	    	<div className="col-sm-7 column">
+	    	<div className="col-sm-7 column noPadding">
 	    		<div style= {{"height": "30%"}} className="market">
 	    			<Card  place="market" id={marketArray[0]} counters= {matchPlayers[userPlayerNumber].counters} />
 	    			<Card  place="market" id={marketArray[1]} counters= {matchPlayers[userPlayerNumber].counters} />
@@ -58,9 +58,9 @@ const Match=
 	    				<div className="marketObject" >Plenty</div>
 	    			</div>
 	    		</div>
-	    		<div style= {{height: "35%", "backgroundColor": matchPlayers[currentPlayerNumber].color }}>
+	    		<div className="playArea" style= {{height: "35%", "backgroundColor": matchPlayers[currentPlayerNumber].color }}>
 	    			<div style={{display: "flow-root"}}>
-	    				<div style={{float: "left"}}>{matchPlayers[currentPlayerNumber].user}'s Play Area</div>
+	    				<div style={{float: "left", marginLeft: "5%"}}>{matchPlayers[currentPlayerNumber].user}'s Play Area</div>
 	    				<div style={{float: "right"}}>
 	    					<img className="icon" src="https://image.ibb.co/nwjNQp/coin.png" />: {matchPlayers[currentPlayerNumber].counters.coin} 
 	    					<img className="icon" src="https://image.ibb.co/gOBfBU/plant.png" />: {matchPlayers[currentPlayerNumber].counters.plant} 
@@ -74,7 +74,6 @@ const Match=
 	    			))}
 	    		</div>
 	    		<div style= {{height: "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
-	    			<div style={{float: "left", display: "inline-block"}}>{matchPlayers[userPlayerNumber].user}: {userPlayerNumber}</div>
 	    			<button style={{cursor: "pointer", float: "right", display: userPlayerNumber===currentPlayerNumber ? "inline-block" : "none"}} onClick={() => endTurn(currentPlayerNumber, matchPlayers[userPlayerNumber], matchPath, numberOfPlayers, playArea)}>End Turn</button>
 	    		</div>
 	    		<div style= {{"height": "30%", "backgroundColor": matchPlayers[userPlayerNumber].color}} className="yourHand">
@@ -83,7 +82,7 @@ const Match=
 					))}
 	    		</div>
 	    	</div>
-	    	<div className="col-sm-3 column">
+	    	<div className="col-sm-3 column noPadding">
 	    		<div style= {{"height": "25%"}}>
 	    			<img className="communityField" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
 	    		</div>
@@ -92,8 +91,9 @@ const Match=
 						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===userPlayerNumber} player={matchPlayers[userPlayerNumber]} />
 	   				))}	    			
 	    		</div>
-	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>Buffer Zone</div>
+	    		<div style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}></div>
 	    		<div style= {{"height": "20%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
+	    			{matchPlayers[userPlayerNumber].user}
 	    			<img className= "icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[userPlayerNumber].counters.plenty}
 	    			<br />
 	    			<img className="card" src={cardBackSrc} style={{"marginRight": "5%"}} alt="deck" />

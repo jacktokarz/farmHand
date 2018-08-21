@@ -11,7 +11,7 @@ const mapStateToProps= (state, ownProps) => {
 	return {
 		crops: ownProps.fieldData.crops,
 		data: cardMap[ownProps.fieldData.id],
-		harvestable: (ownProps.isCurrentPlayer) && (ownProps.player.counters.harvest > 0) && (ownProps.fieldData.crops.length > 0) && (ownProps.fieldData.available), // && (cardMap[ownProps.fieldData.id].primary.discard===undefined || cardMap[ownProps.fieldData.id].primary.discard <= ownProps.player.hand.length)
+		harvestable: (ownProps.isCurrentPlayer) && (ownProps.player.counters.harvest > 0) && (ownProps.fieldData.crops.length > 0) && (ownProps.fieldData.available), //&& (cardMap[ownProps.fieldData.id].primary.discard===undefined || cardMap[ownProps.fieldData.id].primary.discard <= ownProps.player.hand.length)
 		matchPath: getMatchPath(state),
 		playArea: getPlayArea(state),
 		playerNumber: getCurrentPlayerNumber(state),
@@ -32,8 +32,18 @@ const mapDispatchToProps= (dispatch, ownProps) => ({
 			dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
 		}
 		else {
-			console.log("Going with the only crop in "+cardMap[ownProps.fieldData.id].title);
-			harvestCrop(ownProps.fieldData.crops[0], ownProps.fieldData, matchPath, playArea, playerWord, ownProps.player);
+			// if(cardMap[ownProps.fieldData.id].primary.discard > 0) {
+			// 	const title= "Discard which card from your hand?";
+			// 	const parentInfo= {data: cardMap[ownProps.fieldData.id].primary, cardId: ownProps.fieldData.id};
+			// 	let options= [];
+			// 	for(var i=0; i<user.hand.length; i++) {
+			// 		options.push({id: user.hand[i], title: cardMap[user.hand[i]].title});
+			// 	}
+			// 	dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+			// }
+			// else {
+				harvestCrop(ownProps.fieldData.crops[0], ownProps.fieldData, matchPath, playArea, playerWord, ownProps.player);
+			// }
 		}
 	}
 })

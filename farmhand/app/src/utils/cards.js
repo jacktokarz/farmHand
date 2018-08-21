@@ -59,61 +59,58 @@ export const cardMap= {
 		secondary: {}
 	},
 	1: {
-		title: "Massive Mint",
-		type: "seed",
-		picture: "https://image.ibb.co/jLgfBK/Massive_Mint.png",
+		title: "Sturdy Plow",
+		type: "tool",
+		picture: "https://image.ibb.co/haeqkz/Sturdy_Plow.png",
 		cost: 3,
-		faction: "T",
+		faction: "O",
 		primary: {
-			plenty: 1
+			plant: 2
 		},
 		secondary: {
-			plenty: 3		
+			coin: 2		
 		}
 	},
 	2: {
-		title: "Pine-Apple-Pear",
+		title: "Sweet Clover",
 		type: "seed",
-		picture: "https://image.ibb.co/fOVMke/Pine_Apple_Pair.png",
-		cost: 4,
-		faction: "T",
+		picture: "https://image.ibb.co/f2WWse/Sweet_Clover.png",
+		cost: 5,
+		faction: "G",
 		primary: {
-			plenty: 2,
-			coin: 3,
-			waste: 1
+			plant: 1
 		},
 		secondary: {
 			plenty: 3,
-			coin: 1,
-			waste: 1		
+			plant: 1
 		}	
 	},
 	3: {
-		title: "Robot Farmhand",
+		title: "Tractor",
 		type: "tool",
-		picture: "https://image.ibb.co/eBRGJz/Robot_Farmhand.png",
+		picture: "https://image.ibb.co/ipycXe/Tractor.png",
 		cost: 3,
 		faction: "T",
 		primary: {
-			plant: 2,
+			waste: 1,
 			harvest: 1,
-			waste: 1
+			coin: 4
 		},
-		secondary: {		
+		secondary: {
+			harvest: 1
 		}
 	},
 	4: {
-		title: "Sharp Scythe",
-		type: "tool",
-		picture: "https://image.ibb.co/kxa45e/Sharp_Scythe.png",
-		cost: 2,
+		title: "Tulip Bulb",
+		type: "seed",
+		picture: "https://image.ibb.co/gxKUdK/Tulip_Seed.png",
+		cost: 3,
 		faction: "O",
 		primary: {
-			coin: 1,
-			harvest: 1
+			coin: 2
 		},
 		secondary: {
-			marketScrap: 1		
+			plenty: 2		
 		}
 	},
 	5: {
@@ -265,6 +262,240 @@ export const cardMap= {
 			plenty: 1
 		}
 	},
+	14: {
+		title: "Fertilizer",
+		type: "tool",
+		picture: "https://image.ibb.co/fZzHFz/Fertilizer_2.png",
+		cost: 2,
+		faction: "T",
+		primary: {
+			plenty: 2,
+			coin: 1,
+			waste: 1
+		},
+		secondary: {
+			coin: 1
+		}
+	},
+	15: {
+		title: "Flatbed",
+		type: "tool",
+		picture: "https://image.ibb.co/bS0M8K/Flatbed.png",
+		cost: 2,
+		faction: "O",
+		primary: {
+			draw: 1,
+			coin: 3,
+			waste: 1
+		},
+		secondary: {
+			coin: 1
+		}
+	},
+	16: {
+		title: "Gardening Shears",
+		type: "tool",
+		picture: "https://image.ibb.co/gEzL2e/Gardening_Shears.png",
+		cost: 2,
+		faction: "G",
+		primary: {
+			plant: 1,
+			harvest: 1
+		},
+		secondary: {
+			harvest: 1
+		}
+	},
+	17: {
+		title: "Hack-N-Slash",
+		type: "tool",
+		picture: "https://image.ibb.co/gNd8oK/Hack_n_Slash.png",
+		cost: 2,
+		faction: "C",
+		primary: {
+			waste: 1,
+			harvest: 2
+		},
+		secondary: {
+			harvest: 1
+		}
+	},
+	18: {
+		title: "Honeycrisp",
+		type: "seed",
+		picture: "https://image.ibb.co/bvU9vz/Honeycrisp.png",
+		cost: 2,
+		faction: "O",
+		primary: {
+			coin: 2
+		},
+		secondary: {
+			plenty: 1,
+			coin: 3
+		}
+	},
+	19: {
+		title: "Modest Plot",
+		type: "field",
+		picture: "https://image.ibb.co/bMHq2e/Modest_Plot.png",
+		cost: 3,
+		faction: "O",
+		primary: {
+			coin: 1,
+			plenty: 2
+		},
+		secondary: {
+			harvest: 1
+		}
+	},
+	20: {
+		title: "Vineyard",
+		type: "field",
+		picture: "https://image.ibb.co/jhppTK/Vineyard.png",
+		cost: 6,
+		faction: "O",
+		primary: {
+			coin: 3,
+			plenty: 3
+		},
+		secondary: {
+			coin: 1
+		}
+	},
+	21: {
+		title: "Lazer Scythe",
+		type: "tool",
+		picture: "https://image.ibb.co/mOAJNe/Laser_Scythe.png",
+		cost: 4,
+		faction: "T",
+		primary: {
+			harvest: 1,
+			plenty: 3
+		},
+		secondary: {
+			coin: 1
+		}
+	},
+	22: {
+		title: "Massive Mint",
+		type: "seed",
+		picture: "https://image.ibb.co/na4jvz/Massive_Mint.png",
+		cost: 3,
+		faction: "T",
+		primary: {
+			plenty: 1
+		},
+		secondary: {
+			plenty: 3
+		}
+	},
+	23: {
+		title: "Picking Party",
+		type: "tool",
+		picture: "https://image.ibb.co/n4c9TK/Picking_Party.png",
+		cost: 2,
+		faction: "G",
+		primary: {
+			harvest: 1,
+			draw: 1
+		},
+		secondary: {
+			coin: 2
+		}
+	},
+	24: {
+		title: "Potato Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/h3nhhe/Potato_Seed.png",
+		cost: 1,
+		faction: "O",
+		primary: {
+			coin: 1
+		},
+		secondary: {
+			plenty: 1
+		}
+	},
+	25: {
+		title: "Robot Farmhand",
+		type: "tool",
+		picture: "https://image.ibb.co/iWkPvz/Robot_Farmhand.png",
+		cost: 3,
+		faction: "T",
+		primary: {
+			plant: 2,
+			harvest: 1,
+			waste: 1
+		},
+		secondary: {
+		}
+	},
+	26: {
+		title: "Sandwich Tomatoes",
+		type: "seed",
+		picture: "https://image.ibb.co/fvZpTK/Sandwich_Tomatoes.png",
+		cost: 4,
+		faction: "O",
+		primary: {
+			coin: 2,
+			plenty: 1,
+			waste: 1
+		},
+		secondary: {
+			plenty: 1,
+			waste: 1
+		}
+	},
+	27: {
+		title: "Sandwich Tomatoes",
+		type: "seed",
+		picture: "https://image.ibb.co/fvZpTK/Sandwich_Tomatoes.png",
+		cost: 4,
+		faction: "O",
+		primary: {
+			coin: 2,
+			plenty: 1,
+			waste: 1
+		},
+		secondary: {
+			plenty: 1,
+			waste: 1
+		}
+	},
+	28: {
+		title: "Pine-Apple-Pair",
+		type: "seed",
+		picture: "https://image.ibb.co/idh18K/Pine_Apple_Pair.png",
+		cost: 4,
+		faction: "T",
+		primary: {
+			coin: 3,
+			plenty: 2,
+			waste: 1
+		},
+		secondary: {
+			plenty: 3,
+			waste: 1,
+			coin: 1
+		}
+	},
+	29: {
+		title: "Wild, Wild Wetlands",
+		type: "field",
+		picture: "https://image.ibb.co/iJyxyK/Wild_Wild_Wetlands.png",
+		cost: 5,
+		faction: "C",
+		primary: {
+			plenty: 3,
+			discard: 1
+		},
+		secondary: {
+			plenty: 1,
+			attack: {
+				discard: 1
+			}
+		}
+	},
 
 
 	1001: {
@@ -404,6 +635,312 @@ export const cardMap= {
 		title: "Fortune",
 		type: "tool",
 		picture: "https://image.ibb.co/ebpEMK/Fortune_1.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: {
+					draw: 1
+				},
+				right: {
+					opponents: {
+						discard: 1
+					}
+				}
+			}
+		},
+		secondary: {}
+	},
+	1011: {
+		title: "Basic Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/jkPEMK/Basic_Seed_6.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+		},
+		secondary: {
+			plenty: 1		
+		}
+	},
+	1012: {
+		title: "Basic Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/ns3Koz/Basic_Seed_4.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+		},
+		secondary: {
+			plenty: 1		
+		}
+	},
+	1013: {
+		title: "Basic Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/mVb5Tz/Basic_Seed_5.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+		},
+		secondary: {
+			plenty: 1		
+		}
+	},
+	1014: {
+		title: "Wagon",
+		type: "tool",
+		picture: "https://image.ibb.co/f0xvTz/Wagon_2.png",
+		cost: 0,
+		faction: "O",
+		primary: {
+			coin: 2
+		},
+		secondary: {
+			coin: 1		
+		}
+	},
+	1015: {
+		title: "Innovation",
+		type: "tool",
+		picture: "https://image.ibb.co/fg3fve/Innovation_3.png",
+		cost: 0,
+		faction: "T",
+		primary: {
+			coin: 1,
+			marketScrap: 1
+		},
+		secondary: {
+			coin: 1		
+		}
+	},
+	1016: {
+		title: "Cleanup",
+		type: "tool",
+		picture: "https://image.ibb.co/gfJkTz/Clean_Up_3.png",
+		cost: 0,
+		faction: "G",
+		primary: {
+			coin: 1,
+			scrap: 1
+		},
+		secondary: {
+			plant: 1
+		}	
+	},
+	1017: {
+		title: "Shovel",
+		type: "tool",
+		picture: "https://image.ibb.co/cCMN8z/Shovel_1.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: {
+					coin: 1 
+				},
+				right: {
+					plant: 1
+				}
+			}
+		},
+		secondary: {}
+	},
+	1018: {
+		title: "Rusty Scythe",
+		type: "tool",
+		picture: "https://image.ibb.co/bDnJgK/Rusty_Scythe_3.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: { 
+					coin: 1 
+				},
+				right: {
+					harvest: 1,
+					waste: 1
+				}
+			}
+		},
+		secondary: {}
+	},
+	1019: {
+		title: "Dull Scythe",
+		type: "tool",
+		picture: "https://image.ibb.co/epGB1K/Dull_Scythe_3.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: {
+					coin: 1
+				},
+				right: {
+					harvest: 1,
+					waste: 1
+				}
+			}
+		},
+		secondary: {}
+	},
+	1020: {
+		title: "Fortune",
+		type: "tool",
+		picture: "https://image.ibb.co/jKkh8z/Fortune_3.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: {
+					draw: 1
+				},
+				right: {
+					opponents: {
+						discard: 1
+					}
+				}
+			}
+		},
+		secondary: {}
+	},
+	1021: {
+		title: "Basic Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/kQFhFz/Basic_Seed_9.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+		},
+		secondary: {
+			plenty: 1		
+		}
+	},
+	1022: {
+		title: "Basic Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/k0YDNe/Basic_Seed_8.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+		},
+		secondary: {
+			plenty: 1		
+		}
+	},
+	1023: {
+		title: "Basic Seed",
+		type: "seed",
+		picture: "https://image.ibb.co/eLGYNe/Basic_Seed_7.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+		},
+		secondary: {
+			plenty: 1		
+		}
+	},
+	1024: {
+		title: "Wagon",
+		type: "tool",
+		picture: "https://image.ibb.co/fnMYNe/Wagon_1.png",
+		cost: 0,
+		faction: "O",
+		primary: {
+			coin: 2
+		},
+		secondary: {
+			coin: 1		
+		}
+	},
+	1025: {
+		title: "Innovation",
+		type: "tool",
+		picture: "https://image.ibb.co/bTCUvz/Innovation_2.png",
+		cost: 0,
+		faction: "T",
+		primary: {
+			coin: 1,
+			marketScrap: 1
+		},
+		secondary: {
+			coin: 1		
+		}
+	},
+	1026: {
+		title: "Cleanup",
+		type: "tool",
+		picture: "https://image.ibb.co/gwxJoK/Clean_Up_2.png",
+		cost: 0,
+		faction: "G",
+		primary: {
+			coin: 1,
+			scrap: 1
+		},
+		secondary: {
+			plant: 1		
+		}	
+	},
+	1027: {
+		title: "Shovel",
+		type: "tool",
+		picture: "https://image.ibb.co/ce5Gaz/Shovel_2.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: {
+					coin: 1 
+				},
+				right: {
+					plant: 1
+				}
+			}
+		},
+		secondary: {}
+	},
+	1028: {
+		title: "Rusty Scythe",
+		type: "tool",
+		picture: "https://image.ibb.co/ioqGaz/Rusty_Scythe_2.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: { 
+					coin: 1 
+				},
+				right: {
+					harvest: 1,
+					waste: 1
+				}
+			}
+		},
+		secondary: {}
+	},
+	1029: {
+		title: "Dull Scythe",
+		type: "tool",
+		picture: "https://image.ibb.co/fv0tNe/Dull_Scythe_2.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			or: {
+				left: {
+					coin: 1
+				},
+				right: {
+					harvest: 1,
+					waste: 1
+				}
+			}
+		},
+		secondary: {}
+	},
+	1030: {
+		title: "Fortune",
+		type: "tool",
+		picture: "https://image.ibb.co/eQuL2e/Fortune_2.png",
 		cost: 0,
 		faction: "N",
 		primary: {

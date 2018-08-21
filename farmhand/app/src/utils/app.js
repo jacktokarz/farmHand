@@ -36,6 +36,7 @@ function addPlayerToMatch(path, color, deck, hand, user) {
   insertObject(path+'/deck', deck);
   insertObject(path+'/hand', hand);
   insertObject(path+'/fields/'+fieldId, field);
+  insertObject(path+'/activatedFactions', cardMap[fieldId].faction);
 }
 
 export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldId, playerWord) {
@@ -71,6 +72,24 @@ function buyWrapUp(id, market, matchPath, newCoin, newDiscard, userWord) {
 }
 
 export function combineCounters(one, two) {
+  
+  console.log("combining: "+JSON.stringify(one)+'\n'+two.plenty);
+  one= {
+    plenty: one.plenty===undefined?0:one.plenty,
+    coin: one.coin===undefined?0:one.coin,
+    plant: one.plant===undefined?0:one.plant,
+    harvest: one.harvest===undefined?0:one.harvest,
+    scrap: one.scrap===undefined?0:one.scrap,
+    marketScrap: one.marketScrap===undefined?0:one.marketScrap
+  };
+  two= {
+    plenty: two.plenty===undefined?0:two.plenty,
+    coin: two.coin===undefined?0:two.coin,
+    plant: two.plant===undefined?0:two.plant,
+    harvest: two.harvest===undefined?0:two.harvest,
+    scrap: two.scrap===undefined?0:two.scrap,
+    marketScrap: two.marketScrap===undefined?0:two.marketScrap
+  };
   return {
     plenty: one.plenty + two.plenty,
     coin: one.coin + two.coin,

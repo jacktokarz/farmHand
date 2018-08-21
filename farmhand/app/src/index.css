@@ -27,6 +27,14 @@ body {
 	margin-bottom: 10%;
 }
 
+.crops {
+    margin-top: -5%;
+    max-width: 40%;
+    display: block;
+    position: relative;
+    left: 30%;
+}
+
 .deck {
 	height: auto;
 	max-height: 100%;
@@ -77,6 +85,10 @@ body {
 	position: relative;
 }
 
+.market {
+	border: 2px ridge lightgray;
+}
+
 .marketObject {
 	text-align: center;
 	font-size: 24px;
@@ -84,6 +96,15 @@ body {
 	height: auto;
 	width: auto;
 	margin: 10% auto;
+}
+
+.noPadding {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.playArea {
+	border: 2px ridged black;
 }
 
 .starterFieldAndPlenty {
@@ -94,7 +115,6 @@ body {
 
 .testingMatch div{
 	text-align: center;
-	border: 2px black solid;
 }
 
 .textOverField {

@@ -6,15 +6,15 @@ import {cropPicture} from '../utils'
 
 
 const Field= ({crops, data, harvestable, harvestCrop, matchPath, playArea, playerNumber}) => (
-	<div style={{maxHeight: "50%"}}>
+	<div style={{maxHeight: "40%", marginBottom: "10%" }}>
 	    <img 
-	      className="field" 
-	      style={{maxWidth: "auto" }}  
+	      className="card"
+	      style={{maxWidth: "80%", maxHeight: "20%", height: "-webkit-fill-available" }}
 	      src={data.picture}
 	    />
 	    <img
-	    	className="card"
-	    	style={{maxWidth: "40%", cursor: harvestable?"pointer":"default"}}
+	    	className="card crops"
+	    	style={{cursor: harvestable?"pointer":"default"}}
 	    	src={cropPicture}
 	    	onClick={() => harvestable?harvestCrop(matchPath, playArea, playerNumber):null}
 	    />

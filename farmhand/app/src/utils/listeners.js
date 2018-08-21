@@ -93,6 +93,10 @@ function listenForPlayerUpdates(dispatch, matchPath, playerNumber) {
 			scrap: counts.child('scrap').val(),
 			marketScrap: counts.child('marketScrap').val()
 		}
+		let activatedFactions= [];
+		snapshot.child('activatedFactions').forEach(function(childSnapshot) {
+			activatedFactions.push(childSnapshot.val());
+		});
 		let deck= [];
 		snapshot.child('deck').forEach(function(childSnapshot) {
 			deck.push(childSnapshot.val());
@@ -113,7 +117,7 @@ function listenForPlayerUpdates(dispatch, matchPath, playerNumber) {
 		snapshot.child('hand').forEach(function(childSnapshot) {
 			hand.push(childSnapshot.val());
 		});
-		const player= {user: user, color: color, counters: counters, deck: deck, discard: discard, fields: fields, hand: hand};
+		const player= {user: user, color: color, activatedFactions: activatedFactions, counters: counters, deck: deck, discard: discard, fields: fields, hand: hand};
 		if(playerNumber==="playerOne") {
 			dispatch(fromMatch.savePlayerOne(player));
 		}

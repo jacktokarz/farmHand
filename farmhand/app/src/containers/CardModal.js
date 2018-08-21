@@ -75,10 +75,11 @@ const mapDispatchToProps= dispatch => ({
 			let activatedCounters= isThereADefaultChoice(cardData, user);
 			if(activatedCounters !== null) {
 				user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
+				console.log("playing card, and have activated: "+user.activatedFactions.toString()+'\n'+"this faction is: "+cardData.faction);
 				if(user.activatedFactions.includes(cardData.faction)) {
 					activatedCounters= combineCounters(activatedCounters, cardData.secondary);
 				}
-
+					console.log("playing counters: "+JSON.stringify(activatedCounters));
 				if(activatedCounters.discard > 0) {
 					const title= "Discard which card from your hand?";
 					const parentInfo= {data: activatedCounters, cardId: cardId};
