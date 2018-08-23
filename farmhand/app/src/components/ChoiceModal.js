@@ -4,12 +4,12 @@ import PropTypes from 'prop-types'
 import {} from '../utils'
 
 
-const ChoiceModal= ({cardModalId, closeModal, func, marketArray, matchPath, options, parentInfo, playArea, title, user, userPlayerNumber, vis}) => (
+const ChoiceModal= ({cardModalId, closeModal, func, marketArray, matchPath, options, parentInfo, playArea, required, title, user, userPlayerNumber, vis}) => (
 
-	<div style={{display: vis}} className="modal" onClick={ (event) => (!event.target.classList.contains("inside") ? closeModal() : "" ) }>
+	<div style={{display: vis}} className="modal" onClick={ (event) => required?"":(!event.target.classList.contains("inside") ? closeModal() : "" ) }>
 		<div className="visible-modal-content inside" id="modalContent">
     		<div className="modal-header inside">
-    			<span onClick={closeModal} className="close">&times;</span>
+    			<span style={{display: required?"none":"default"}} onClick={closeModal} className="close">&times;</span>
     		</div>
     		<div className="modal-body justify-content-around inside">
 				<div className="modal-title inside" >

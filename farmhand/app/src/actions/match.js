@@ -41,10 +41,11 @@ export const openCardModal= (actions, data, id) => ({
 	id: id,
 })
 
-export const openChoiceModal= (options, parentInfo, title) => ({
+export const openChoiceModal= (options, parentInfo, required, title) => ({
 	type: actionTypes.OPENCHOICEMODAL,
 	options: options,
 	parentInfo: parentInfo,
+	required: required,
 	title: title,
 })
 

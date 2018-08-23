@@ -58,7 +58,7 @@ const mapDispatchToProps= dispatch => ({
 					const title= "Replace which field?";
 					const parentInfo= cardId;
 					const options= [{id: user.fields[0].id, title: cardMap[user.fields[0].id]}, {id: user.fields[1].id, title: cardMap[user.fields[1].id]}];
-					dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+					dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
 				}
 				else {
 					buyField(null, marketArray, matchPath, user.counters.coin - data.cost, cardId, playerWord);
@@ -66,7 +66,7 @@ const mapDispatchToProps= dispatch => ({
 				}
 			}
 			else {
-				buyMarketCard(cardId, marketArray, matchPath, user.counters.coin - data.cost, playerWord);
+				buyMarketCard(cardId, marketArray, matchPath, user.counters.coin - data.cost, user, playerWord);
 				dispatch(fromMatch.closeCardModal());
 			}
 		}
@@ -76,31 +76,20 @@ const mapDispatchToProps= dispatch => ({
 			if(activatedCounters !== null) {
 				user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
 				console.log("playing card, and have activated: "+user.activatedFactions.toString()+'\n'+"this faction is: "+cardData.faction);
-				if(user.activatedFactions.includes(cardData.faction)) {
+				if(user.activatedFactions.includes(cardData.faction) && cardData.type==="tool") {
 					activatedCounters= combineCounters(activatedCounters, cardData.secondary);
 				}
-					console.log("playing counters: "+JSON.stringify(activatedCounters));
-				if(activatedCounters.discard > 0) {
-					const title= "Discard which card from your hand?";
-					const parentInfo= {data: activatedCounters, cardId: cardId};
-					let options= [];
-					for(var i=0; i<user.hand.length; i++) {
-						options.push({id: user.hand[i].id, title: user.hand[i].title});
-					}
-					options.splice(options.indexOf(cardId), 1);
-					dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
-				}
-				else {
-					playCard(activatedCounters, user.counters, cardId, matchPath, playArea, playerWord, user);
-					dispatch(fromMatch.closeCardModal());					
-				}
+				console.log("playing counters: "+JSON.stringify(activatedCounters));
+
+				playCard(activatedCounters, user.counters, dispatch, cardId, matchPath, playArea, playerWord, user);
+				dispatch(fromMatch.closeCardModal());
 			}
 			else {
 				const title= "Play which side of the 'OR' statement?";
 				const parentInfo= cardId;
 				const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
 				console.log("choice modal called! "+JSON.stringify(options));
-				dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+				dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
 			}
 		}
 		else if(actionTitle === "Plant") {
@@ -114,7 +103,7 @@ const mapDispatchToProps= dispatch => ({
 				const parentInfo= cardId;
 				const options= [{id: user.fields[0].id, title: cardMap[user.fields[0].id].title}, {id: user.fields[1].id, title: cardMap[user.fields[1].id].title}]; 
 				console.log("choice modal called! "+JSON.stringify(options));
-				dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+				dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
 			}
 		}
 		else if(actionTitle === "Scrap") {

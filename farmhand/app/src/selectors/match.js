@@ -10,6 +10,7 @@ export const getCardModalId= createSelector(matchState, state => state.cardModal
 export const getCardModalVis= createSelector(matchState, state => state.cardModalVis);
 export const getChoiceModalOptions= createSelector(matchState, state => state.choiceModalOptions);
 export const getChoiceModalParentInfo= createSelector(matchState, state => state.choiceModalParentInfo);
+export const getChoiceModalRequired= createSelector(matchState, state => state.choiceModalRequired);
 export const getChoiceModalTitle= createSelector(matchState, state => state.choiceModalTitle);
 export const getChoiceModalVis= createSelector(matchState, state => state.choiceModalVis);
 export const getCurrentPlayerNumber= createSelector(matchState, state => state.currentPlayerNumber);

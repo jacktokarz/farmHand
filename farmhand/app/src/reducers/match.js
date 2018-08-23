@@ -10,6 +10,7 @@ const initState=
 		cardModalId: 0,
 		choiceModalOptions: ["Example"],
 		choiceModalParentInfo: "",
+		choiceModalRequired: false,
 		choiceModalTitle: "",
 		choiceModalVis: "none",
 		currentPlayerNumber: 1,

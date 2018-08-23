@@ -17,17 +17,23 @@ export const database= firebase.database();
 
 
 
-function activateCounters(counters, matchPath, playerWord, playerObject) {
+function activateCounters(counters, dispatch, matchPath, playerWord, playerObject) {
   console.log("activating these counters: "+JSON.stringify(counters));
   if(counters.draw > 0) {
     drawCards(matchPath, counters.draw, playerWord, playerObject);
   }
-  if(counters.discard > 0) {
-    console.log("They should be discarding...");
-  }
   if(counters.waste > 0) {
     playerObject.discard.push(wasteKey);
     insertObject(matchPath+'/'+playerWord+'/discard', playerObject.discard);
+  }
+  if(counters.discard > 0) {
+    const title= "Discard which card from your hand?";
+    const parentInfo= {playerWord: playerWord};
+    let options= [];
+    for(var i=0; i<playerObject.hand.length; i++) {
+      options.push({id: playerObject.hand[i], title: cardMap[playerObject.hand[i]].title});
+    }
+    dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
   }
   updateDatabaseCounters(counters, matchPath, playerWord);
 }
@@ -76,8 +82,9 @@ export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldI
   }
 }
 
-export function buyMarketCard(id, market, matchPath, newCoin, userWord) {
-  buyWrapUp(id, market, matchPath, newCoin, [id], userWord);
+export function buyMarketCard(id, market, matchPath, newCoin, userObject, userWord) {
+  userObject.discard.push(id);
+  buyWrapUp(id, market, matchPath, newCoin, userObject.discard, userWord);
 }
 
 export function buyMarketPlenty(matchPath, playerWord, userPlayer) {
@@ -343,7 +350,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-export function harvestCrop(cropId, fieldData, matchPath, playArea, playerWord, userData) {
+export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, playerWord, userData) {
   console.log("Harvesting "+cropId);
   const cropData= cardMap[cropId];
 
@@ -378,7 +385,7 @@ export function harvestCrop(cropId, fieldData, matchPath, playArea, playerWord, 
 
   //finally activate what's been put together
   console.log("The combined harvest effects are: "+JSON.stringify(counters));
-  activateCounters(counters, matchPath, playerWord, userData);
+  activateCounters(counters, dispatch, matchPath, playerWord, userData);
 
   //put the card in the play area...
   playArea.push(cropId);
@@ -411,7 +418,7 @@ export function isCardPlayable(cardData, userData) {
     primary= isAreaPlayable(cardData.primary, userData);
   }
   userData.activatedFactions = userData.activatedFactions===undefined?[]:userData.activatedFactions;
-  if(userData.activatedFactions.includes(cardData.faction)) {
+  if(userData.activatedFactions.includes(cardData.faction) && cardData.faction==="tool") {
     secondary= isAreaPlayable(cardData.secondary, userData);
   }
   return (primary && secondary);
@@ -487,14 +494,16 @@ export function plantCard(cardId, field, matchPath, plantCounter, playerWord, pl
   insertObject(matchPath+'/'+playerWord+'/counters/plant', plantCounter-1);
 }
 
-export function playCard(activatedArea, counters, id, matchPath, playArea, playerWord, playerObject) {
+export function playCard(activatedArea, counters, dispatch, id, matchPath, playArea, playerWord, playerObject) {
   console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters)+'\n'+" and are about to add "+JSON.stringify(activatedArea));
   playArea.push(id);
   insertObject(matchPath+'/playArea', playArea);
   removeAndInsertArray(playerObject.hand, id, matchPath+'/'+playerWord+'/hand');
   counters= combineCounters(activatedArea, counters);
   console.log("the played card's effects have been combined with the users: "+JSON.stringify(counters));
-  activateCounters(counters, matchPath, playerWord, playerObject);
+  activateCounters(counters, dispatch, matchPath, playerWord, playerObject);
+  playerObject.activatedFactions.push(cardMap[id].faction);
+  insertObject(matchPath+'/'+playerWord+'/activatedFactions', playerObject.activatedFactions);
 }
 
 export function playMatch(key, dispatch) {
@@ -580,6 +589,7 @@ function updateMatchArray(matchPath, array) {
 
 function updateDatabaseCounters(counters, matchPath, playerWord) {
   console.log("new counters: "+JSON.stringify(counters));
+  console.log("putting them into "+matchPath+'/'+playerWord+'/counters');
   let updates= {};
   updates[matchPath+'/'+playerWord+'/counters']= counters;
   database.ref().update(updates);

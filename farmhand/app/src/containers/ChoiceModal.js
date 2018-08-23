@@ -6,6 +6,7 @@ import {
 	getChoiceModalOptions,
 	getChoiceModalTitle,
 	getChoiceModalParentInfo,
+	getChoiceModalRequired,
 	getChoiceModalVis,
 	getMarketArray,
 	getMatchPath,
@@ -38,6 +39,7 @@ const mapStateToProps= (state) => { console.log("choice modal: "+JSON.stringify(
 		options: getChoiceModalOptions(state),
 		parentInfo: getChoiceModalParentInfo(state),
 		playArea: getPlayArea(state),
+		required: getChoiceModalRequired(state),
 		title: getChoiceModalTitle(state),
 		user: user,
 		userPlayerNumber: userPlayerNumber,
@@ -60,27 +62,12 @@ const mapDispatchToProps= dispatch => ({
 		    	areaData= cardData.primary.or.right;
 		    }
 			user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
-			if(user.activatedFactions.includes(cardData.faction)) {
+			if(user.activatedFactions.includes(cardData.faction) && cardData.type==="tool") {
 				areaData= combineCounters(areaData, cardData.secondary);
 			}
-
-			if(areaData.discard > 0) {
-				const title= "Discard which card from your hand?";
-				const parentInfo= {data: areaData, cardId: option.id};
-				let options= [];
-				for(var i=0; i<user.hand.length; i++) {
-					options.push({id: user.hand[i], title: cardMap[user.hand[i]].title});
-				}
-				options.splice(options.indexOf({id: option.id, title: cardMap[option.id].title}), 1);
-					console.log("the options for discard are: "+JSON.stringify(options));
-				dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
-			}
-			else {
-				console.log("not discarding from choice");
-			    playCard(areaData, user.counters, option.id, matchPath, playArea, playerWord, user);
-				dispatch(fromMatch.closeChoiceModal());
-				dispatch(fromMatch.closeCardModal());
-			}
+		    playCard(areaData, user.counters, dispatch, option.id, matchPath, playArea, playerWord, user);
+			dispatch(fromMatch.closeChoiceModal());
+			dispatch(fromMatch.closeCardModal());
 		}
 		else {
 			if(title.startsWith("Plant")) {
@@ -91,7 +78,7 @@ const mapDispatchToProps= dispatch => ({
 			    plantCard(parentInfo, field, matchPath, user.counters.plant, playerWord, user);
 			}
 			else if(title.startsWith("Harvest")) {
-				harvestCrop(option.id, parentInfo, matchPath, playArea, playerWord, user);
+				harvestCrop(option.id, dispatch, parentInfo, matchPath, playArea, playerWord, user);
 			}
 			else if(title.startsWith("Replace")) {
 				buyField(parentInfo, marketArray, matchPath, user.counters.coin - cardMap[option.id].cost, option.id, playerWord)
@@ -101,9 +88,6 @@ const mapDispatchToProps= dispatch => ({
 				insertObject(matchPath+'/'+playerWord+'/discard', user.discard);
 				user.hand.splice(user.hand.indexOf(option.id), 1);
 				insertObject(matchPath+'/'+playerWord+'/hand', user.hand);
-				const cardData= cardMap[parentInfo];
-				playCard(parentInfo.data, user.counters, parentInfo.cardId, matchPath, playArea, playerWord, user);
-				dispatch(fromMatch.closeCardModal());	
 			}
 			dispatch(fromMatch.closeChoiceModal());
 			dispatch(fromMatch.closeCardModal());

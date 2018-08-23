@@ -29,7 +29,7 @@ const mapDispatchToProps= (dispatch, ownProps) => ({
 			}
 			const parentInfo= ownProps.fieldData;
 			const title= "Harvest which crop from "+cardMap[ownProps.fieldData.id].title+"?";
-			dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
+			dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
 		}
 		else {
 			// if(cardMap[ownProps.fieldData.id].primary.discard > 0) {
@@ -42,7 +42,7 @@ const mapDispatchToProps= (dispatch, ownProps) => ({
 			// 	dispatch(fromMatch.openChoiceModal(options, parentInfo, title));
 			// }
 			// else {
-				harvestCrop(ownProps.fieldData.crops[0], ownProps.fieldData, matchPath, playArea, playerWord, ownProps.player);
+				harvestCrop(ownProps.fieldData.crops[0], dispatch, ownProps.fieldData, matchPath, playArea, playerWord, ownProps.player);
 			// }
 		}
 	}
