@@ -17,6 +17,21 @@ export const database= firebase.database();
 
 
 
+function activateCounters(counters, matchPath, playerWord, playerObject) {
+  console.log("activating these counters: "+JSON.stringify(counters));
+  if(counters.draw > 0) {
+    drawCards(matchPath, counters.draw, playerWord, playerObject);
+  }
+  if(counters.discard > 0) {
+    console.log("They should be discarding...");
+  }
+  if(counters.waste > 0) {
+    playerObject.discard.push(wasteKey);
+    insertObject(matchPath+'/'+playerWord+'/discard', playerObject.discard);
+  }
+  updateDatabaseCounters(counters, matchPath, playerWord);
+}
+
 function addPlayerToMatch(path, color, deck, hand, user) {
   console.log("player to add to match: "+JSON.stringify(user));
   const counters= {
@@ -79,14 +94,17 @@ function buyWrapUp(id, market, matchPath, newCoin, newDiscard, userWord) {
 
 export function combineCounters(one, two) {
   
-  console.log("combining: "+JSON.stringify(one)+'\n'+two.plenty);
+  console.log("combining: "+JSON.stringify(one)+'\n'+JSON.stringify(two));
   one= {
     plenty: one.plenty===undefined?0:one.plenty,
     coin: one.coin===undefined?0:one.coin,
     plant: one.plant===undefined?0:one.plant,
     harvest: one.harvest===undefined?0:one.harvest,
     scrap: one.scrap===undefined?0:one.scrap,
-    marketScrap: one.marketScrap===undefined?0:one.marketScrap
+    marketScrap: one.marketScrap===undefined?0:one.marketScrap,
+    draw: one.draw===undefined?0:one.draw,
+    discard: one.discard===undefined?0:one.discard,
+    waste: one.waste===undefined?0:one.waste
   };
   two= {
     plenty: two.plenty===undefined?0:two.plenty,
@@ -94,15 +112,22 @@ export function combineCounters(one, two) {
     plant: two.plant===undefined?0:two.plant,
     harvest: two.harvest===undefined?0:two.harvest,
     scrap: two.scrap===undefined?0:two.scrap,
-    marketScrap: two.marketScrap===undefined?0:two.marketScrap
+    marketScrap: two.marketScrap===undefined?0:two.marketScrap,
+    draw: two.draw===undefined?0:two.draw,
+    discard: two.discard===undefined?0:two.discard,
+    waste: two.waste===undefined?0:two.waste
   };
+  console.log("UPDATED combining: "+JSON.stringify(one)+'\n'+JSON.stringify(two));
   return {
     plenty: one.plenty + two.plenty,
     coin: one.coin + two.coin,
     plant: one.plant + two.plant,
     harvest: one.harvest + two.harvest,
     scrap: one.scrap + two.scrap,
-    marketScrap: one.marketScrap + two.marketScrap
+    marketScrap: one.marketScrap + two.marketScrap,
+    draw: one.draw + two.draw,
+    discard: one.discard + two.discard,
+    waste: one.waste + two.waste
   }
 }
 
@@ -331,31 +356,34 @@ export function harvestCrop(cropId, fieldData, matchPath, playArea, playerWord, 
   if(fieldCard.primary.cropCount !== undefined) {
     console.log("SPECIAL HARVEST SITUATION!");
     if(fieldData.crops.length > fieldCard.primary.cropCount) {
-      counters= updateUserCounters(fieldCard.primary.higher, counters);
+      counters= combineCounters(fieldCard.primary.higher, counters);
     }
     else {
-      counters= updateUserCounters(fieldCard.primary.lower, counters);
+      counters= combineCounters(fieldCard.primary.lower, counters);
     }
   }
   else {
-    counters= updateUserCounters(fieldCard.primary, counters);
+    counters= combineCounters(fieldCard.primary, counters);
   }
   //and maybe secondary
   console.log("so crop faction is "+cropData.faction+'\n'+"and field faction is: "+fieldCard.faction);
   if(cropData.faction===fieldCard.faction) {
-    counters= updateUserCounters(fieldCard.secondary, counters);
+    counters= combineCounters(fieldCard.secondary, counters);
   }
 
-  //harvest effect of card is played as if from hand (counters updated, goes into play area)
+  //and maybe the crop's seed secondary
   if(cropData.type==="seed") {
-    playCard(cropData.secondary, counters, cropId, matchPath, playArea, playerWord, userData);
+    counters= combineCounters(cropData.secondary, counters);
   }
-  //or, it just goes in play area if not a selected
-  else {
-    playArea.push(cropId);
-    insertObject(matchPath+'/playArea', playArea);
-    updateDatabaseCounters(counters, matchPath, playerWord);
-  }
+
+  //finally activate what's been put together
+  console.log("The combined harvest effects are: "+JSON.stringify(counters));
+  activateCounters(counters, matchPath, playerWord, userData);
+
+  //put the card in the play area...
+  playArea.push(cropId);
+  insertObject(matchPath+'/playArea', playArea);
+
   //remove the id from the crop array
   fieldData.crops.splice(fieldData.crops.indexOf(cropId), 1);
   console.log("new crop array without "+cropId+": "+fieldData.crops);
@@ -463,16 +491,10 @@ export function playCard(activatedArea, counters, id, matchPath, playArea, playe
   console.log(playerWord+" played card "+id+'\n'+"They have these counters "+JSON.stringify(counters)+'\n'+" and are about to add "+JSON.stringify(activatedArea));
   playArea.push(id);
   insertObject(matchPath+'/playArea', playArea);
-  if(activatedArea.draw > 0) {
-    drawCards(matchPath, activatedArea.draw, playerWord, playerObject);
-  }
-  if(activatedArea.waste > 0) {
-    playerObject.discard.push(wasteKey);
-    insertObject(matchPath+'/'+playerWord+'/discard', playerObject.discard);
-  }
   removeAndInsertArray(playerObject.hand, id, matchPath+'/'+playerWord+'/hand');
-  counters= updateUserCounters(activatedArea, counters);
-  updateDatabaseCounters(counters, matchPath, playerWord);
+  counters= combineCounters(activatedArea, counters);
+  console.log("the played card's effects have been combined with the users: "+JSON.stringify(counters));
+  activateCounters(counters, matchPath, playerWord, playerObject);
 }
 
 export function playMatch(key, dispatch) {
@@ -554,17 +576,6 @@ function updateMatchArray(matchPath, array) {
     updates[matchPath+'/'+array[i]]= {".value": array[i], ".priority": i};
   }
   database.ref().update(updates);
-}
-
-function updateUserCounters(activatedArea, counters) {
-  return counters= {
-    plenty: counters.plenty+(activatedArea.plenty===undefined?0:activatedArea.plenty),
-    coin: counters.coin+(activatedArea.coin===undefined?0:activatedArea.coin),
-    plant: counters.plant+(activatedArea.plant===undefined?0:activatedArea.plant),
-    harvest: counters.harvest+(activatedArea.harvest===undefined?0:activatedArea.harvest),
-    scrap: counters.scrap+(activatedArea.scrap===undefined?0:activatedArea.scrap),
-    marketScrap: counters.marketScrap+(activatedArea.marketScrap===undefined?0:activatedArea.marketScrap)
-  };
 }
 
 function updateDatabaseCounters(counters, matchPath, playerWord) {
