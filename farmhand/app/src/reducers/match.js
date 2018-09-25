@@ -90,6 +90,7 @@ export default (state=initState, action) => {
 			return {...state, 
 				choiceModalOptions: action.options,
 				choiceModalParentInfo: action.parentInfo,
+				choiceModalRequired: action.required,
 				choiceModalTitle: action.title,
 				choiceModalVis: "block",
 			};

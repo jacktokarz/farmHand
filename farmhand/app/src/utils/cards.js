@@ -34,7 +34,7 @@ export const defaultMarketArray= [
 	29
 ]
 
-export const defaultStartingArray= [
+export const oneStartingDeck= [
 	1001,
 	1002,
 	1003,
@@ -45,6 +45,30 @@ export const defaultStartingArray= [
 	1008,
 	1009,
 	1010
+]
+export const twoStartingDeck= [
+	1011,
+	1012,
+	1013,
+	1014,
+	1015,
+	1016,
+	1017,
+	1018,
+	1019,
+	1020
+]
+export const threeStartingDeck= [
+	1021,
+	1022,
+	1023,
+	1024,
+	1025,
+	1026,
+	1027,
+	1028,
+	1029,
+	1030
 ]
 
 export const starterFields= [
@@ -177,7 +201,7 @@ export const cardMap= {
 		secondary: {
 			plenty: 1,
 			draw: 1,
-			opponents: {
+			attack: {
 				discard: 1
 			}
 		}
@@ -386,7 +410,7 @@ export const cardMap= {
 		faction: "T",
 		primary: {
 			harvest: 1,
-			plenty: 3
+			plenty: 1
 		},
 		secondary: {
 			coin: 1
@@ -447,19 +471,17 @@ export const cardMap= {
 		}
 	},
 	26: {
-		title: "Sandwich Tomatoes",
-		type: "seed",
-		picture: "https://image.ibb.co/fvZpTK/Sandwich_Tomatoes.png",
-		cost: 4,
+		title: "Sharp Scythe",
+		type: "tool",
+		picture: "https://image.ibb.co/kxa45e/Sharp_Scythe.png",
+		cost: 2,
 		faction: "O",
 		primary: {
-			coin: 2,
-			plenty: 1,
-			waste: 1
+			coin: 1,
+			harvest: 1
 		},
 		secondary: {
-			plenty: 1,
-			waste: 1
+			marketScrap: 1
 		}
 	},
 	27: {
@@ -474,7 +496,7 @@ export const cardMap= {
 			waste: 1
 		},
 		secondary: {
-			plenty: 1,
+			plenty: 3,
 			waste: 1
 		}
 	},
@@ -652,20 +674,22 @@ export const cardMap= {
 		type: "tool",
 		picture: "https://image.ibb.co/ebpEMK/Fortune_1.png",
 		cost: 0,
-		faction: "N",
+		faction: "C",
 		primary: {
 			or: {
 				left: {
 					draw: 1
 				},
 				right: {
-					opponents: {
+					attack: {
 						discard: 1
 					}
 				}
 			}
 		},
-		secondary: {}
+		secondary: {
+			draw: 1
+		}
 	},
 	1011: {
 		title: "Basic Seed",
@@ -805,20 +829,22 @@ export const cardMap= {
 		type: "tool",
 		picture: "https://image.ibb.co/jKkh8z/Fortune_3.png",
 		cost: 0,
-		faction: "N",
+		faction: "C",
 		primary: {
 			or: {
 				left: {
 					draw: 1
 				},
 				right: {
-					opponents: {
+					attack: {
 						discard: 1
 					}
 				}
 			}
 		},
-		secondary: {}
+		secondary: {
+			draw: 1
+		}
 	},
 	1021: {
 		title: "Basic Seed",
@@ -958,27 +984,42 @@ export const cardMap= {
 		type: "tool",
 		picture: "https://image.ibb.co/eQuL2e/Fortune_2.png",
 		cost: 0,
-		faction: "N",
+		faction: "C",
 		primary: {
 			or: {
 				left: {
 					draw: 1
 				},
 				right: {
-					opponents: {
+					attack: {
 						discard: 1
 					}
 				}
 			}
 		},
-		secondary: {}
+		secondary: {
+			draw: 1
+		}
+	},
+
+	1998: {
+		title: "Neighborhood Field",
+		type: "field",
+		picture: "https://image.ibb.co/gq2XU9/Neighborhood_Field.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			special: "Neighborhood Field"
+		},
+		secondary: {
+		}
 	},
 
 	2001: {
 		title: "Abandoned Plot",
 		type: "field",
 		picture: "https://image.ibb.co/gWHSfz/Abandoned_Plot.png",
-		cost: 0,
+		cost: 2,
 		faction: "C",
 		primary: {
 			plenty: 1,
@@ -995,7 +1036,7 @@ export const cardMap= {
 		title: "Makeshift Field",
 		type: "field",
 		picture: "https://image.ibb.co/gwLDLz/Makeshift_Field.png",
-		cost: 0,
+		cost: 2,
 		faction: "C",
 		primary: {
 			plenty: 1,
@@ -1012,7 +1053,7 @@ export const cardMap= {
 		title: "Botanical Facilities",
 		type: "field",
 		picture: "https://image.ibb.co/ivKetK/Botanical_Facilities.png",
-		cost: 0,
+		cost: 2,
 		faction: "T",
 		primary: {
 			plenty: 2,
@@ -1026,7 +1067,7 @@ export const cardMap= {
 		title: "Experimental Field",
 		type: "field",
 		picture: "https://image.ibb.co/fv0f0z/Experimental_Field.png",
-		cost: 0,
+		cost: 2,
 		faction: "T",
 		primary: {
 			plenty: 2,
@@ -1040,7 +1081,7 @@ export const cardMap= {
 		title: "Hilltop Field",
 		type: "field",
 		picture: "https://image.ibb.co/e3kPSe/Hilltop_Field.png",
-		cost: 0,
+		cost: 2,
 		faction: "O",
 		primary: {
 			plenty: 1,
@@ -1055,7 +1096,7 @@ export const cardMap= {
 		title: "Quaint Field",
 		type: "field",
 		picture: "https://image.ibb.co/h0X4Se/Quaint_Field.png",
-		cost: 0,
+		cost: 2,
 		faction: "O",
 		primary: {
 			plenty: 1,
@@ -1070,7 +1111,7 @@ export const cardMap= {
 		title: "Verdant Field",
 		type: "field",
 		picture: "https://image.ibb.co/bQ3uSe/Verdant_Field.png",
-		cost: 0,
+		cost: 2,
 		faction: "G",
 		primary: {
 			cropCount: 2,
@@ -1090,7 +1131,7 @@ export const cardMap= {
 		title: "Green Field",
 		type: "field",
 		picture: "https://image.ibb.co/gD0DLz/Green_Field.png",
-		cost: 0,
+		cost: 2,
 		faction: "G",
 		primary: {
 			cropCount: 2,

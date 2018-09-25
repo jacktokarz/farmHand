@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import { fromHeader, fromMatch } from '../actions'
-import { cardMap, defaultMarketArray, defaultStartingArray, listenForMatches, listenForMatchUpdates, starterFields, wasteKey } from './'
+import { cardMap, defaultMarketArray, oneStartingDeck, twoStartingDeck, threeStartingDeck, listenForMatches, listenForMatchUpdates, starterFields, wasteKey } from './'
 
 
 const config = {
@@ -16,29 +16,50 @@ const config = {
 export const database= firebase.database();
 
 
+function activateAttack(attack, matchPath, playerWord) {
+  console.log("An attack is happening from "+playerWord);
+  database.ref(matchPath+'/').once('value')
+  .then(function(snapshot) {
+    const pOne= snapshot.child('playerOne/').child('/user').val();
+    const pTwo= snapshot.child('playerTwo/').child('/user').val();
+    const pThree= snapshot.child('playerThree/').child('/user').val();
+    console.log("The players are: "+pOne+pTwo+pThree);
+    if(playerWord !== pOne) {
+      console.log("attacking one");
+      insertObject(matchPath+'/playerOne/attack', attack);
+    }
+    if(playerWord !== pTwo) {
+      console.log("attacking two");
+      insertObject(matchPath+'/playerTwo/attack', attack);
+    }
+    if(pThree !== null && pThree !== playerWord) {
+      console.log("attacking threee");
+      insertObject(matchPath+'/playerThree/attack', attack);
+    }
+  });
+}
 
 function activateCounters(counters, dispatch, matchPath, playerWord, playerObject) {
   console.log("activating these counters: "+JSON.stringify(counters));
   if(counters.draw > 0) {
     drawCards(matchPath, counters.draw, playerWord, playerObject);
+    counters.draw= 0;
+    console.log("cards drawn, continuing with counters: "+JSON.stringify(counters));
   }
   if(counters.waste > 0) {
-    playerObject.discard.push(wasteKey);
+    while(counters.waste > 0) {
+      playerObject.discard.push(wasteKey);
+      counters.waste= counters.waste-1;
+    }
     insertObject(matchPath+'/'+playerWord+'/discard', playerObject.discard);
   }
   if(counters.discard > 0) {
-    const title= "Discard which card from your hand?";
-    const parentInfo= {playerWord: playerWord};
-    let options= [];
-    for(var i=0; i<playerObject.hand.length; i++) {
-      options.push({id: playerObject.hand[i], title: cardMap[playerObject.hand[i]].title});
-    }
-    dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
+    openDiscardChoiceModal(dispatch, counters, playerWord, playerObject.hand);
   }
   updateDatabaseCounters(counters, matchPath, playerWord);
 }
 
-function addPlayerToMatch(path, color, deck, hand, user) {
+function addPlayerToMatch(path, color, deck, hand, playerNumber, user) {
   console.log("player to add to match: "+JSON.stringify(user));
   const counters= {
     plenty: 0,
@@ -48,36 +69,43 @@ function addPlayerToMatch(path, color, deck, hand, user) {
     scrap: 0,
     marketScrap: 0
   };
-  const fieldId= starterFields[getRandomInt(starterFields.length)];
-  const field= {id: fieldId, crops: [], available: true};
-
-  insertObject(path+'/counters', counters);
-  insertObject(path+'/color', color);
-  insertObject(path+'/user', user);
-  insertObject(path+'/deck', deck);
-  insertObject(path+'/hand', hand);
-  insertObject(path+'/fields/'+fieldId, field);
-  insertObject(path+'/activatedFactions', cardMap[fieldId].faction);
+      
+  database.ref(path+'/starterFields').once('value')
+    .then(function(snapshot) {
+      let starters= snapshot.val();
+      console.log("the starter fields are: "+starters);
+      const fieldId= starters.pop();
+      console.log("field id is: "+fieldId+"... and now starters: "+starters);
+      insertObject(path+'/starterFields', starters);
+      const playerObject= {counters: counters, color: color, user: user, deck: deck, hand: hand, activatedFactions: {0: cardMap[fieldId].faction}};
+      insertObject(path+'/'+playerNumber, playerObject);
+      const field= {id: fieldId, crops: [], available: true};
+      insertObject(path+'/'+playerNumber+'/fields/'+fieldId, field);
+    });
 }
 
 export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldId, playerWord) {
   console.log("playing field: "+newFieldId);
-  const playerRef= matchPath+'/'+playerWord;
   const newField= {id: newFieldId, crops: [], available: false};
   if(fieldIdToReplace!==null) {
-    const query= database.ref(playerRef);
+    const query= database.ref(matchPath);
     query.once("value")
       .then(function(snapshot) {
         let crops= [];
-        snapshot.child('/fields').child(fieldIdToReplace).child('/crops').forEach(function(childSnapshot) {
+        snapshot.child(playerWord+'/fields').child(fieldIdToReplace).child('/crops').forEach(function(childSnapshot) {
           crops.push(childSnapshot.val());
         });
-        database.ref(playerRef+'/fields/'+newFieldId).set(newField);
+        database.ref(matchPath+'/'+playerWord+'/fields/'+newFieldId).set(newField);
         buyWrapUp(newFieldId, matchPath, newCoin, crops, playerWord);
+        if(starterFields.includes(fieldIdToReplace)) {
+          let newStarters= snapshot.child("starterFields").val();
+          newStarters.splice(0, 0, fieldIdToReplace);
+          insertObject(matchPath+'/starterFields', newStarters);
+        }
       });
   }
   else {
-    database.ref(playerRef+'/fields/'+newFieldId).set(newField);
+    database.ref(matchPath+'/'+playerWord+'/fields/'+newFieldId).set(newField);
     buyWrapUp(newFieldId, market, matchPath, newCoin, [], playerWord);
   }
 }
@@ -87,10 +115,30 @@ export function buyMarketCard(id, market, matchPath, newCoin, userObject, userWo
   buyWrapUp(id, market, matchPath, newCoin, userObject.discard, userWord);
 }
 
-export function buyMarketPlenty(matchPath, playerWord, userPlayer) {
+export function buyMarketPlenty(matchPath, playerNumber, userPlayer) {
+  const playerWord= convertPlayerNumberToWord(playerNumber);
   userPlayer.counters.coin= userPlayer.counters.coin-5;
   userPlayer.counters.plenty= userPlayer.counters.plenty+1;
   insertObject(matchPath+'/'+playerWord+'/counters', userPlayer.counters);
+}
+
+export function buyStarterField(dispatch, marketArray, matchPath, user, playerNumber) {
+  const playerWord= convertPlayerNumberToWord(playerNumber);
+  database.ref(matchPath+'/starterFields').once('value')
+    .then(function(snapshot) {
+      let starters= snapshot.val();
+      const fieldId= starters.pop();
+      insertObject(matchPath+'/starterFields', starters);
+      if(user.fields.length===2) {
+        const title= "Replace which field?";
+        const parentInfo= fieldId;
+        const options= [{id: user.fields[0].id, title: cardMap[user.fields[0].id].title}, {id: user.fields[1].id, title: cardMap[user.fields[1].id].title}];
+        dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
+      }
+      else {
+        buyField(null, marketArray, matchPath, user.counters.coin - cardMap[fieldId].cost, fieldId, playerWord);
+      }
+    });
 }
 
 function buyWrapUp(id, market, matchPath, newCoin, newDiscard, userWord) {
@@ -111,7 +159,9 @@ export function combineCounters(one, two) {
     marketScrap: one.marketScrap===undefined?0:one.marketScrap,
     draw: one.draw===undefined?0:one.draw,
     discard: one.discard===undefined?0:one.discard,
-    waste: one.waste===undefined?0:one.waste
+    waste: one.waste===undefined?0:one.waste,
+
+    attack: one.attack===undefined?null:one.attack,
   };
   two= {
     plenty: two.plenty===undefined?0:two.plenty,
@@ -122,7 +172,9 @@ export function combineCounters(one, two) {
     marketScrap: two.marketScrap===undefined?0:two.marketScrap,
     draw: two.draw===undefined?0:two.draw,
     discard: two.discard===undefined?0:two.discard,
-    waste: two.waste===undefined?0:two.waste
+    waste: two.waste===undefined?0:two.waste,
+
+    attack: two.attack===undefined?null:two.attack,
   };
   console.log("UPDATED combining: "+JSON.stringify(one)+'\n'+JSON.stringify(two));
   return {
@@ -134,7 +186,9 @@ export function combineCounters(one, two) {
     marketScrap: one.marketScrap + two.marketScrap,
     draw: one.draw + two.draw,
     discard: one.discard + two.discard,
-    waste: one.waste + two.waste
+    waste: one.waste + two.waste,
+
+    attack: one.attack!==null?(two.attack!==null?combineCounters(one.attack, two.attack):one.attack):null,
   }
 }
 
@@ -221,14 +275,15 @@ export function createMatch(user) {
         const today = new Date();
         const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         insertObject(path+'/date', todayDate);
+        insertObject(path+'/starterFields', shuffleArray(starterFields.slice()));
         insertObject(path+'/currentPlayerNumber', 0);
         const market= shuffleArray(defaultMarketArray);
         console.log("inserting market: "+market.toString());
         insertObject(path+'/market', market);
-        let pOneDeck= shuffleArray(defaultStartingArray.slice());
+        let pOneDeck= shuffleArray(oneStartingDeck.slice());
         let hand= [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()];
         const color= "lightcyan";
-        addPlayerToMatch(path+'/playerOne', color, pOneDeck, hand, user);
+        addPlayerToMatch(path, color, pOneDeck, hand, "playerOne", user);
       });
     });
 }
@@ -324,34 +379,33 @@ export function getCookie(cname) {
     return null;
 }
 
-function getMatchPlayers(dispatch, matchPath, user) {
-  database.ref(matchPath+'/').once('value')
-    .then(function(snapshot) {
-      const pOne= snapshot.child('playerOne/').child('/user').val();
-      const pTwo= snapshot.child('playerTwo/').child('/user').val();
-      const pThree= snapshot.child('playerThree/').child('/user').val();
-      let userPlayerNumber=null;
-      if(user===pOne) {
-        userPlayerNumber=0;
-      }
-      else if(user===pTwo) {
-        userPlayerNumber=1;
-      }
-      else if(user===pThree) {
-        userPlayerNumber=2;
-      }
-      dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
-      const matchPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null });
-      dispatch(fromMatch.saveNumberOfPlayers(matchPlayers.length));
-    });
-}
-
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, playerWord, userData) {
+export function harvestCall(dispatch, fieldData, matchPath, playArea, playerNumber, userData) {
+  console.log("harvesting from field: "+JSON.stringify(fieldData));
+  
+  if(fieldData.crops.length > 1) {
+    let options= [];
+    for(var i=0; i < fieldData.crops.length; i++) {
+      options.push({id: fieldData.crops[i], title: i+1})
+    }
+    const parentInfo= fieldData;
+    const title= "Harvest which crop from "+cardMap[fieldData.id].title+"?";
+    dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
+    return;
+  }
+  else {
+    harvestCrop(fieldData.crops[0], dispatch, fieldData, matchPath, playArea, playerNumber, userData);
+  }
+}
+
+export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, playerNumber, userData) {
   console.log("Harvesting "+cropId);
+  dispatch(fromMatch.closeChoiceModal());
+
+  const playerWord= convertPlayerNumberToWord(playerNumber);
   const cropData= cardMap[cropId];
 
   //for counter: take away a harvest...
@@ -385,7 +439,13 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
 
   //finally activate what's been put together
   console.log("The combined harvest effects are: "+JSON.stringify(counters));
+  if(counters.attack !== null) {
+    activateAttack(counters.attack, matchPath, userData.user);
+    counters.attack= null;
+  }
   activateCounters(counters, dispatch, matchPath, playerWord, userData);
+
+
 
   //put the card in the play area...
   playArea.push(cropId);
@@ -450,9 +510,9 @@ export function joinMatch(key, playerList, user) {
   const players= playerList.split(", ");
   const playerNumber= players.length > 1 ? "playerThree" : "playerTwo";
   const color= playerNumber === "playerTwo" ? "lightgoldenrodyellow": "lightpink";
-  let deck= shuffleArray(defaultStartingArray.slice());
+  let deck= playerNumber==="playerTwo"?shuffleArray(twoStartingDeck.slice()):shuffleArray(threeStartingDeck.slice());
   const hand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
-  addPlayerToMatch('/matches/'+key+'/'+playerNumber, color, deck, hand, user);
+  addPlayerToMatch('/matches/'+key, color, deck, hand, playerNumber, user);
 }
 
 function loginUser(un, dispatch) {
@@ -475,10 +535,139 @@ export function matchMount(dispatch) {
     else {
       const matchPath= '/matches/'+matchId;
       dispatch(fromMatch.saveMatchPath(matchPath));
-      getMatchPlayers(dispatch, matchPath, user);
-      listenForMatchUpdates(dispatch, matchPath);
+      setUpMatch(dispatch, matchPath, user);
     }
   }
+}
+
+export function modalAction(option, parentInfo, actionTitle, cardId, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch) {
+  const playerWord= convertPlayerNumberToWord(userPlayerNumber);
+  console.log("MODAL ACTION, option: "+JSON.stringify(option));
+  let cardData= cardMap[cardId];
+  console.log("card data: "+JSON.stringify(cardData));
+
+    //not possible to be from choice modal
+  if(actionTitle.startsWith("Buy")) {
+    if(cardData.type==="field") {
+      console.log("Buying a field");
+      if(user.fields.length===2) {
+        const title= "Replace which field?";
+        const parentInfo= cardId;
+        const options= [{id: user.fields[0].id, title: cardMap[user.fields[0].id].title}, {id: user.fields[1].id, title: cardMap[user.fields[1].id].title}];
+        dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
+        return;
+      }
+      else {
+        buyField(null, marketArray, matchPath, user.counters.coin - cardData.cost, cardId, playerWord);
+      }
+    }
+    else {
+      console.log("Buying not a field");
+      buyMarketCard(cardId, marketArray, matchPath, user.counters.coin - cardData.cost, user, playerWord);
+    }
+  }
+
+  else if(actionTitle.startsWith("Scrap")) {
+    if(marketArray.includes(cardId)) {
+      scrapMarketCard(cardId, user.counters.marketScrap, marketArray, matchPath, playerWord, trashArray);
+    }
+    else {
+      scrapCard(cardId, user.counters.scrap, matchPath, playerWord, user, trashArray);
+    }
+  }
+
+    // Maybe from choice modal
+  else if(actionTitle.startsWith("Play")) {
+    let activatedCounters= isThereADefaultChoice(cardData, user);  //checks if there's an 'or'
+    console.log("Playing the card with these counters: "+JSON.stringify(activatedCounters));
+    if(activatedCounters === null) { //there is
+      if(option===null) { //it has not been decided, so puts up choice
+        const title= "Play which side of the 'OR' statement?";
+        const parentInfo= cardId;
+        const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
+        console.log("choice modal called! "+JSON.stringify(options));
+        dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
+        return;
+      }
+      else { //it has been chosen, sets choice as activated area
+        activatedCounters= (option.title==="left" ? cardData.primary.or.left : cardData.primary.or.right);
+        console.log("The choice was made of what to play, it is: "+ JSON.stringify(activatedCounters));
+      }
+    }
+    user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
+    console.log("playing card, and have activated factions: "+user.activatedFactions.toString()+'\n'+"this faction is: "+cardData.faction);
+    if(user.activatedFactions.includes(cardData.faction) && cardData.type==="tool") { //if there's synergy, adds it in
+      activatedCounters= combineCounters(activatedCounters, cardData.secondary);
+    }
+    console.log("playing counters: "+JSON.stringify(activatedCounters));
+
+    playCard(activatedCounters, user.counters, dispatch, cardId, matchPath, playArea, playerWord, user);
+  }
+
+  else if(actionTitle.startsWith("Plant")) {
+    console.log("user is planting");
+    if(option === null && user.fields.length > 1) { //there is a choice of field which has not been answered
+      const title= "Plant "+cardData.title+" in which field?";
+      const parentInfo= cardId;
+      const options= [{id: user.fields[0].id, title: cardMap[user.fields[0].id].title}, {id: user.fields[1].id, title: cardMap[user.fields[1].id].title}]; 
+      console.log("choice modal called! "+JSON.stringify(options));
+      dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
+      return;
+    }
+    else {
+      let field= user.fields[0];
+      if(option !== null) {
+        if(field.id !== option.id) {
+          field= user.fields[1];
+        }
+        cardId= parentInfo;
+      }
+      plantCard(cardId, field, matchPath, user.counters.plant, playerWord, user);
+    }  
+  }
+
+
+    //Definitely from choice modal
+  else if(actionTitle.startsWith("Harvest")) {
+    console.log("Choice was to harvest!");
+    harvestCrop(option.id, dispatch, parentInfo, matchPath, playArea, userPlayerNumber, user);
+    return;
+  }
+  else if(actionTitle.startsWith("Replace")) {
+    buyField(option.id, marketArray, matchPath, user.counters.coin - cardMap[option.id].cost, parentInfo, playerWord);
+  }
+  else if(actionTitle.startsWith("Discard")) {
+    console.log("The modal action is discarding!");
+    user.discard.push(option.id);
+    insertObject(matchPath+'/'+playerWord+'/discard', user.discard);
+    user.hand.splice(user.hand.indexOf(option.id), 1);
+    insertObject(matchPath+'/'+playerWord+'/hand', user.hand);
+    
+    parentInfo.discard= parentInfo.discard - 1;
+    if(parentInfo.discard > 0) {
+      openDiscardChoiceModal(dispatch, parentInfo, playerWord, user.hand);
+      return;
+    }
+    else {
+      updateDatabaseCounters(parentInfo, matchPath, playerWord);      
+    }
+  }
+
+  if(option !== null) {
+    dispatch(fromMatch.closeChoiceModal());
+  }
+  dispatch(fromMatch.closeCardModal());
+}
+
+function openDiscardChoiceModal(dispatch, counters, playerWord, hand) {
+  console.log("asking to discard");
+  const title= "Discard which card from your hand? ("+counters.discard+ " left to discard)";
+  const parentInfo= counters;
+  let options= [];
+  for(var i=0; i<hand.length; i++) {
+    options.push({id: hand[i], title: cardMap[hand[i]].title});
+  }
+  dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
 }
 
 export function openRules() {
@@ -500,9 +689,18 @@ export function playCard(activatedArea, counters, dispatch, id, matchPath, playA
   insertObject(matchPath+'/playArea', playArea);
   removeAndInsertArray(playerObject.hand, id, matchPath+'/'+playerWord+'/hand');
   counters= combineCounters(activatedArea, counters);
+  console.log("now counters (probably unchanged) are: "+JSON.stringify+' and attack: '+counters.attack===null);
+  if(counters.attack !== null) {
+    activateAttack(counters.attack, matchPath, playerObject.user);
+    counters.attack= null;
+  }
   console.log("the played card's effects have been combined with the users: "+JSON.stringify(counters));
   activateCounters(counters, dispatch, matchPath, playerWord, playerObject);
-  playerObject.activatedFactions.push(cardMap[id].faction);
+
+  const cardFaction= cardMap[id].faction;
+  if(cardFaction !== "N") {
+    playerObject.activatedFactions.push(cardFaction);
+  }
   insertObject(matchPath+'/'+playerWord+'/activatedFactions', playerObject.activatedFactions);
 }
 
@@ -532,7 +730,7 @@ function removeAndInsertArray(array, id, path) {
   insertObject(path, array);
 }
 
-function removeFromDatabase(path) {
+export function removeFromDatabase(path) {
   let updates= {};
   updates[ path ]= null;
   database.ref().update(updates);
@@ -555,6 +753,30 @@ export function scrapMarketCard(cardId, scrapCounter, market, matchPath, playerW
 function setCookie(cname, cvalue) {
     document.cookie = cname + "=" + cvalue + ";expires=Thu, 21 July 2050 01:00:00 UTC;";
     console.log(cname+" cookie set as "+cvalue);
+}
+
+function setUpMatch(dispatch, matchPath, user) {
+  database.ref(matchPath+'/').once('value')
+    .then(function(snapshot) {
+      const pOne= snapshot.child('playerOne/').child('/user').val();
+      const pTwo= snapshot.child('playerTwo/').child('/user').val();
+      const pThree= snapshot.child('playerThree/').child('/user').val();
+      let userPlayerNumber=null;
+      if(user===pOne) {
+        userPlayerNumber=0;
+      }
+      else if(user===pTwo) {
+        userPlayerNumber=1;
+      }
+      else if(user===pThree) {
+        userPlayerNumber=2;
+      }
+      dispatch(fromMatch.saveUserPlayerNumber(userPlayerNumber));
+      const matchPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null });
+      dispatch(fromMatch.saveNumberOfPlayers(matchPlayers.length));
+      
+      listenForMatchUpdates(dispatch, matchPath, userPlayerNumber);
+    });
 }
 
 function shuffleArray(passedArray) {
@@ -594,3 +816,4 @@ function updateDatabaseCounters(counters, matchPath, playerWord) {
   updates[matchPath+'/'+playerWord+'/counters']= counters;
   database.ref().update(updates);
 }
+

@@ -17,7 +17,7 @@ const CardModal= ({actions, cardId, closeModal, currentPlayerNumber, data, func,
 						<button 
 							className="inside modal-button"
 							style={{cursor: "pointer", display: (currentPlayerNumber===userPlayerNumber?"inline-block":"none")}} 
-							onClick={ () => func(i, cardId, data, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber)}
+							onClick={ () => func(i, cardId, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber)}
 						>
 							{i}
 						</button>

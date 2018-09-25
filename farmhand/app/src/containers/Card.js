@@ -24,7 +24,6 @@ const mapStateToProps= (state, ownProps) => {
 
 	let actions=[];
 	if(ownProps.place==="userHand") {
-		console.log("data for card "+ownProps.id+": "+cardData);
 		if(isCardPlayable(cardData, user)) {
 			actions.push("Play");
 		}

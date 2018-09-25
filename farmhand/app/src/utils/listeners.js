@@ -1,5 +1,5 @@
 import { fromLobby, fromMatch } from '../actions'
-import { convertPlayerWordToNumber, database, getCookie } from './'
+import { cardMap, convertPlayerWordToNumber, database, getCookie, removeFromDatabase } from './'
 
 
 function listenForCurrentPlayerNumber(dispatch, matchPath ) {
@@ -57,14 +57,15 @@ function listenForMatchMarketArray(dispatch, matchPath ) {
   } );
 }
 
-export function listenForMatchUpdates(dispatch, matchPath) {
+export function listenForMatchUpdates(dispatch, matchPath, userPlayerNumber) {
 	database.ref('matches/').off();
+	userPlayerNumber= userPlayerNumber===0?"playerOne":(userPlayerNumber===1?"playerTwo":"playerThree");
 	listenForCurrentPlayerNumber(dispatch, matchPath);
 	listenForMatchMarketArray(dispatch, matchPath);
 	listenForPlayArea(dispatch, matchPath);
-	listenForPlayerUpdates(dispatch, matchPath, "playerOne");
-	listenForPlayerUpdates(dispatch, matchPath, "playerTwo");
-	listenForPlayerUpdates(dispatch, matchPath, "playerThree");
+	listenForPlayerUpdates(dispatch, matchPath, "playerOne", userPlayerNumber);
+	listenForPlayerUpdates(dispatch, matchPath, "playerTwo", userPlayerNumber);
+	listenForPlayerUpdates(dispatch, matchPath, "playerThree", userPlayerNumber);
 	listenForTrash(dispatch, matchPath);
 }
 
@@ -80,8 +81,9 @@ function listenForPlayArea(dispatch, matchPath) {
 }
 
 
-function listenForPlayerUpdates(dispatch, matchPath, playerNumber) {
+function listenForPlayerUpdates(dispatch, matchPath, playerNumber, userPlayerNumber) {
 	database.ref(matchPath+'/'+playerNumber).on("value", snapshot => {
+		console.log("Update for player "+playerNumber+" visile for "+userPlayerNumber);
 		const user= snapshot.child('user').val();
 		const color= snapshot.child('color').val();
 		const counts= snapshot.child('counters');
@@ -117,6 +119,32 @@ function listenForPlayerUpdates(dispatch, matchPath, playerNumber) {
 		snapshot.child('hand').forEach(function(childSnapshot) {
 			hand.push(childSnapshot.val());
 		});
+
+			//if this is the player, look for a current attack and display it
+		if(userPlayerNumber === playerNumber) {
+			const attack= snapshot.child('attack').val();
+			console.log("The retrieved attack is: "+attack);
+			if(attack !== null) {
+				let title= "";
+				let parentInfo= null;
+				let options= [];
+
+				if(attack.discard !== null) {
+					console.log("Player "+playerNumber+" has to discard! "+attack);
+					title= "Discard! You have been attacked and must discard! ("+attack.discard+" remaining)";
+					parentInfo= attack;
+					for(var i=0; i<hand.length; i++) {
+						options.push({id: hand[i], title: cardMap[hand[i]].title});
+					}
+					if(hand.length===0) {
+						console.log("NOTHING TO DISCARD! OH NO!");
+					}
+				}
+				dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
+				removeFromDatabase(matchPath+'/'+playerNumber+'/attack');
+			}
+		}
+
 		const player= {user: user, color: color, activatedFactions: activatedFactions, counters: counters, deck: deck, discard: discard, fields: fields, hand: hand};
 		if(playerNumber==="playerOne") {
 			dispatch(fromMatch.savePlayerOne(player));

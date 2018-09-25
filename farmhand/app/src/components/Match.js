@@ -10,6 +10,7 @@ import {cardBackSrc, cardMap} from '../utils'
 const Match= 
 	({
 		buyMarketPlenty,
+		buyMarketStarterField,
 		currentPlayerNumber,
 		endTurn,
 		history, 
@@ -55,11 +56,17 @@ const Match=
 	    			<Card  place="market" id={marketArray[4]} counters= {matchPlayers[userPlayerNumber].counters} />
 	    			<Card place="hiddenMarket" id={marketArray[5]} />
 	    			<div className="starterFieldAndPlenty" style={{"maxWidth": (100/6-1)+"%"}}>
-	    				<div className="marketObject" >Starter Field</div>
+	    				<div 
+	    					className="marketObject"
+	    					style= {{cursor: matchPlayers[userPlayerNumber].counters.coin<2?"default":"pointer"}}
+	    					onClick={() => matchPlayers[userPlayerNumber].counters.coin<2?"":buyMarketStarterField(marketArray, matchPath, matchPlayers[userPlayerNumber], userPlayerNumber)}
+	    				>
+	    					Starter Field
+	    				</div>
 	    				<div 
 	    					className="marketObject"
 	    					style={{cursor: matchPlayers[userPlayerNumber].counters.coin<5?"default":"pointer"}}
-	    					onClick={() => matchPlayers[userPlayerNumber].counters.coin<5?"":buyMarketPlenty(matchPath, currentPlayerNumber, matchPlayers[userPlayerNumber])}
+	    					onClick={() => matchPlayers[userPlayerNumber].counters.coin<5?"":buyMarketPlenty(matchPath, userPlayerNumber, matchPlayers[userPlayerNumber])}
 	    				>
 	    					Plenty
 	    				</div>
@@ -91,7 +98,7 @@ const Match=
 	    	</div>
 	    	<div className="col-sm-3 column noPadding">
 	    		<div style= {{"height": "25%"}}>
-	    			<img className="communityField" src="https://image.ibb.co/dbVwm8/Modest_Plot.png" alt="Modest_Plot" />
+	    			<img className="communityField" src="https://image.ibb.co/gq2XU9/Neighborhood_Field.png" alt="Neighborhood Field" />
 	    		</div>
 	    		<div style= {{"height": "50%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 					{matchPlayers[userPlayerNumber].fields.map((i, index) => (
