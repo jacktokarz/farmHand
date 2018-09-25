@@ -27,7 +27,7 @@ const Header= (
 	<div>
     <nav className="navbar navbar-dark bg-dark">
         <div className="navbar-brand" href="#">
-          {user === null ? "Welcome to Otter Owl Games" : "Welcome back to Otter Owl Games, "+user}
+          {user === null ? "Welcome to Otter Owl Fox Games" : "Welcome back to Otter Owl Fox Games, "+user}
         </div>
         <button className="btn" onClick={() => {
   	      	logButtonAction({buttonText});
