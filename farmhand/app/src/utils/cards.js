@@ -82,6 +82,37 @@ export const starterFields= [
 	2008
 ]
 
+export const communityFields= [
+	1997,
+	1998,
+	1999
+]
+
+
+export const choosableColors= [
+	"blanchedalmond",
+	"cadetblue",
+	"coral",
+	"cornflowerblue",
+	"darkgoldenrod",
+	"darkgreen",
+	"darkkhaki",
+	"darkorange",
+	"darkorchid",
+	"darksalmon",
+	"darktorquise",
+	"deeppink",
+	"deepskyblue",
+	"lightcyan",
+	"lightgoldenrodyellow",
+	"lightpink",
+	"lightsteelblue",
+	"mediumseagreen",
+	"mediumslateblue",
+	"yellow"
+]
+
+
 export const cardMap= {
 	666: {
 		title: "waste",
@@ -1002,7 +1033,7 @@ export const cardMap= {
 		}
 	},
 
-	1998: {
+	1997: {
 		title: "Neighborhood Field",
 		type: "field",
 		picture: "https://image.ibb.co/gq2XU9/Neighborhood_Field.png",
@@ -1010,6 +1041,30 @@ export const cardMap= {
 		faction: "N",
 		primary: {
 			special: "Neighborhood Field"
+		},
+		secondary: {
+		}
+	},
+	1998: {
+		title: "Local Graveyard",
+		type: "field",
+		picture: "https://image.ibb.co/gq2XU9/Neighborhood_Field.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			special: "Local Graveyard"
+		},
+		secondary: {
+		}
+	},
+	1999: {
+		title: "Treasure Trove",
+		type: "field",
+		picture: "https://image.ibb.co/gq2XU9/Neighborhood_Field.png",
+		cost: 0,
+		faction: "N",
+		primary: {
+			special: "Treasure Trove"
 		},
 		secondary: {
 		}

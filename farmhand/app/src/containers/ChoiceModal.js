@@ -8,6 +8,7 @@ import {
 	getChoiceModalParentInfo,
 	getChoiceModalRequired,
 	getChoiceModalVis,
+	getCommunityField,
 	getMarketArray,
 	getMatchPath,
 	getPlayArea,
@@ -18,7 +19,7 @@ import {
 	getUserPlayerNumber,
 } from '../selectors'
 import {ChoiceModal} from '../components'
-import {buyField, cardMap, combineCounters, convertPlayerNumberToWord, discardCard, insertObject, isThereADefaultChoice, harvestCrop, modalAction, playCard, plantCard} from '../utils'
+import {modalAction} from '../utils'
 
 
 const mapStateToProps= (state) => {
@@ -35,6 +36,7 @@ const mapStateToProps= (state) => {
 	}
 	return {
 		cardModalId: getCardModalId(state),
+		communityField: getCommunityField(state),
 		marketArray: getMarketArray(state),
 		matchPath: getMatchPath(state),
 		options: getChoiceModalOptions(state),
@@ -51,8 +53,8 @@ const mapStateToProps= (state) => {
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeChoiceModal()),
-	func: (option, cardModalId, marketArray, matchPath, parentInfo, playArea, actionTitle, trashArray, user, userPlayerNumber) =>
-		modalAction(option, parentInfo, actionTitle, cardModalId, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch),
+	func: (option, cardModalId, communityField, marketArray, matchPath, parentInfo, playArea, actionTitle, trashArray, user, userPlayerNumber) =>
+		modalAction(option, parentInfo, actionTitle, cardModalId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch),
 })
 
 

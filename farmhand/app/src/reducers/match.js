@@ -13,6 +13,7 @@ const initState=
 		choiceModalRequired: false,
 		choiceModalTitle: "",
 		choiceModalVis: "none",
+		communityField: {id: 1997, crops: [], available: true},
 		currentPlayerNumber: 1,
 		marketArray: [0,0,0,0,0,0],
 		matchPath: "/matches/0",
@@ -63,6 +64,7 @@ export default (state=initState, action) => {
 				cardModalVis: "none",
 			};
 		case fromMatch.actionTypes.CLOSECHOICEMODAL:
+			console.log("closing the choice modal");
 			return {...state,
 				choiceModalVis: "none",
 			};
@@ -87,6 +89,7 @@ export default (state=initState, action) => {
 				cardModalVis: "block",
 			};
 		case fromMatch.actionTypes.OPENCHOICEMODAL:
+			console.log("opening the choice modal");
 			return {...state, 
 				choiceModalOptions: action.options,
 				choiceModalParentInfo: action.parentInfo,
@@ -94,6 +97,10 @@ export default (state=initState, action) => {
 				choiceModalTitle: action.title,
 				choiceModalVis: "block",
 			};
+		case fromMatch.actionTypes.SAVECOMMUNITYFIELD:
+			return {...state,
+				communityField: action.payload,
+			}
 		case fromMatch.actionTypes.SAVEMARKETARRAY:
 			console.log("updating market array with: "+action.payload.toString());
 			return {...state, 

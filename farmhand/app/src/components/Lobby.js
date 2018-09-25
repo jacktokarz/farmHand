@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { BrowserRouter as Router } from 'react-router-dom'
 
+import {ChoiceModal, } from '../containers'
+
 
 
 const Lobby= ({createMatch, entryAction, history, matches, user}) => (
@@ -35,11 +37,11 @@ const Lobby= ({createMatch, entryAction, history, matches, user}) => (
       </table>
     </div>
     <button onClick={() => createMatch(user)}>Create Match</button>
+  
+      <ChoiceModal />
   </div>
+
 )
 
-Lobby.propTypes = {
-
-}
 
 export default Lobby;

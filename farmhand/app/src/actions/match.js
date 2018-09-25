@@ -4,6 +4,7 @@ export const actionTypes= {
 	DRAWHAND: 'match drawHand',
 	OPENCARDMODAL: 'match openCardModal',
 	OPENCHOICEMODAL: 'match openChoiceModal',
+	SAVECOMMUNITYFIELD: 'match saveCommunityField',
 	SAVEMARKETARRAY: 'match saveMarketArray',
 	SAVEMATCHPATH: 'match saveMatchPath',
 	SAVENUMBEROFPLAYERS: 'match saveNumberOfPlayers',
@@ -47,6 +48,11 @@ export const openChoiceModal= (options, parentInfo, required, title) => ({
 	parentInfo: parentInfo,
 	required: required,
 	title: title,
+})
+
+export const saveCommunityField= (field) => ({
+	type: actionTypes.SAVECOMMUNITYFIELD,
+	payload: field,
 })
 
 export const saveMarketArray= (array) => ({

@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import { fromHeader, fromMatch } from '../actions'
-import { cardMap, defaultMarketArray, oneStartingDeck, twoStartingDeck, threeStartingDeck, listenForMatches, listenForMatchUpdates, starterFields, wasteKey } from './'
+import { cardMap, choosableColors, defaultMarketArray, oneStartingDeck, twoStartingDeck, threeStartingDeck, listenForMatches, listenForMatchUpdates, starterFields, wasteKey } from './'
 
 
 const config = {
@@ -59,8 +59,9 @@ function activateCounters(counters, dispatch, matchPath, playerWord, playerObjec
   updateDatabaseCounters(counters, matchPath, playerWord);
 }
 
-function addPlayerToMatch(path, color, deck, hand, playerNumber, user) {
-  console.log("player to add to match: "+JSON.stringify(user));
+function addPlayerToMatch(dispatch, path, deck, hand, playerWord, user) {
+  console.log("player to add to "+path+": "+JSON.stringify(user));
+  dispatch(fromMatch.saveMatchPath(path));
   const counters= {
     plenty: 0,
     coin: 0,
@@ -77,10 +78,11 @@ function addPlayerToMatch(path, color, deck, hand, playerNumber, user) {
       const fieldId= starters.pop();
       console.log("field id is: "+fieldId+"... and now starters: "+starters);
       insertObject(path+'/starterFields', starters);
-      const playerObject= {counters: counters, color: color, user: user, deck: deck, hand: hand, activatedFactions: {0: cardMap[fieldId].faction}};
-      insertObject(path+'/'+playerNumber, playerObject);
+      const playerObject= {counters: counters, color: "grey", user: user, deck: deck, hand: hand, activatedFactions: {0: cardMap[fieldId].faction}};
+      insertObject(path+'/'+playerWord, playerObject);
       const field= {id: fieldId, crops: [], available: true};
-      insertObject(path+'/'+playerNumber+'/fields/'+fieldId, field);
+      insertObject(path+'/'+playerWord+'/fields/'+fieldId, field);
+      chooseUserColor(dispatch, path, playerWord);
     });
 }
 
@@ -241,6 +243,25 @@ export function checkRegister(dispatch, un, pw, cp) {
   }
 }
 
+function chooseUserColor(dispatch, matchPath, playerWord) {
+  database.ref(matchPath).once('value')
+    .then(function(snapshot) {
+      const colorTitle= "Pick a color for the match";
+      const colorParentInfo= playerWord;
+      let colorOptions= [];
+      for(var i=0; i < choosableColors.length; i++) {
+        if(snapshot.child("playerOne").child("color").val() !== choosableColors[i]) {
+          if(snapshot.child("playerTwo").val() === null || snapshot.child("playerTwo").child("color").val() !== choosableColors[i]) {
+            colorOptions.push({id: choosableColors[i], title: choosableColors[i]});
+          }
+        }
+      }
+      console.log("Refined color list: "+JSON.stringify(colorOptions));
+      dispatch(fromMatch.openChoiceModal(colorOptions, colorParentInfo, true, colorTitle));
+
+    });
+}
+
 export function convertPlayerNumberToWord(number) {
     if(number === 0) {
       return 'playerOne';
@@ -265,25 +286,33 @@ export function convertPlayerWordToNumber(word) {
     }
 }
 
-export function createMatch(user) {
+function createMatch(dispatch, commField, user) {
   const keyQuery= database.ref('/matches/').orderByKey().limitToLast(1);
   keyQuery.once("value")
     .then(function(snapshot) {
       snapshot.forEach(function(childSnapshot) {
         const path= 'matches/'+(parseInt(childSnapshot.key)+1);
+        console.log("Creating match "+path);
+
         insertObject(path+'/status', "pending");
+        
         const today = new Date();
         const todayDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         insertObject(path+'/date', todayDate);
+        
         insertObject(path+'/starterFields', shuffleArray(starterFields.slice()));
+        
         insertObject(path+'/currentPlayerNumber', 0);
+        
         const market= shuffleArray(defaultMarketArray);
         console.log("inserting market: "+market.toString());
         insertObject(path+'/market', market);
+        
+        insertObject(path+'/communityField', commField);
+
         let pOneDeck= shuffleArray(oneStartingDeck.slice());
         let hand= [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()];
-        const color= "lightcyan";
-        addPlayerToMatch(path, color, pOneDeck, hand, "playerOne", user);
+        addPlayerToMatch(dispatch, path, pOneDeck, hand, "playerOne", user);
       });
     });
 }
@@ -353,6 +382,7 @@ console.log("their info: "+JSON.stringify(userPlayer));
   }
   insertObject(matchPath+'/'+playerWord+'/activatedFactions', newlyActivatedFactions);
   database.ref(matchPath+'/playArea').set(null);
+  database.ref(matchPath+'/communityField/available').set(true);
 
 //updates currentPlayer for next player
   currentPlayerNumber= (currentPlayerNumber+1)%numberOfPlayers;
@@ -414,8 +444,15 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
   //add in the field's primary effect...
   const fieldCard= cardMap[fieldData.id];
   console.log("harvest from field: "+JSON.stringify(fieldCard));
+
+    //check for exceptional fields
+  if(fieldCard.primary.special !== undefined) {
+    if(fieldCard.primary.special === "Neighborhood Field") {
+      counters= combineCounters(counters, {plenty: fieldData.crops.length});
+    }
+  }
   if(fieldCard.primary.cropCount !== undefined) {
-    console.log("SPECIAL HARVEST SITUATION!");
+    console.log("SPECIAL HARVEST SITUATION! COUNTING CROPS.");
     if(fieldData.crops.length > fieldCard.primary.cropCount) {
       counters= combineCounters(fieldCard.primary.higher, counters);
     }
@@ -463,7 +500,7 @@ export function insertObject(dbPath, obj) {
       console.log("object submission error");
     }
     else {
-      console.log(JSON.stringify(obj)+" inserted");
+      console.log(JSON.stringify(obj)+" inserted at "+dbPath);
     }
   });
 }
@@ -506,13 +543,12 @@ export function isThereADefaultChoice(cardData, user) {
   return activatedCounters;
 }
 
-export function joinMatch(key, playerList, user) {
+export function joinMatch(dispatch, key, playerList, user) {
   const players= playerList.split(", ");
   const playerNumber= players.length > 1 ? "playerThree" : "playerTwo";
-  const color= playerNumber === "playerTwo" ? "lightgoldenrodyellow": "lightpink";
   let deck= playerNumber==="playerTwo"?shuffleArray(twoStartingDeck.slice()):shuffleArray(threeStartingDeck.slice());
   const hand= [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
-  addPlayerToMatch('/matches/'+key, color, deck, hand, playerNumber, user);
+  addPlayerToMatch(dispatch, '/matches/'+key, deck, hand, playerNumber, user);
 }
 
 function loginUser(un, dispatch) {
@@ -540,7 +576,7 @@ export function matchMount(dispatch) {
   }
 }
 
-export function modalAction(option, parentInfo, actionTitle, cardId, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch) {
+export function modalAction(option, parentInfo, actionTitle, cardId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch) {
   const playerWord= convertPlayerNumberToWord(userPlayerNumber);
   console.log("MODAL ACTION, option: "+JSON.stringify(option));
   let cardData= cardMap[cardId];
@@ -606,24 +642,31 @@ export function modalAction(option, parentInfo, actionTitle, cardId, marketArray
 
   else if(actionTitle.startsWith("Plant")) {
     console.log("user is planting");
-    if(option === null && user.fields.length > 1) { //there is a choice of field which has not been answered
+    if(option === null) { //there is a choice of field which has not been answered
       const title= "Plant "+cardData.title+" in which field?";
       const parentInfo= cardId;
-      const options= [{id: user.fields[0].id, title: cardMap[user.fields[0].id].title}, {id: user.fields[1].id, title: cardMap[user.fields[1].id].title}]; 
+      let options= [];
+      for(var i=0; i < user.fields.length; i++) {
+        options.push({id: user.fields[i].id, title: cardMap[user.fields[i].id].title});
+      }
+      options.push({id: communityField.id, title: cardMap[communityField.id].title});
       console.log("choice modal called! "+JSON.stringify(options));
       dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
       return;
     }
     else {
-      let field= user.fields[0];
-      if(option !== null) {
+      let field= communityField;
         if(field.id !== option.id) {
-          field= user.fields[1];
+          for(var i=0; i < user.fields.length; i++) {
+            if(option.id === user.fields[i].id) {
+              field= user.fields[i];
+              break;
+            }
+          }
         }
         cardId= parentInfo;
-      }
       plantCard(cardId, field, matchPath, user.counters.plant, playerWord, user);
-    }  
+    }
   }
 
 
@@ -652,6 +695,15 @@ export function modalAction(option, parentInfo, actionTitle, cardId, marketArray
       updateDatabaseCounters(parentInfo, matchPath, playerWord);      
     }
   }
+  else if(actionTitle.startsWith("Share")) {
+    const field= {id: option.id, crops: [], available: true};
+    createMatch(dispatch, field, parentInfo);
+  }
+
+  else if(actionTitle.startsWith("Pick")) {
+    console.log("updating color "+option.id+" for "+parentInfo);
+    insertObject(matchPath+'/'+parentInfo+'/color', option.id);
+  }
 
   if(option !== null) {
     dispatch(fromMatch.closeChoiceModal());
@@ -676,9 +728,16 @@ export function openRules() {
 
 export function plantCard(cardId, field, matchPath, plantCounter, playerWord, playerObject) {
   console.log("Planting "+cardId+" in: "+JSON.stringify(field));
+  if(field.crops === undefined) {
+    field.crops= [];
+  }
   field.crops.push(cardId);
-  insertObject(matchPath+'/'+playerWord+'/fields/'+field.id+'/crops', field.crops);
-  database.ref(matchPath+'/'+playerWord+'/fields/'+field.id+'/available').set(false);
+  let path= matchPath+'/'+playerWord+'/fields/'+field.id;
+  if(field.id > 1990 && field.id < 2001) {
+    path= matchPath+'/communityField';
+  }
+  insertObject(path+'/crops', field.crops);
+  database.ref(path+'/available').set(false);
   removeAndInsertArray(playerObject.hand, cardId, matchPath+'/'+playerWord+'/hand');
   insertObject(matchPath+'/'+playerWord+'/counters/plant', plantCounter-1);
 }

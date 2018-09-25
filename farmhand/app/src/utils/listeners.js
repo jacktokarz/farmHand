@@ -2,6 +2,14 @@ import { fromLobby, fromMatch } from '../actions'
 import { cardMap, convertPlayerWordToNumber, database, getCookie, removeFromDatabase } from './'
 
 
+
+function listenForCommunityField(dispatch, matchPath) {
+	database.ref(matchPath+'/communityField/').on("value", snapshot => {
+		console.log("comm field update!");
+	    dispatch(fromMatch.saveCommunityField(snapshot.val()));
+	})
+}
+
 function listenForCurrentPlayerNumber(dispatch, matchPath ) {
   database.ref(matchPath+'/currentPlayerNumber').on("value", snapshot => {
     console.log("current player is: "+snapshot.val());
@@ -57,9 +65,11 @@ function listenForMatchMarketArray(dispatch, matchPath ) {
   } );
 }
 
+
 export function listenForMatchUpdates(dispatch, matchPath, userPlayerNumber) {
 	database.ref('matches/').off();
 	userPlayerNumber= userPlayerNumber===0?"playerOne":(userPlayerNumber===1?"playerTwo":"playerThree");
+	listenForCommunityField(dispatch, matchPath);
 	listenForCurrentPlayerNumber(dispatch, matchPath);
 	listenForMatchMarketArray(dispatch, matchPath);
 	listenForPlayArea(dispatch, matchPath);
@@ -68,6 +78,7 @@ export function listenForMatchUpdates(dispatch, matchPath, userPlayerNumber) {
 	listenForPlayerUpdates(dispatch, matchPath, "playerThree", userPlayerNumber);
 	listenForTrash(dispatch, matchPath);
 }
+
 
 function listenForPlayArea(dispatch, matchPath) {
 	database.ref(matchPath+'/playArea').on("value", snapshot => {
@@ -79,7 +90,6 @@ function listenForPlayArea(dispatch, matchPath) {
 		dispatch(fromMatch.updatePlayArea(playArea));
 	});
 }
-
 
 function listenForPlayerUpdates(dispatch, matchPath, playerNumber, userPlayerNumber) {
 	database.ref(matchPath+'/'+playerNumber).on("value", snapshot => {

@@ -9,7 +9,7 @@ import {cardMap, convertPlayerNumberToWord, harvestCall} from '../utils'
 
 const mapStateToProps= (state, ownProps) => { 
 	return {
-		crops: ownProps.fieldData.crops,
+		crops: ownProps.fieldData.crops===undefined?[]:ownProps.fieldData.crops,
 		data: cardMap[ownProps.fieldData.id],
 		harvestable: (ownProps.isCurrentPlayer) && (ownProps.player.counters.harvest > 0) && (ownProps.fieldData.crops.length > 0) && (ownProps.fieldData.available), //&& (cardMap[ownProps.fieldData.id].primary.discard===undefined || cardMap[ownProps.fieldData.id].primary.discard <= ownProps.player.hand.length)
 		matchPath: getMatchPath(state),

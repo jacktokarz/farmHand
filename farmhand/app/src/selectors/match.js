@@ -13,6 +13,7 @@ export const getChoiceModalParentInfo= createSelector(matchState, state => state
 export const getChoiceModalRequired= createSelector(matchState, state => state.choiceModalRequired);
 export const getChoiceModalTitle= createSelector(matchState, state => state.choiceModalTitle);
 export const getChoiceModalVis= createSelector(matchState, state => state.choiceModalVis);
+export const getCommunityField= createSelector(matchState, state => state.communityField);
 export const getCurrentPlayerNumber= createSelector(matchState, state => state.currentPlayerNumber);
 export const getMatchPath= createSelector(matchState, state => state.matchPath);
 export const getMarketArray= createSelector(matchState, state => state.marketArray);

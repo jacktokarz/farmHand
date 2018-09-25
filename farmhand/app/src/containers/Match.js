@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { 
+	getCommunityField,
 	getCurrentPlayerNumber,
 	getMarketArray,
 	getMatchPath,
@@ -16,7 +17,8 @@ import {Match} from '../components'
 import {buyMarketPlenty, buyStarterField, endTurn, matchMount} from '../utils'
 
 
-const mapStateToProps= state => { return {
+const mapStateToProps= state => { console.log("comm field is: "+JSON.stringify(getCommunityField(state))); return {
+	communityField: getCommunityField(state),
 	currentPlayerNumber: getCurrentPlayerNumber(state),
 	marketArray: getMarketArray(state),
 	matchPath: getMatchPath(state),

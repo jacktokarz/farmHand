@@ -11,6 +11,7 @@ const Match=
 	({
 		buyMarketPlenty,
 		buyMarketStarterField,
+		communityField,
 		currentPlayerNumber,
 		endTurn,
 		history, 
@@ -98,7 +99,7 @@ const Match=
 	    	</div>
 	    	<div className="col-sm-3 column noPadding">
 	    		<div style= {{"height": "25%"}}>
-	    			<img className="communityField" src="https://image.ibb.co/gq2XU9/Neighborhood_Field.png" alt="Neighborhood Field" />
+	    			<Field fieldData={communityField} isCurrentPlayer={currentPlayerNumber===userPlayerNumber} player={matchPlayers[userPlayerNumber]} />
 	    		</div>
 	    		<div style= {{"height": "50%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 					{matchPlayers[userPlayerNumber].fields.map((i, index) => (
