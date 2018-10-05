@@ -16,6 +16,7 @@ export const actionTypes= {
 	UPDATEACTIVATEDFACTIONS: 'match updateActivateFactions',
 	UPDATECURRENTPLAYERNUMBER: 'match updateCurrentPlayerNumber',
 	UPDATEPLAYAREA: 'match updatePlayArea',
+	UPDATETURNCOUNT: 'match updateTurnCount',
 }
 
 
@@ -108,4 +109,9 @@ export const updateCurrentPlayerNumber= (currentPlayerNumber) => ({
 export const updatePlayArea= (playArea) => ({
 	type: actionTypes.UPDATEPLAYAREA,
 	payload: playArea,
+})
+
+export const updateTurnCount= (turnCount) => ({
+	type: actionTypes.UPDATETURNCOUNT,
+	payload: turnCount,
 })

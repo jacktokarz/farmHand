@@ -52,8 +52,7 @@ const initState=
 				hand: [0,0,0,0,0]
 			},
 		playArea: [],
-		trashArray: [],
-		userHandSize: 5,
+		turnCount: 1,
 		userPlayerNumber: 0,
 	};
 
@@ -146,6 +145,10 @@ export default (state=initState, action) => {
 		case fromMatch.actionTypes.UPDATEPLAYAREA:
 			return {...state,
 				playArea: action.payload,
+			};
+		case fromMatch.actionTypes.UPDATETURNCOUNT:
+			return {...state,
+				turnCount: action.payload,
 			};
 	}
 	return state;

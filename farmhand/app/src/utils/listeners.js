@@ -77,6 +77,7 @@ export function listenForMatchUpdates(dispatch, matchPath, userPlayerNumber) {
 	listenForPlayerUpdates(dispatch, matchPath, "playerTwo", userPlayerNumber);
 	listenForPlayerUpdates(dispatch, matchPath, "playerThree", userPlayerNumber);
 	listenForTrash(dispatch, matchPath);
+	listenForTurnCount(dispatch, matchPath);
 }
 
 
@@ -177,4 +178,10 @@ function listenForTrash(dispatch, matchPath) {
 		console.log("new trash array is: "+JSON.stringify(trashArray));
 		dispatch(fromMatch.saveTrashArray(trashArray));
 	});
+}
+
+function listenForTurnCount(dispatch, matchPath) {
+	database.ref(matchPath+'/turnCount').on("value", snapshot => {
+		dispatch(fromMatch.updateTurnCount(snapshot.val()));
+	})
 }

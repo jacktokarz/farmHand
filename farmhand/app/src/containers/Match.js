@@ -10,6 +10,7 @@ import {
 	getPlayerOne,
 	getPlayerTwo,
 	getPlayerThree,
+	getTurnCount,
 	getUser, 
 	getUserPlayerNumber, 
 } from '../selectors'
@@ -25,6 +26,7 @@ const mapStateToProps= state => { console.log("comm field is: "+JSON.stringify(g
 	matchPlayers: [getPlayerOne(state), getPlayerTwo(state), getPlayerThree(state)],
 	numberOfPlayers: getNumberOfPlayers(state),
 	playArea: getPlayArea(state)===null?[]:getPlayArea(state),
+	turnCount: getTurnCount(state),
 	user: getUser(state),
 	userPlayerNumber: getUserPlayerNumber(state),
 } }
@@ -38,7 +40,7 @@ const mapDispatchToProps= dispatch => {
 		buyMarketStarterField: (marketArray, matchPath, user, userPlayerNumber) => { 
 			buyStarterField(dispatch, marketArray, matchPath, user, userPlayerNumber)
 		},
-		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) => { endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) },
+		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) => { endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) },
 	}
 }
 

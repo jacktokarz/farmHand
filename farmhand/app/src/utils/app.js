@@ -303,6 +303,8 @@ function createMatch(dispatch, commField, user) {
         insertObject(path+'/starterFields', shuffleArray(starterFields.slice()));
         
         insertObject(path+'/currentPlayerNumber', 0);
+
+        insertObject(path+'/turnCount', 1);
         
         const market= shuffleArray(defaultMarketArray);
         console.log("inserting market: "+market.toString());
@@ -329,15 +331,15 @@ function drawCards(matchPath, numberOfCards, playerWord, playerObject) {
   console.log(playerObject.user+" is about to draw "+numberOfCards);
   const originalHandSize= playerObject.hand.length;
   if(playerObject.deck.length < numberOfCards) {
-    while(playerObject.deck.length > 0) {  
+    while(playerObject.deck.length > 0) {
       playerObject.hand.push(playerObject.deck.pop());
     }
-    playerObject.deck= [...shuffleArray(playerObject.discard)];    
+    playerObject.deck= [...shuffleArray(playerObject.discard)];
     while(playerObject.hand.length < originalHandSize + numberOfCards) {
-      playerObject.hand.push(playerObject.deck.pop());
       if(playerObject.deck.length === 0) {
         break;
       }
+      playerObject.hand.push(playerObject.deck.pop());
     }
     removeFromDatabase(matchPath+'/'+playerWord+'/discard');
   }
@@ -352,7 +354,7 @@ function drawCards(matchPath, numberOfCards, playerWord, playerObject) {
   insertObject(matchPath+'/'+playerWord+'/deck', playerObject.deck);
 }
 
-export function endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea) {
+export function endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) {
   let discard= (userPlayer.discard === null ? [] : userPlayer.discard);
   playArea= (playArea === null ? [] : playArea);
   const playerWord= convertPlayerNumberToWord(currentPlayerNumber);
@@ -387,6 +389,9 @@ console.log("their info: "+JSON.stringify(userPlayer));
 //updates currentPlayer for next player
   currentPlayerNumber= (currentPlayerNumber+1)%numberOfPlayers;
   insertObject(matchPath+'/currentPlayerNumber', currentPlayerNumber);
+  if(currentPlayerNumber===0) {
+    insertObject(matchPath+'/turnCount', turnCount+1);
+  }
 }
 
 export function getCardInfo(id) {
@@ -451,7 +456,7 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
       counters= combineCounters(counters, {plenty: fieldData.crops.length});
     }
   }
-  if(fieldCard.primary.cropCount !== undefined) {
+  else if(fieldCard.primary.cropCount !== undefined) {
     console.log("SPECIAL HARVEST SITUATION! COUNTING CROPS.");
     if(fieldData.crops.length > fieldCard.primary.cropCount) {
       counters= combineCounters(fieldCard.primary.higher, counters);
@@ -482,8 +487,6 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
   }
   activateCounters(counters, dispatch, matchPath, playerWord, userData);
 
-
-
   //put the card in the play area...
   playArea.push(cropId);
   insertObject(matchPath+'/playArea', playArea);
@@ -491,7 +494,12 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
   //remove the id from the crop array
   fieldData.crops.splice(fieldData.crops.indexOf(cropId), 1);
   console.log("new crop array without "+cropId+": "+fieldData.crops);
-  insertObject(matchPath+'/'+playerWord+'/fields/'+fieldData.id+'/crops', fieldData.crops);
+  if(1990< fieldData.id && fieldData.id <2000) {
+    insertObject(matchPath+'/communityField/crops', fieldData.crops);
+  }
+  else {
+    insertObject(matchPath+'/'+playerWord+'/fields/'+fieldData.id+'/crops', fieldData.crops);
+  }
 }
 
 export function insertObject(dbPath, obj) {
@@ -690,9 +698,6 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
     if(parentInfo.discard > 0) {
       openDiscardChoiceModal(dispatch, parentInfo, playerWord, user.hand);
       return;
-    }
-    else {
-      updateDatabaseCounters(parentInfo, matchPath, playerWord);      
     }
   }
   else if(actionTitle.startsWith("Share")) {

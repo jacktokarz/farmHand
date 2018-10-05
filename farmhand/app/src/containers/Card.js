@@ -47,7 +47,7 @@ const mapStateToProps= (state, ownProps) => {
 	{
 		actions: actions,
 		data: cardData,
-		handSize: ownProps.place==="market" ? 6 : ownProps.place==="playArea" ? getPlayArea(state).length : getUserHandSize(state),
+		handSize: ownProps.place==="market" ? 6 : (ownProps.place==="playArea" ? getPlayArea(state).length : user.hand.length),
 		place: ownProps.place,
 	}
 ) }

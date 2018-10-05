@@ -316,7 +316,7 @@ export const cardMap= {
 		},
 		secondary: {
 			plenty: 2,
-			discard: 1
+			draw: 1
 		}
 	},
 	13: {
@@ -1048,7 +1048,7 @@ export const cardMap= {
 	1998: {
 		title: "Local Graveyard",
 		type: "field",
-		picture: "https://image.ibb.co/gq2XU9/Neighborhood_Field.png",
+		picture: "https://image.ibb.co/bKDRP9/Local_Graveyard.png",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -1060,7 +1060,7 @@ export const cardMap= {
 	1999: {
 		title: "Treasure Trove",
 		type: "field",
-		picture: "https://image.ibb.co/gq2XU9/Neighborhood_Field.png",
+		picture: "https://image.ibb.co/dDdXxU/Treasure_Trove.png",
 		cost: 0,
 		faction: "N",
 		primary: {

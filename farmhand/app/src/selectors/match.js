@@ -23,5 +23,5 @@ export const getPlayerOne= createSelector(matchState, state => state.playerOne);
 export const getPlayerTwo= createSelector(matchState, state => state.playerTwo);
 export const getPlayerThree= createSelector(matchState, state => state.playerThree);
 export const getTrashArray= createSelector(matchState, state => state.trashArray);
-export const getUserHandSize= createSelector(matchState, state => state.userHandSize);
+export const getTurnCount= createSelector(matchState, state => state.turnCount);
 export const getUserPlayerNumber= createSelector(matchState, state => state.userPlayerNumber);
