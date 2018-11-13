@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 
 import {Card, CardModal, ChoiceModal, Field} from '../containers'
-import {cardBackSrc, cardMap} from '../utils'
+import {cardBackSrc, cardMap, grayBoxImg} from '../utils'
 
 
 const Match= 
@@ -14,7 +14,6 @@ const Match=
 		communityField,
 		currentPlayerNumber,
 		endTurn,
-		history, 
 		market, 
 		marketArray,
 		matchPath,
@@ -114,7 +113,7 @@ const Match=
 	    			<br />
 	    			<img className="card" src={cardBackSrc} style={{"marginRight": "5%"}} alt="deck" />
 	    			<div className="textOverImage" style={{"left": "33%"}}>{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
-	    			<img className="card" src={(matchPlayers[userPlayerNumber].discard===undefined || matchPlayers[userPlayerNumber].discard.length===0)?cardBackSrc:cardMap[matchPlayers[userPlayerNumber].discard[matchPlayers[userPlayerNumber].discard.length-1]].picture} alt="Discard" />
+	    			<img className="card" src={(matchPlayers[userPlayerNumber].discard===undefined || matchPlayers[userPlayerNumber].discard.length===0)?grayBoxImg:cardMap[matchPlayers[userPlayerNumber].discard[matchPlayers[userPlayerNumber].discard.length-1]].picture} alt="Discard" />
     				<div className="textOverImage" style={{"left": "67%"}}>{matchPlayers[userPlayerNumber].discard===null ? 0 : matchPlayers[userPlayerNumber].discard.length}</div>
 	    		</div>
 	    	</div>

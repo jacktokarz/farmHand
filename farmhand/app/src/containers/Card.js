@@ -25,7 +25,13 @@ const mapStateToProps= (state, ownProps) => {
 	let actions=[];
 	if(ownProps.place==="userHand") {
 		if(isCardPlayable(cardData, user)) {
-			actions.push("Play");
+			if(cardData.primary.or !== undefined) {
+				actions.push("Play Left");
+				actions.push("Play Right");
+			}
+			else {
+				actions.push("Play");				
+			}
 		}
 		if(counts.plant>0 && user.fields.length > 0) {
 			actions.push("Plant");

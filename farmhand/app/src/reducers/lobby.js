@@ -1,7 +1,7 @@
 import { fromLobby } from '../actions'
 
 
-const initState= {matches: [{playerList: "", actionLabel: "", actionFunction: ""}]};
+const initState= {matches: [{playerList: "", actionLabel: "", actionFunction: "", matchLeader: ""}]};
 
 export default (state= initState, action) => {
 	switch(action.type) {

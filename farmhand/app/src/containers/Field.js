@@ -22,7 +22,8 @@ const mapStateToProps= (state, ownProps) => {
 const mapDispatchToProps= (dispatch, ownProps) => ({
 	harvestCrop: (matchPath, playArea, playerNumber) => {
 		harvestCall(dispatch, ownProps.fieldData, matchPath, playArea, playerNumber, ownProps.player);
-	}
+	},
+	openCardModal: (actions, data) => dispatch(fromMatch.openCardModal(actions, data, ownProps.fieldData.id)),
 })
 
 

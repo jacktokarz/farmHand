@@ -219,7 +219,22 @@ export function checkLogin(dispatch, un, pw) {
 }
 
 export function checkRegister(dispatch, un, pw, cp) {
-  if(un.length < 2) {
+  const badChars= [".", "#", "$", "[", "]"];
+  let bad= false;
+  for(var i= 0; i< badChars.length; i++) {
+    if(un.indexOf(badChars[i]) > -1) {
+      bad= true;
+      break;
+    }
+    if(pw.indexOf(badChars[i]) > -1) {
+      bad= true;
+      break;
+    }
+  }
+  if(bad===true) {
+    dispatch(fromHeader.setRegisterErrorMessage("You cannot use any '. # $ [ ]' characters"));
+  }
+  else if(un.length < 2) {
     dispatch(fromHeader.setRegisterErrorMessage("You must submit a username of at least 2 characters"));
   }
   else if(pw.length < 4) {
@@ -323,6 +338,10 @@ export function deleteCookie(cname) {
   document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
 }
 
+export function deleteMatch(id) {
+  removeFromDatabase('/matches/'+id);
+}
+
 function displayError(message) {
   console.log("ERROR ERROR - "+message);
 }
@@ -355,6 +374,10 @@ function drawCards(matchPath, numberOfCards, playerWord, playerObject) {
 }
 
 export function endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) {
+  if(userPlayer.counters.plenty >= 30) {
+    insertObject(matchPath+'/winner', userPlayer.user);
+    return;
+  }
   let discard= (userPlayer.discard === null ? [] : userPlayer.discard);
   playArea= (playArea === null ? [] : playArea);
   const playerWord= convertPlayerNumberToWord(currentPlayerNumber);
@@ -584,7 +607,7 @@ export function matchMount(dispatch) {
   }
 }
 
-export function modalAction(option, parentInfo, actionTitle, cardId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch) {
+export function modalAction(option, parentInfo, actionTitle, cardId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch, history) {
   const playerWord= convertPlayerNumberToWord(userPlayerNumber);
   console.log("MODAL ACTION, option: "+JSON.stringify(option));
   let cardData= cardMap[cardId];
@@ -622,20 +645,30 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
 
     // Maybe from choice modal
   else if(actionTitle.startsWith("Play")) {
-    let activatedCounters= isThereADefaultChoice(cardData, user);  //checks if there's an 'or'
-    console.log("Playing the card with these counters: "+JSON.stringify(activatedCounters));
-    if(activatedCounters === null) { //there is
-      if(option===null) { //it has not been decided, so puts up choice
-        const title= "Play which side of the 'OR' statement?";
-        const parentInfo= cardId;
-        const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
-        console.log("choice modal called! "+JSON.stringify(options));
-        dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
-        return;
-      }
-      else { //it has been chosen, sets choice as activated area
-        activatedCounters= (option.title==="left" ? cardData.primary.or.left : cardData.primary.or.right);
-        console.log("The choice was made of what to play, it is: "+ JSON.stringify(activatedCounters));
+    let activatedCounters= null;
+    console.log("action title: "+actionTitle);
+    if(actionTitle==="Play Left") {
+      activatedCounters= cardData.primary.or.left;
+    }
+    else if(actionTitle==="Play Right") {
+      activatedCounters= cardData.primary.or.right;
+    }
+    else {
+      isThereADefaultChoice(cardData, user);  //checks if there's an 'or'
+      console.log("Playing the card with these counters: "+JSON.stringify(activatedCounters));
+      if(activatedCounters === null) { //there is
+        if(option===null) { //it has not been decided, so puts up choice
+          const title= "Play which side of the 'OR' statement?";
+          const parentInfo= cardId;
+          const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
+          console.log("choice modal called! "+JSON.stringify(options));
+          dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
+          return;
+        }
+        else { //it has been chosen, sets choice as activated area
+          activatedCounters= (option.title==="left" ? cardData.primary.or.left : cardData.primary.or.right);
+          console.log("The choice was made of what to play, it is: "+ JSON.stringify(activatedCounters));
+        }
       }
     }
     user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
@@ -708,6 +741,10 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
   else if(actionTitle.startsWith("Pick")) {
     console.log("updating color "+option.id+" for "+parentInfo);
     insertObject(matchPath+'/'+parentInfo+'/color', option.id);
+  }
+
+  else if(actionTitle.startsWith("Winner")) {
+    history.push('/lobby');
   }
 
   if(option !== null) {

@@ -64,7 +64,7 @@ const Header= (
       </div>
     </div>
 
-    <div style={{display: registerModalVis}} id="registerModal" className="modal container">
+    <div style={{display: registerModalVis}} id="registerModal" className="modal">
       <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">

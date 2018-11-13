@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {withRouter} from 'react-router'
 
 import {} from '../utils'
 
 
-const ChoiceModal= ({cardModalId, closeModal, communityField, func, marketArray, matchPath, options, parentInfo, playArea, required, title, trashArray, user, userPlayerNumber, vis}) => (
+const ChoiceModal= ({cardModalId, closeModal, communityField, func, history, marketArray, matchPath, options, parentInfo, playArea, required, title, trashArray, user, userPlayerNumber, vis}) => (
 
 	<div style={{display: vis}} className="modal" onClick={ (event) => required?"":(!event.target.classList.contains("inside") ? closeModal() : "" ) }>
 		<div className="visible-modal-content inside" id="modalContent">
@@ -19,7 +20,7 @@ const ChoiceModal= ({cardModalId, closeModal, communityField, func, marketArray,
 					<button 
 						className= "inside"
 						style={{cursor: "pointer", margin: "3%", backgroundColor: title.startsWith("Pick")?i.id:"buttonface"}} 
-						onClick={ () => func(i, cardModalId, communityField, marketArray, matchPath, parentInfo, playArea, title, trashArray, user, userPlayerNumber)}
+						onClick={ () => func(i, cardModalId, communityField, marketArray, matchPath, parentInfo, playArea, title, trashArray, user, userPlayerNumber, history)}
 					>
 						{i.title}
 					</button>
@@ -29,4 +30,4 @@ const ChoiceModal= ({cardModalId, closeModal, communityField, func, marketArray,
     </div>
 )
 
-export default ChoiceModal;
+export default withRouter(ChoiceModal);

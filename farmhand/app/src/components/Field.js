@@ -5,10 +5,11 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import {cropPicture} from '../utils'
 
 
-const Field= ({crops, data, harvestable, harvestCrop, matchPath, playArea, playerNumber}) => (
+const Field= ({crops, data, harvestable, harvestCrop, matchPath, openCardModal, playArea, playerNumber}) => (
 	<div style={{maxHeight: "40%", marginBottom: "10%" }}>
 	    <img 
 	      className="field"
+	      onClick= {() => openCardModal([], data)}
 	      src={data.picture}
 	    />
 	    <img

@@ -53,8 +53,8 @@ const mapStateToProps= (state) => {
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeChoiceModal()),
-	func: (option, cardModalId, communityField, marketArray, matchPath, parentInfo, playArea, actionTitle, trashArray, user, userPlayerNumber) =>
-		modalAction(option, parentInfo, actionTitle, cardModalId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch),
+	func: (option, cardModalId, communityField, marketArray, matchPath, parentInfo, playArea, actionTitle, trashArray, user, userPlayerNumber, history) =>
+		modalAction(option, parentInfo, actionTitle, cardModalId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch, history),
 })
 
 

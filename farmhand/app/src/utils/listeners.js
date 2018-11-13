@@ -20,33 +20,35 @@ function listenForCurrentPlayerNumber(dispatch, matchPath ) {
 export function listenForMatches(dispatch) {
   database.ref('matches/').on('value', snapshot => {
   	let user= getCookie("user");
-    const matchList= [];
+    let matchList= [];
     snapshot.forEach(function(childSnapshot) {
-      const pOne= childSnapshot.child('/playerOne').child('/user').val();
-      const pTwo= childSnapshot.child('/playerTwo').child('/user').val();
-      const pThree= childSnapshot.child('/playerThree').child('/user').val();
-    console.log("retrieving matches, with players: "+pOne+", "+pTwo+", and "+pThree);
-      const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null }).join(', ');
-      const inMatch= (user === pOne || user === pTwo || user === pThree);
-      const matchFull= (pOne!==null && pTwo!==null && pThree!==null);
-      const status= childSnapshot.child('/status').val();
-      var label= "";
-      if(inMatch) {
-        if(status === "pending") {
-          if(pTwo) {
-            label= "Start Match";
-          }
-        }
-        else if(status === "in progress") {
-          label="Play Match";
-        }
-      }
-      else {
-        if(!matchFull && status==="pending") {
-          label= "Join Match";
-        }
-      }
-      matchList.push({playerList: joinedPlayers, actionLabel: label, key: childSnapshot.key});
+    	if(childSnapshot.child('/winner').val()===null) {
+	    	const pOne= childSnapshot.child('/playerOne').child('/user').val();
+	    	const pTwo= childSnapshot.child('/playerTwo').child('/user').val();
+	    	const pThree= childSnapshot.child('/playerThree').child('/user').val();
+	    		console.log("retrieving matches, with players: "+pOne+", "+pTwo+", and "+pThree);
+	    	const joinedPlayers= [pOne, pTwo, pThree].filter(function(n){ return n !== null }).join(', ');
+	    	const inMatch= (user === pOne || user === pTwo || user === pThree);
+	    	const matchFull= (pOne!==null && pTwo!==null && pThree!==null);
+	    	const status= childSnapshot.child('/status').val();
+	    	var label= "";
+	    	if(inMatch) {
+		    	if(status === "pending") {
+		        	if(pTwo) {
+		        		label= "Start Match";
+		        	}
+		        }
+		        else if(status === "in progress") {
+		        	label="Play Match";
+		        }
+		    }
+	    	else {
+	        	if(!matchFull && status==="pending") {
+	    			label= "Join Match";
+	        	}
+	    	}
+	    	matchList.push({playerList: joinedPlayers, actionLabel: label, key: childSnapshot.key, matchLeader: pOne});
+    	}
     });
     matchList.sort(function(a, b) {a.key - b.key});
     matchList.reverse();
@@ -78,6 +80,7 @@ export function listenForMatchUpdates(dispatch, matchPath, userPlayerNumber) {
 	listenForPlayerUpdates(dispatch, matchPath, "playerThree", userPlayerNumber);
 	listenForTrash(dispatch, matchPath);
 	listenForTurnCount(dispatch, matchPath);
+	listenForWinner(dispatch, matchPath);
 }
 
 
@@ -183,5 +186,14 @@ function listenForTrash(dispatch, matchPath) {
 function listenForTurnCount(dispatch, matchPath) {
 	database.ref(matchPath+'/turnCount').on("value", snapshot => {
 		dispatch(fromMatch.updateTurnCount(snapshot.val()));
+	})
+}
+
+function listenForWinner(dispatch, matchPath) {
+	database.ref(matchPath+'/winner').on("value", snapshot => {
+		if(snapshot.val() !== null) {
+			console.log("got a winner! "+snapshot.val());
+			dispatch(fromMatch.openChoiceModal([{id: 0, title: "Return To Lobby"}], snapshot.val(), true, "Winner! "+snapshot.val()+" won the match!"));
+		}
 	})
 }

@@ -40,7 +40,9 @@ const mapDispatchToProps= dispatch => {
 		buyMarketStarterField: (marketArray, matchPath, user, userPlayerNumber) => { 
 			buyStarterField(dispatch, marketArray, matchPath, user, userPlayerNumber)
 		},
-		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) => { endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) },
+		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) => { 
+			endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) 
+		},
 	}
 }
 
