@@ -6,6 +6,9 @@ body {
 }
 
 
+.bolded {
+	font-weight: bold;
+}
 
 .bordered {
 	border: 2px ridged black;
@@ -36,12 +39,15 @@ body {
 	margin-bottom: 10%;
 }
 
-.crops {
-	margin-top: -3%;
-    max-width: 40%;
+.cropsImg {
+	margin-top: -2%;
+    max-width: 50%;
+    max-height: 20%;
+    width: auto;
+    height: auto;
     display: block;
-    position: relative;
-    left: 30%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .deck {
@@ -66,11 +72,16 @@ body {
 	justify-content: center;
 }
 
-.field {
-	height: -webkit-fill-available;
-	max-height: 80%;
+.fieldDiv {
+	max-height: 100%;
+	height: 100%;
+}
+
+.fieldImg {
+	height: 80%;
+	max-height: auto;
 	width: auto;
-	max-width: "80%";
+	max-width: 90%;
 	margin-right: 1%;
 	display: inline-block;
 }
@@ -86,7 +97,9 @@ body {
 	max-height: 40px;
 	height: auto;
 	width: auto;
-	margin-left: 20px;
+	margin-left: 10px;
+	margin-right: 5px;
+	margin-bottom: 4px;
 }
 
 .inputBox{
@@ -111,6 +124,17 @@ body {
 	padding-right: 0;
 }
 
+.opponentFieldBuffer {
+	max-height: 6%;
+	height: 6%;
+	padding: 3%;
+}
+
+.opponentFieldHolder {
+	max-height: 43%; 
+	height: 43%;
+}
+
 .starterFieldAndPlenty {
 	display: inline-flex;
 	align-items: center;
@@ -132,7 +156,7 @@ body {
     font-size: 24px;
     position: absolute;
     left: 50%;
-    transform: translate(-50%, -130%);
+    transform: translate(-50%, -110%);
 }
 
 .textOverImage {
@@ -188,6 +212,27 @@ body {
 */
 
 
+#DCText {
+	text-align: center;
+	width: 90%;
+	height: auto;
+	background: url("https://www.godisageek.com/wp-content/uploads/Rock-Band-4-review.jpg");
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	border-radius: 100px;
+}
+
+#DCTitle {
+	font-size: 52px;
+	font-weight: bold;
+	margin-bottom: 10%;
+	margin-top: 40%;
+	margin-bottom: 10%;
+	color: #dc3545;
+	text-shadow: 3px 2px 3px black;
+}
+
 
 #FHBox {
 	margin-top: 50px;
@@ -200,7 +245,7 @@ body {
 	height: auto;
 	background: url("https://image.ibb.co/eoVC8o/cardBack.png");
 	background-position: center;
-	background-size: auto;
+	background-size: cover;
 	background-repeat: no-repeat;
 	border-radius: 100px;
 }
@@ -213,6 +258,7 @@ body {
 	height: auto;
 	font-size: 22px;
 }
+
 #FHTitle {
 	font-size: 52px;
 	font-weight: bold;

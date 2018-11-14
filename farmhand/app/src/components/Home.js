@@ -23,6 +23,13 @@ const Home= ({openLoginFromPlay, playRedirect, openRules, history}) => (
           <button onClick={openRules} className="btn">Rules</button>
         </div>
       </div>
+
+      <div className="col-4 text-center" id="FHBox">
+        <div id="DCText">
+          <div id="DCTitle">disCHORD - <br /><span style={{"fontSize": "40px"}}>coming soon</span></div>
+
+        </div>
+      </div>
     </div>
 
   </div>

@@ -6,14 +6,14 @@ import {cropPicture} from '../utils'
 
 
 const Field= ({crops, data, harvestable, harvestCrop, matchPath, openCardModal, playArea, playerNumber}) => (
-	<div style={{maxHeight: "40%", marginBottom: "10%" }}>
+	<div className="fieldDiv">
 	    <img 
-	      className="field"
+	      className="fieldImg"
 	      onClick= {() => openCardModal([], data)}
 	      src={data.picture}
 	    />
 	    <img
-	    	className="crops"
+	    	className="cropsImg"
 	    	style={{cursor: harvestable?"pointer":"default"}}
 	    	src={cropPicture}
 	    	onClick={() => harvestable?harvestCrop(matchPath, playArea, playerNumber):null}

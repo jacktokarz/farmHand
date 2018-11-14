@@ -26,30 +26,34 @@ const Match=
 	}) => (
 	<div className="App container-fluid" style={{"height": "99vh"}} >
    		<div className="row testingMatch" style={{"height": "100%"}}>
-	   		<div className="col-sm-2 column noPadding">
-	   			<div className="bordered" style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color }}>
+	   		<div className="col-sm-2 column noPadding" style={{"height": "100%"}}>
+	   			<div className="bordered opponentFieldHolder" style={{"backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color }}>
 	   				{matchPlayers[(userPlayerNumber+2)%3].fields.map((i, index) => (
-						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===(userPlayerNumber+2)%3} player={matchPlayers[(userPlayerNumber+2)%3]} />				
+	   					<div className="bordered" style={{"maxHeight": "50%", "height": "50%"}}>
+							<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===(userPlayerNumber+2)%3} player={matchPlayers[(userPlayerNumber+2)%3]} />				
+						</div>
 	   				))}
 				</div>
-	    		<div className="bordered" style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color}}>
-	    			{matchPlayers[(userPlayerNumber+2)%3].user} 
+	    		<div className="bordered opponentFieldBuffer" style={{"backgroundColor": matchPlayers[(userPlayerNumber+2)%3].color}}>
+	    			<span className="bolded">{matchPlayers[(userPlayerNumber+2)%3].user}</span> 
 	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" style={{"display": matchPlayers[(userPlayerNumber+2)%3].user===null?"none":"inline-flex"}}/>
-	    				: {matchPlayers[(userPlayerNumber+2)%3].counters.plenty}
+	    			<span className="bolded" style={{"display": matchPlayers[(userPlayerNumber+2)%3].user===null?"none":"inline-block"}}>: {matchPlayers[(userPlayerNumber+2)%3].counters.plenty}</span>
 	    		</div>
-	   			<div className="bordered" style={{"height": "45%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
+	   			<div className="bordered opponentFieldHolder" style={{"backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
 					{matchPlayers[(userPlayerNumber+1)%3].fields.map((i, index) => (
-						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===(userPlayerNumber+1)%3} player={matchPlayers[(userPlayerNumber+1)%3]} />
+						<div className="bordered" style={{"maxHeight": "50%", "height": "50%"}}>
+							<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===(userPlayerNumber+1)%3} player={matchPlayers[(userPlayerNumber+1)%3]} />
+						</div>
 	   				))}
 	    		</div>
-	    		<div className="bordered" style={{"height": "5%", "backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
-	    			{matchPlayers[(userPlayerNumber+1)%3].user} 
+	    		<div className="bordered opponentFieldBuffer" style={{"backgroundColor": matchPlayers[(userPlayerNumber+1)%3].color}}>
+	    			<span className="bolded">{matchPlayers[(userPlayerNumber+1)%3].user}</span> 
 	    			<img className="icon" src="https://image.ibb.co/ezytWU/plenty.png" style={{"display": matchPlayers[(userPlayerNumber+1)%3].user===null?"none":"inline-flex"}} />
-	    				: {matchPlayers[(userPlayerNumber+1)%3].counters.plenty}
+	    			<span className="bolded" style={{"display": matchPlayers[(userPlayerNumber+1)%3].user===null?"none":"inline-block"}}>: {matchPlayers[(userPlayerNumber+1)%3].counters.plenty}</span>
 	    		</div>
 	   		</div>
 	    	<div className="col-sm-7 column noPadding">
-	    		<div className=" bordered" style= {{"height": "30%"}}>
+	    		<div className=" bordered" style= {{"height": "28%"}}>
 	    			<Card  place="market" id={marketArray[0]} counters= {matchPlayers[userPlayerNumber].counters} />
 	    			<Card  place="market" id={marketArray[1]} counters= {matchPlayers[userPlayerNumber].counters} />
 	    			<Card  place="market" id={marketArray[2]} counters= {matchPlayers[userPlayerNumber].counters} />
@@ -98,18 +102,21 @@ const Match=
 	    		</div>
 	    	</div>
 	    	<div className="col-sm-3 column noPadding">
-	    		<div className=" bordered" style= {{"height": "25%"}}>
+	    		<div className="bordered" style= {{"maxHeight": "20%", "height": "20%"}}>
 	    			<Field fieldData={communityField} isCurrentPlayer={currentPlayerNumber===userPlayerNumber} player={matchPlayers[userPlayerNumber]} />
 	    		</div>
-	    		<div className=" bordered" style= {{"height": "50%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
+	    		<div className="bordered" style= {{"maxHeight": "55%", "height": "55%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
 					{matchPlayers[userPlayerNumber].fields.map((i, index) => (
-						<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===userPlayerNumber} player={matchPlayers[userPlayerNumber]} />
+						<div className="bordered" style={{"maxHeight": "50%", "height": "50%"}}>
+							<Field fieldData={i} isCurrentPlayer={currentPlayerNumber===userPlayerNumber} player={matchPlayers[userPlayerNumber]} />
+						</div>
 	   				))}	    			
 	    		</div>
-	    		<div className=" bordered" style={{"height": "5%", "backgroundColor": matchPlayers[userPlayerNumber].color}}></div>
-	    		<div className=" bordered" style= {{"height": "20%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
-	    			{matchPlayers[userPlayerNumber].user}
-	    			<img className= "icon" src="https://image.ibb.co/ezytWU/plenty.png" />: {matchPlayers[userPlayerNumber].counters.plenty}
+	    		<div className=" bordered" style={{"maxHeight": "3%", "height": "3%", "backgroundColor": matchPlayers[userPlayerNumber].color}}></div>
+	    		<div className=" bordered" style= {{"maxHeight": "20%", "height": "20%", "padding": "3%", "backgroundColor": matchPlayers[userPlayerNumber].color}}>
+	    			<span className="bolded">{matchPlayers[userPlayerNumber].user}</span>
+	    			<img className= "icon" src="https://image.ibb.co/ezytWU/plenty.png" />
+	    			<span className="bolded">: {matchPlayers[userPlayerNumber].counters.plenty}</span>
 	    			<br />
 	    			<img className="card" src={cardBackSrc} style={{"marginRight": "5%"}} alt="deck" />
 	    			<div className="textOverImage" style={{"left": "33%"}}>{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
