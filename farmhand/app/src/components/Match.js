@@ -119,9 +119,9 @@ const Match=
 	    			<span className="bolded">: {matchPlayers[userPlayerNumber].counters.plenty}</span>
 	    			<br />
 	    			<img className="card" src={cardBackSrc} style={{"marginRight": "5%"}} alt="deck" />
-	    			<div className="textOverImage" style={{"left": "33%"}}>{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
+	    			<div className="textOverImage" style={{"left": "38%"}}>{matchPlayers[userPlayerNumber].deck===null ? 0 : matchPlayers[userPlayerNumber].deck.length}</div>
 	    			<img className="card" src={(matchPlayers[userPlayerNumber].discard===undefined || matchPlayers[userPlayerNumber].discard.length===0)?grayBoxImg:cardMap[matchPlayers[userPlayerNumber].discard[matchPlayers[userPlayerNumber].discard.length-1]].picture} alt="Discard" />
-    				<div className="textOverImage" style={{"left": "67%"}}>{matchPlayers[userPlayerNumber].discard===null ? 0 : matchPlayers[userPlayerNumber].discard.length}</div>
+    				<div className="textOverImage" style={{"left": "62%"}}>{matchPlayers[userPlayerNumber].discard===null ? 0 : matchPlayers[userPlayerNumber].discard.length}</div>
 	    		</div>
 	    	</div>
 	    	<CardModal />

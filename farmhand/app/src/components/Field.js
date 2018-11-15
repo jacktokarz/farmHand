@@ -9,6 +9,7 @@ const Field= ({crops, data, harvestable, harvestCrop, matchPath, openCardModal, 
 	<div className="fieldDiv">
 	    <img 
 	      className="fieldImg"
+	      style={{cursor: "pointer"}}
 	      onClick= {() => openCardModal([], data)}
 	      src={data.picture}
 	    />

@@ -116,7 +116,7 @@ export const choosableColors= [
 
 export const cardMap= {
 	666: {
-		title: "waste",
+		title: "Waste",
 		type: "tool",
 		picture: "https://image.ibb.co/cEoG0z/Waste_Template1.png",
 		cost: 0,
@@ -127,6 +127,7 @@ export const cardMap= {
 	0: {
 		title: "card back",
 		picture: "",
+		cost: 100,
 		primary: {},
 		secondary: {}
 	},

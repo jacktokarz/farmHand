@@ -321,11 +321,15 @@ function createMatch(dispatch, commField, user) {
 
         insertObject(path+'/turnCount', 1);
         
-        const market= shuffleArray(defaultMarketArray);
+        let market= shuffleArray(defaultMarketArray);
+        market.push(0, 0, 0, 0, 0, 0);
         console.log("inserting market: "+market.toString());
         insertObject(path+'/market', market);
         
         insertObject(path+'/communityField', commField);
+        if(commField.id===1998) { //1998 is the id of Local Graveyard, or UPDATE!
+          insertObject(path+'/communityField/crops', [666,666,666,666]);
+        }
 
         let pOneDeck= shuffleArray(oneStartingDeck.slice());
         let hand= [pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop(), pOneDeck.pop()];
@@ -417,10 +421,6 @@ console.log("their info: "+JSON.stringify(userPlayer));
   }
 }
 
-export function getCardInfo(id) {
-  console.log("gonna get the info for card "+id);
-}
-
 export function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -478,6 +478,10 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
     if(fieldCard.primary.special === "Neighborhood Field") {
       counters= combineCounters(counters, {plenty: fieldData.crops.length});
     }
+    else if(fieldCard.primary.special === "Local Graveyard" || fieldCard.primary.special=== "Treasure Trove") {
+      counters= combineCounters(counters, {plenty: 1});
+    }
+
   }
   else if(fieldCard.primary.cropCount !== undefined) {
     console.log("SPECIAL HARVEST SITUATION! COUNTING CROPS.");
@@ -510,9 +514,15 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
   }
   activateCounters(counters, dispatch, matchPath, playerWord, userData);
 
-  //put the card in the play area...
-  playArea.push(cropId);
-  insertObject(matchPath+'/playArea', playArea);
+  //put the card in the play area...unless it's Treasure Trove
+  if(fieldCard.primary.special === "Treasure Trove") {
+    userData.hand.push(cropId);
+    insertObject(matchPath+'/'+playerWord+'/hand', userData.hand);    
+  }
+  else {
+    playArea.push(cropId);
+    insertObject(matchPath+'/playArea', playArea);
+  }
 
   //remove the id from the crop array
   fieldData.crops.splice(fieldData.crops.indexOf(cropId), 1);
@@ -636,17 +646,16 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
 
   else if(actionTitle.startsWith("Scrap")) {
     if(marketArray.includes(cardId)) {
-      scrapMarketCard(cardId, user.counters.marketScrap, marketArray, matchPath, playerWord, trashArray);
+      scrapCard(cardId, communityField, marketArray, matchPath, playerWord, null, user.counters.marketScrap, trashArray);
     }
     else {
-      scrapCard(cardId, user.counters.scrap, matchPath, playerWord, user, trashArray);
+      scrapCard(cardId, communityField, null, matchPath, playerWord, user, user.counters.scrap, trashArray);
     }
   }
 
     // Maybe from choice modal
   else if(actionTitle.startsWith("Play")) {
     let activatedCounters= null;
-    console.log("action title: "+actionTitle);
     if(actionTitle==="Play Left") {
       activatedCounters= cardData.primary.or.left;
     }
@@ -654,14 +663,12 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
       activatedCounters= cardData.primary.or.right;
     }
     else {
-      isThereADefaultChoice(cardData, user);  //checks if there's an 'or'
-      console.log("Playing the card with these counters: "+JSON.stringify(activatedCounters));
+      activatedCounters= isThereADefaultChoice(cardData, user);  //checks if there's an 'or'
       if(activatedCounters === null) { //there is
         if(option===null) { //it has not been decided, so puts up choice
           const title= "Play which side of the 'OR' statement?";
           const parentInfo= cardId;
           const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
-          console.log("choice modal called! "+JSON.stringify(options));
           dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
           return;
         }
@@ -790,7 +797,6 @@ export function playCard(activatedArea, counters, dispatch, id, matchPath, playA
   insertObject(matchPath+'/playArea', playArea);
   removeAndInsertArray(playerObject.hand, id, matchPath+'/'+playerWord+'/hand');
   counters= combineCounters(activatedArea, counters);
-  console.log("now counters (probably unchanged) are: "+JSON.stringify+' and attack: '+counters.attack===null);
   if(counters.attack !== null) {
     activateAttack(counters.attack, matchPath, playerObject.user);
     counters.attack= null;
@@ -825,7 +831,7 @@ function registerUser(username, password, dispatch) {
 }
 
 function removeAndInsertArray(array, id, path) {
-  console.log("hand before splicing "+id+'\n'+JSON.stringify(array));
+  console.log("array before splicing "+id+'\n'+JSON.stringify(array));
   array.splice(array.indexOf(id), 1);
   console.log("And after: "+JSON.stringify(array));
   insertObject(path, array);
@@ -837,18 +843,28 @@ export function removeFromDatabase(path) {
   database.ref().update(updates);
 }
 
-export function scrapCard(cardId, scrapCounter, matchPath, playerWord, playerObject, trashArray) {
-  trashArray.push(cardId);
-  insertObject(matchPath+'/trashPile', trashArray);
-  removeAndInsertArray(playerObject.hand, cardId, matchPath+'/'+playerWord+'/hand');
-  insertObject(matchPath+'/'+playerWord+'/counters/scrap', scrapCounter-1);
-}
-
-export function scrapMarketCard(cardId, scrapCounter, market, matchPath, playerWord, trashArray) {
-  trashArray.push(cardId);
-  insertObject(matchPath+'/trashPile', trashArray);
-  removeAndInsertArray(market, cardId, matchPath+'/market');
-  insertObject(matchPath+'/'+playerWord+'/counters/marketScrap', scrapCounter-1);
+export function scrapCard(cardId, commField, market, matchPath, playerWord, playerObject, scrapCounter, trashArray) {
+  let updatedCounter="marketScrap";
+  if(market===null) {
+    updatedCounter= "scrap";
+    removeAndInsertArray(playerObject.hand, cardId, matchPath+'/'+playerWord+'/hand');
+  }
+  else {
+    removeAndInsertArray(market, cardId, matchPath+'/market');
+  }
+  insertObject(matchPath+'/'+playerWord+'/counters/'+updatedCounter, scrapCounter-1);
+  if(commField.id===1998 && cardMap[cardId].type!=="field") { //1998 is the id of Local Graveyard. Otherwise update this!!!
+    console.log("adding trashed card to graveyard" +cardId);
+    if(commField.crops===undefined) {
+      commField.crops=[];
+    }
+    commField.crops.push(cardId);
+    insertObject(matchPath+'/communityField/crops', shuffleArray(commField.crops));
+  }
+  else {
+    trashArray.push(cardId);
+    insertObject(matchPath+'/trashPile', trashArray);
+  }
 }
 
 function setCookie(cname, cvalue) {
@@ -899,15 +915,6 @@ function shuffleArray(passedArray) {
 export function startMatch(key) {
   console.log("starting match "+key);
   insertObject('matches/'+key+'/status', "in progress");
-}
-
-function updateMatchArray(matchPath, array) {
-  database.ref(matchPath).set(null);
-  let updates= {};
-  for(var i= 0; i < array.length; i++) {
-    updates[matchPath+'/'+array[i]]= {".value": array[i], ".priority": i};
-  }
-  database.ref().update(updates);
 }
 
 function updateDatabaseCounters(counters, matchPath, playerWord) {
