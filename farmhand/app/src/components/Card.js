@@ -8,7 +8,7 @@ import {cardBackSrc} from '../utils'
 
 const Card= ({actions, data, handSize, openCardModal, place}) => (
     <img 
-      className="card" 
+      className="card"
       style={{"maxWidth": (100/handSize-1)+"%", "display": (place==="hiddenMarket"?"none":"inline-block"), cursor: (place!=="playArea"?"pointer":"default") }} 
       onClick={() => (place!=="playArea"?openCardModal(actions, data):null)} 
       src={data.picture}
