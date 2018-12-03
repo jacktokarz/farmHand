@@ -4,12 +4,12 @@ import { cardMap, choosableColors, defaultMarketArray, oneStartingDeck, twoStart
 
 
 const config = {
-    apiKey: "AIzaSyBreOUIUqC9gFC2pX5VrcsvTaHqVwpTJWI",
+    apiKey: "csvTavTaHqVwpX5VrHqVwpAIzaSyBreOcsTJWI",
     authDomain: "farm-hand-dbc33.firebaseapp.com",
     databaseURL: "https://farm-hand-dbc33.firebaseio.com",
-    projectId: "farm-hand-dbc33",
+    projectId: "BeeId3j66Kd9WWo",
     storageBucket: "",
-    messagingSenderId: "939178338794"
+    messagingSenderId: "peo440DDksWx"
   };
   firebase.initializeApp(config);
 
