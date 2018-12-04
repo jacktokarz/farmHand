@@ -1,6 +1,6 @@
 export const cardBackSrc= "https://image.ibb.co/eoVC8o/cardBack.png"
 export const cropPicture= "https://image.ibb.co/kLAVWU/cropBack.png"
-export const grayBoxImg= "https://image.ibb.co/kxyDC0/gray-news-box.png"
+export const grayBoxImg= "https://i.ibb.co/dWSDsZ3/gray-news-box.png"
 export const wasteKey= 666
 
 export const defaultMarketArray= [

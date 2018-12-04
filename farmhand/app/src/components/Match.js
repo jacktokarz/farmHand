@@ -62,14 +62,14 @@ const Match=
 	    			<Card place="hiddenMarket" id={marketArray[5]} />
 	    			<div className="starterFieldAndPlenty" style={{"maxWidth": (100/6-1)+"%"}}>
 	    				<div 
-	    					className="marketObject"
+	    					className="marketObject surrounded"
 	    					style= {{cursor: matchPlayers[userPlayerNumber].counters.coin<2?"default":"pointer"}}
 	    					onClick={() => matchPlayers[userPlayerNumber].counters.coin<2?"":buyMarketStarterField(marketArray, matchPath, matchPlayers[userPlayerNumber], userPlayerNumber)}
 	    				>
 	    					Starter Field
 	    				</div>
 	    				<div 
-	    					className="marketObject"
+	    					className="marketObject surrounded"
 	    					style={{cursor: matchPlayers[userPlayerNumber].counters.coin<5?"default":"pointer"}}
 	    					onClick={() => matchPlayers[userPlayerNumber].counters.coin<5?"":buyMarketPlenty(matchPath, userPlayerNumber, matchPlayers[userPlayerNumber])}
 	    				>
