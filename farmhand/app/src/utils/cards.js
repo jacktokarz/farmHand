@@ -118,7 +118,7 @@ export const cardMap= {
 	666: {
 		title: "Waste",
 		type: "tool",
-		picture: "https://image.ibb.co/cEoG0z/Waste_Template1.png",
+		picture: "",
 		cost: 0,
 		faction: "",
 		primary: {},
@@ -134,7 +134,7 @@ export const cardMap= {
 	1: {
 		title: "Sturdy Plow",
 		type: "tool",
-		picture: "https://image.ibb.co/haeqkz/Sturdy_Plow.png",
+		picture: "https://ibb.co/wRTsZP0",
 		cost: 3,
 		faction: "O",
 		primary: {
@@ -147,7 +147,7 @@ export const cardMap= {
 	2: {
 		title: "Sweet Clover",
 		type: "seed",
-		picture: "https://image.ibb.co/f2WWse/Sweet_Clover.png",
+		picture: "https://ibb.co/d2qSccb",
 		cost: 5,
 		faction: "G",
 		primary: {
@@ -161,7 +161,7 @@ export const cardMap= {
 	3: {
 		title: "Tractor",
 		type: "tool",
-		picture: "https://image.ibb.co/ipycXe/Tractor.png",
+		picture: "https://ibb.co/FV1xWdW",
 		cost: 3,
 		faction: "T",
 		primary: {
@@ -176,7 +176,7 @@ export const cardMap= {
 	4: {
 		title: "Tulip Bulb",
 		type: "seed",
-		picture: "https://image.ibb.co/gxKUdK/Tulip_Seed.png",
+		picture: "https://ibb.co/SR5yrh8",
 		cost: 3,
 		faction: "O",
 		primary: {
@@ -189,7 +189,7 @@ export const cardMap= {
 	5: {
 		title: "Sound Management",
 		type: "tool",
-		picture: "https://image.ibb.co/eiaFBK/Sound_Management.png",
+		picture: "https://ibb.co/nsSNxyc",
 		cost: 4,
 		faction: "G",
 		primary: {
@@ -203,7 +203,7 @@ export const cardMap= {
 	6: {
 		title: "Altered Eggplant",
 		type: "seed",
-		picture: "https://image.ibb.co/gV9Oqe/Altered_Eggplant.png",
+		picture: "https://ibb.co/RPwMcpb",
 		cost: 6,
 		faction: "T",
 		primary: {
@@ -225,7 +225,7 @@ export const cardMap= {
 	7: {
 		title: "A Rye",
 		type: "seed",
-		picture: "https://image.ibb.co/kYq4Ve/A_Rye.png",
+		picture: "https://ibb.co/vJYptZQ",
 		cost: 2,
 		faction: "C",
 		primary: {
@@ -242,7 +242,7 @@ export const cardMap= {
 	8: {
 		title: "Avocado Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/deTmbK/Avocado_Seed.png",
+		picture: "https://ibb.co/6vdhDjG",
 		cost: 3,
 		faction: "G",
 		primary: {
@@ -257,7 +257,7 @@ export const cardMap= {
 	9: {
 		title: "Compost",
 		type: "tool",
-		picture: "https://image.ibb.co/cCTrAe/Compost.png",
+		picture: "https://ibb.co/68YV5zD",
 		cost: 2,
 		faction: "G",
 		primary: {
@@ -271,7 +271,7 @@ export const cardMap= {
 	10: {
 		title: "Cool Cucumber",
 		type: "seed",
-		picture: "https://image.ibb.co/fOyPVe/Cool_Cucumber.png",
+		picture: "https://ibb.co/JRc2ZXB",
 		cost: 1,
 		faction: "G",
 		primary: {
@@ -286,7 +286,7 @@ export const cardMap= {
 	11: {
 		title: "Corn Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/dDjbbK/Corn_Seed.png",
+		picture: "https://ibb.co/4ZrWvpG",
 		cost: 1,
 		faction: "T",
 		primary: {
@@ -309,7 +309,7 @@ export const cardMap= {
 	12: {
 		title: "All-Natural Farm",
 		type: "field",
-		picture: "https://image.ibb.co/jZiOo9/All_Natural_Farm.png",
+		picture: "https://ibb.co/Mg2VJk7",
 		cost: 6,
 		faction: "G",
 		primary: {
@@ -324,7 +324,7 @@ export const cardMap= {
 	13: {
 		title: "Historical Plot",
 		type: "field",
-		picture: "https://image.ibb.co/kb3jT9/Historical_Plot.png",
+		picture: "https://ibb.co/SyTysmm",
 		cost: 3,
 		faction: "C",
 		primary: {
@@ -338,7 +338,7 @@ export const cardMap= {
 	14: {
 		title: "Fertilizer",
 		type: "tool",
-		picture: "https://image.ibb.co/fZzHFz/Fertilizer_2.png",
+		picture: "https://ibb.co/JnGwXSp",
 		cost: 2,
 		faction: "T",
 		primary: {
@@ -353,7 +353,7 @@ export const cardMap= {
 	15: {
 		title: "Flatbed",
 		type: "tool",
-		picture: "https://image.ibb.co/bS0M8K/Flatbed.png",
+		picture: "https://ibb.co/QJJQSMy",
 		cost: 2,
 		faction: "O",
 		primary: {
@@ -368,7 +368,7 @@ export const cardMap= {
 	16: {
 		title: "Gardening Shears",
 		type: "tool",
-		picture: "https://image.ibb.co/gEzL2e/Gardening_Shears.png",
+		picture: "https://ibb.co/Jsh8DdY",
 		cost: 2,
 		faction: "G",
 		primary: {
@@ -382,7 +382,7 @@ export const cardMap= {
 	17: {
 		title: "Hack-N-Slash",
 		type: "tool",
-		picture: "https://image.ibb.co/gNd8oK/Hack_n_Slash.png",
+		picture: "https://ibb.co/qNDT1FG",
 		cost: 2,
 		faction: "C",
 		primary: {
@@ -396,7 +396,7 @@ export const cardMap= {
 	18: {
 		title: "Honeycrisp",
 		type: "seed",
-		picture: "https://image.ibb.co/bvU9vz/Honeycrisp.png",
+		picture: "https://ibb.co/60GFvwX",
 		cost: 2,
 		faction: "O",
 		primary: {
@@ -410,7 +410,7 @@ export const cardMap= {
 	19: {
 		title: "Modest Plot",
 		type: "field",
-		picture: "https://image.ibb.co/bMHq2e/Modest_Plot.png",
+		picture: "https://ibb.co/yfLV2jL",
 		cost: 3,
 		faction: "O",
 		primary: {
@@ -424,7 +424,7 @@ export const cardMap= {
 	20: {
 		title: "Vineyard",
 		type: "field",
-		picture: "https://image.ibb.co/jhppTK/Vineyard.png",
+		picture: "https://ibb.co/vskJ0fH",
 		cost: 6,
 		faction: "O",
 		primary: {
@@ -438,7 +438,7 @@ export const cardMap= {
 	21: {
 		title: "Lazer Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/mOAJNe/Laser_Scythe.png",
+		picture: "https://ibb.co/qR14p33",
 		cost: 4,
 		faction: "T",
 		primary: {
@@ -452,7 +452,7 @@ export const cardMap= {
 	22: {
 		title: "Massive Mint",
 		type: "seed",
-		picture: "https://image.ibb.co/na4jvz/Massive_Mint.png",
+		picture: "https://ibb.co/gDmrs0z",
 		cost: 3,
 		faction: "T",
 		primary: {
@@ -465,7 +465,7 @@ export const cardMap= {
 	23: {
 		title: "Picking Party",
 		type: "tool",
-		picture: "https://image.ibb.co/n4c9TK/Picking_Party.png",
+		picture: "https://ibb.co/w0zjF1h",
 		cost: 2,
 		faction: "G",
 		primary: {
@@ -479,7 +479,7 @@ export const cardMap= {
 	24: {
 		title: "Potato Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/h3nhhe/Potato_Seed.png",
+		picture: "https://ibb.co/stQwGSN",
 		cost: 1,
 		faction: "O",
 		primary: {
@@ -492,7 +492,7 @@ export const cardMap= {
 	25: {
 		title: "Robot Farmhand",
 		type: "tool",
-		picture: "https://image.ibb.co/iWkPvz/Robot_Farmhand.png",
+		picture: "https://ibb.co/tm8mDyZ",
 		cost: 3,
 		faction: "T",
 		primary: {
@@ -506,7 +506,7 @@ export const cardMap= {
 	26: {
 		title: "Sharp Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/kxa45e/Sharp_Scythe.png",
+		picture: "https://ibb.co/gZfJr1m",
 		cost: 2,
 		faction: "O",
 		primary: {
@@ -520,7 +520,7 @@ export const cardMap= {
 	27: {
 		title: "Sandwich Tomatoes",
 		type: "seed",
-		picture: "https://image.ibb.co/fvZpTK/Sandwich_Tomatoes.png",
+		picture: "https://ibb.co/C8H89R2",
 		cost: 4,
 		faction: "O",
 		primary: {
@@ -536,7 +536,7 @@ export const cardMap= {
 	28: {
 		title: "Pine-Apple-Pair",
 		type: "seed",
-		picture: "https://image.ibb.co/idh18K/Pine_Apple_Pair.png",
+		picture: "https://ibb.co/bbDZ9Wb",
 		cost: 4,
 		faction: "T",
 		primary: {
@@ -553,7 +553,7 @@ export const cardMap= {
 	29: {
 		title: "Wild, Wild Wetlands",
 		type: "field",
-		picture: "https://image.ibb.co/iJyxyK/Wild_Wild_Wetlands.png",
+		picture: "https://ibb.co/w46fP9j",
 		cost: 5,
 		faction: "C",
 		primary: {
@@ -572,7 +572,7 @@ export const cardMap= {
 	1001: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/jmcC8z/Basic_Seed_3.png",
+		picture: "https://ibb.co/fY2BsMm",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -584,7 +584,7 @@ export const cardMap= {
 	1002: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/jeNC8z/Basic_Seed_2.png",
+		picture: "https://ibb.co/RhVpqKy",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -596,7 +596,7 @@ export const cardMap= {
 	1003: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/dMhqve/Basic_Seed_1.png",
+		picture: "https://ibb.co/5BvfPtM",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -608,7 +608,7 @@ export const cardMap= {
 	1004: {
 		title: "Wagon",
 		type: "tool",
-		picture: "https://image.ibb.co/cJftFe/Wagon_3.png",
+		picture: "https://ibb.co/7XDvGyG",
 		cost: 0,
 		faction: "O",
 		primary: {
@@ -621,7 +621,7 @@ export const cardMap= {
 	1005: {
 		title: "Innovation",
 		type: "tool",
-		picture: "https://image.ibb.co/gzVcae/Innovation_1.png",
+		picture: "https://ibb.co/FzXdKz1",
 		cost: 0,
 		faction: "T",
 		primary: {
@@ -635,7 +635,7 @@ export const cardMap= {
 	1006: {
 		title: "Cleanup",
 		type: "tool",
-		picture: "https://image.ibb.co/m5MTgK/Clean_Up_1.png",
+		picture: "https://ibb.co/YBhWZRQ",
 		cost: 0,
 		faction: "G",
 		primary: {
@@ -649,7 +649,7 @@ export const cardMap= {
 	1007: {
 		title: "Shovel",
 		type: "tool",
-		picture: "https://image.ibb.co/dumYFe/Shovel_3.png",
+		picture: "https://ibb.co/BL15yY4",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -667,7 +667,7 @@ export const cardMap= {
 	1008: {
 		title: "Rusty Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/b3aFTz/Rusty_Scythe_1.png",
+		picture: "https://ibb.co/Kj8gNcm",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -686,7 +686,7 @@ export const cardMap= {
 	1009: {
 		title: "Dull Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/exGHae/Dull_Scythe_1.png",
+		picture: "https://ibb.co/g4TRMJQ",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -705,7 +705,7 @@ export const cardMap= {
 	1010: {
 		title: "Fortune",
 		type: "tool",
-		picture: "https://image.ibb.co/ebpEMK/Fortune_1.png",
+		picture: "https://ibb.co/KGjbLKR",
 		cost: 0,
 		faction: "C",
 		primary: {
@@ -727,7 +727,7 @@ export const cardMap= {
 	1011: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/jkPEMK/Basic_Seed_6.png",
+		picture: "https://ibb.co/rMYTcm4",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -739,7 +739,7 @@ export const cardMap= {
 	1012: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/ns3Koz/Basic_Seed_4.png",
+		picture: "https://ibb.co/BTKY2qj",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -751,7 +751,7 @@ export const cardMap= {
 	1013: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/mVb5Tz/Basic_Seed_5.png",
+		picture: "https://ibb.co/b6wtbvr",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -763,20 +763,20 @@ export const cardMap= {
 	1014: {
 		title: "Wagon",
 		type: "tool",
-		picture: "https://image.ibb.co/f0xvTz/Wagon_2.png",
+		picture: "https://ibb.co/GWJNsdR",
 		cost: 0,
 		faction: "O",
 		primary: {
 			coin: 2
 		},
 		secondary: {
-			coin: 1		
+			coin: 1
 		}
 	},
 	1015: {
 		title: "Innovation",
 		type: "tool",
-		picture: "https://image.ibb.co/fg3fve/Innovation_3.png",
+		picture: "https://ibb.co/dLT33sp",
 		cost: 0,
 		faction: "T",
 		primary: {
@@ -790,7 +790,7 @@ export const cardMap= {
 	1016: {
 		title: "Cleanup",
 		type: "tool",
-		picture: "https://image.ibb.co/gfJkTz/Clean_Up_3.png",
+		picture: "https://ibb.co/nMyXzSz",
 		cost: 0,
 		faction: "G",
 		primary: {
@@ -804,7 +804,7 @@ export const cardMap= {
 	1017: {
 		title: "Shovel",
 		type: "tool",
-		picture: "https://image.ibb.co/cCMN8z/Shovel_1.png",
+		picture: "https://ibb.co/Z27HJ8S",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -822,7 +822,7 @@ export const cardMap= {
 	1018: {
 		title: "Rusty Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/bDnJgK/Rusty_Scythe_3.png",
+		picture: "https://ibb.co/DwZBZ2D",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -841,7 +841,7 @@ export const cardMap= {
 	1019: {
 		title: "Dull Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/epGB1K/Dull_Scythe_3.png",
+		picture: "https://ibb.co/4fkgfPn",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -860,7 +860,7 @@ export const cardMap= {
 	1020: {
 		title: "Fortune",
 		type: "tool",
-		picture: "https://image.ibb.co/jKkh8z/Fortune_3.png",
+		picture: "https://ibb.co/W6b0gBw",
 		cost: 0,
 		faction: "C",
 		primary: {
@@ -882,7 +882,7 @@ export const cardMap= {
 	1021: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/kQFhFz/Basic_Seed_9.png",
+		picture: "https://i.ibb.co/q9xVYXH/Basic-Seed-7.png",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -894,7 +894,7 @@ export const cardMap= {
 	1022: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/k0YDNe/Basic_Seed_8.png",
+		picture: "https://i.ibb.co/Bt8CydN/Basic-Seed-8.png",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -906,7 +906,7 @@ export const cardMap= {
 	1023: {
 		title: "Basic Seed",
 		type: "seed",
-		picture: "https://image.ibb.co/eLGYNe/Basic_Seed_7.png",
+		picture: "https://i.ibb.co/SK0vp3m/Basic-Seed-9.png",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -918,7 +918,7 @@ export const cardMap= {
 	1024: {
 		title: "Wagon",
 		type: "tool",
-		picture: "https://image.ibb.co/fnMYNe/Wagon_1.png",
+		picture: "https://i.ibb.co/TcHYFh7/Wagon-3.png",
 		cost: 0,
 		faction: "O",
 		primary: {
@@ -931,7 +931,7 @@ export const cardMap= {
 	1025: {
 		title: "Innovation",
 		type: "tool",
-		picture: "https://image.ibb.co/bTCUvz/Innovation_2.png",
+		picture: "https://i.ibb.co/X8qHyWW/Innovation-3.png",
 		cost: 0,
 		faction: "T",
 		primary: {
@@ -945,7 +945,7 @@ export const cardMap= {
 	1026: {
 		title: "Cleanup",
 		type: "tool",
-		picture: "https://image.ibb.co/gwxJoK/Clean_Up_2.png",
+		picture: "https://i.ibb.co/BjZzYSj/Clean-Up-3.png",
 		cost: 0,
 		faction: "G",
 		primary: {
@@ -959,7 +959,7 @@ export const cardMap= {
 	1027: {
 		title: "Shovel",
 		type: "tool",
-		picture: "https://image.ibb.co/ce5Gaz/Shovel_2.png",
+		picture: "https://i.ibb.co/SJsjyxp/Shovel-3.png",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -977,7 +977,7 @@ export const cardMap= {
 	1028: {
 		title: "Rusty Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/ioqGaz/Rusty_Scythe_2.png",
+		picture: "https://i.ibb.co/6XfV2R9/Rusty-Scythe-3.png",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -996,7 +996,7 @@ export const cardMap= {
 	1029: {
 		title: "Dull Scythe",
 		type: "tool",
-		picture: "https://image.ibb.co/fv0tNe/Dull_Scythe_2.png",
+		picture: "https://i.ibb.co/6vbBx2N/Dull-Scythe-3.png",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -1015,7 +1015,7 @@ export const cardMap= {
 	1030: {
 		title: "Fortune",
 		type: "tool",
-		picture: "https://image.ibb.co/eQuL2e/Fortune_2.png",
+		picture: "https://i.ibb.co/QHQDvc6/Fortune-3.png",
 		cost: 0,
 		faction: "C",
 		primary: {
@@ -1038,7 +1038,7 @@ export const cardMap= {
 	1997: {
 		title: "Neighborhood Field",
 		type: "field",
-		picture: "https://image.ibb.co/gq2XU9/Neighborhood_Field.png",
+		picture: "https://ibb.co/7krYBdz",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -1050,7 +1050,7 @@ export const cardMap= {
 	1998: {
 		title: "Local Graveyard",
 		type: "field",
-		picture: "https://image.ibb.co/bKDRP9/Local_Graveyard.png",
+		picture: "https://ibb.co/6JH9jjy",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -1062,7 +1062,7 @@ export const cardMap= {
 	1999: {
 		title: "Treasure Trove",
 		type: "field",
-		picture: "https://image.ibb.co/dDdXxU/Treasure_Trove.png",
+		picture: "https://ibb.co/LJxs38J",
 		cost: 0,
 		faction: "N",
 		primary: {
@@ -1075,7 +1075,7 @@ export const cardMap= {
 	2001: {
 		title: "Abandoned Plot",
 		type: "field",
-		picture: "https://image.ibb.co/gWHSfz/Abandoned_Plot.png",
+		picture: "https://ibb.co/rvxhmMX",
 		cost: 2,
 		faction: "C",
 		primary: {
@@ -1092,7 +1092,7 @@ export const cardMap= {
 	2002: {
 		title: "Makeshift Field",
 		type: "field",
-		picture: "https://image.ibb.co/gwLDLz/Makeshift_Field.png",
+		picture: "https://ibb.co/4FgxTwT",
 		cost: 2,
 		faction: "C",
 		primary: {
@@ -1109,7 +1109,7 @@ export const cardMap= {
 	2003: {
 		title: "Botanical Facilities",
 		type: "field",
-		picture: "https://image.ibb.co/ivKetK/Botanical_Facilities.png",
+		picture: "https://ibb.co/1ZpLS3b",
 		cost: 2,
 		faction: "T",
 		primary: {
@@ -1123,7 +1123,7 @@ export const cardMap= {
 	2004: {
 		title: "Experimental Field",
 		type: "field",
-		picture: "https://image.ibb.co/fv0f0z/Experimental_Field.png",
+		picture: "https://ibb.co/YRzkccD",
 		cost: 2,
 		faction: "T",
 		primary: {
@@ -1137,7 +1137,7 @@ export const cardMap= {
 	2005: {
 		title: "Hilltop Field",
 		type: "field",
-		picture: "https://image.ibb.co/e3kPSe/Hilltop_Field.png",
+		picture: "https://ibb.co/qyz3kgR",
 		cost: 2,
 		faction: "O",
 		primary: {
@@ -1152,7 +1152,7 @@ export const cardMap= {
 	2006: {
 		title: "Quaint Field",
 		type: "field",
-		picture: "https://image.ibb.co/h0X4Se/Quaint_Field.png",
+		picture: "https://ibb.co/wC9pVQM",
 		cost: 2,
 		faction: "O",
 		primary: {
@@ -1167,7 +1167,7 @@ export const cardMap= {
 	2007: {
 		title: "Verdant Field",
 		type: "field",
-		picture: "https://image.ibb.co/bQ3uSe/Verdant_Field.png",
+		picture: "https://ibb.co/YB2jDbS",
 		cost: 2,
 		faction: "G",
 		primary: {
@@ -1187,7 +1187,7 @@ export const cardMap= {
 	2008: {
 		title: "Green Field",
 		type: "field",
-		picture: "https://image.ibb.co/gD0DLz/Green_Field.png",
+		picture: "https://ibb.co/93Jddwz",
 		cost: 2,
 		faction: "G",
 		primary: {
