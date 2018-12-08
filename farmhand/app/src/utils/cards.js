@@ -118,7 +118,7 @@ export const cardMap= {
 	666: {
 		title: "Waste",
 		type: "tool",
-		picture: "",
+		picture: "https://image.ibb.co/cEoG0z/Waste-Template1.png",
 		cost: 0,
 		faction: "",
 		primary: {},
