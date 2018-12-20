@@ -567,6 +567,66 @@ export const cardMap= {
 			}
 		}
 	},
+	30: {
+		title: "Industrial Field",
+		type: "field",
+		picture: "https://i.ibb.co/QdMqZRg/Industrial-Field.png",
+		cost: 3,
+		faction: "T",
+		primary: {
+			or: {
+				left: {
+					plenty: 2
+				},
+				right: {
+					plenty: 3,
+					waste: 1
+				}
+			}
+		},
+		secondary: {
+			plant: 1
+		}
+	},
+	31: {
+		title: "Pesticide-Free Field",
+		type: "field",
+		picture: "https://i.ibb.co/jTDLFhp/Pesticide-Free-Field.png",
+		cost: 4,
+		faction: "G",
+		primary: {
+			plenty: 4,
+			cropDiscard: 1
+		},
+		secondary: {
+			plant: 1
+		}
+	},
+	32: {
+		title: "Refinery",
+		type: "field",
+		picture: "https://i.ibb.co/2ZnpGkB/Refinery.png",
+		cost: 4,
+		faction: "O",
+		primary: {
+			special: "Refinery"
+		},
+		secondary: {
+		}
+	},
+	34: {
+		title: "Nature Provides",
+		type: "tool",
+		picture: "https://i.ibb.co/h8wTnr6/Nature-Provides.png",
+		cost: 5,
+		faction: "G",
+		primary: {
+			special: "Nature Provides"
+		},
+		secondary: {
+			marketScrap: 1
+		}
+	},
 
 
 	1001: {

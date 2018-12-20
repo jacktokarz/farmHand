@@ -22,16 +22,32 @@ import {modalAction} from '../utils'
 
 
 const mapStateToProps= (state) => {
+	
+	let totalCrops= 0;
+	const p1= getPlayerOne(state);
+	const p2= getPlayerTwo(state);
+	const p3= getPlayerThree(state);
+	for(var i=0; i<(p1.fields!==undefined ? p1.fields.length : 0);i++) {
+		totalCrops+=(p1.fields[i].crops!==undefined ? p1.fields[i].crops.length : 0);
+	}
+	for(var i=0; i<(p2.fields!==undefined ? p2.fields.length : 0);i++) {
+		totalCrops+=(p2.fields[i].crops!==undefined ? p2.fields[i].crops.length : 0);
+	}
+	if(p3!==undefined) {
+		for(var i=0; i<(p3.fields!==undefined ? p3.fields.length : 0);i++) {
+			totalCrops+=(p3.fields[i].crops!==undefined ? p3.fields[i].crops.length : 0);
+		}
+	}
 	const userPlayerNumber= getUserPlayerNumber(state);
 	let user= {};
 	if(userPlayerNumber===0) {
-		user= getPlayerOne(state);
+		user= p1;
 	}
 	else if(userPlayerNumber===1) {
-		user= getPlayerTwo(state);
+		user= p2;
 	}
 	else {
-		user= getPlayerThree(state);
+		user= p3;
 	}
 	return {
 		actions: getCardModalActions(state),
@@ -42,6 +58,7 @@ const mapStateToProps= (state) => {
 		marketArray: getMarketArray(state),
 		matchPath: getMatchPath(state),
 		playArea: getPlayArea(state),
+		totalCrops: totalCrops,
 		trashArray: getTrashArray(state),
 		user: user,
 		userPlayerNumber: userPlayerNumber,
@@ -51,9 +68,9 @@ const mapStateToProps= (state) => {
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeCardModal()),
-	func: (actionTitle, cardId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber) => {
+	func: (actionTitle, cardId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber) => {
 		console.log("Card Modal container");
-		modalAction(null, null, actionTitle, cardId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch); 
+		modalAction(null, null, actionTitle, cardId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch); 
 	},
 })
 

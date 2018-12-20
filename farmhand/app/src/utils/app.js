@@ -39,7 +39,7 @@ function activateAttack(attack, matchPath, playerWord) {
   });
 }
 
-function activateCounters(counters, dispatch, matchPath, playerWord, playerObject) {
+function activateCounters(counters, dispatch, fieldData, matchPath, playerWord, playerObject) {
   console.log("activating these counters: "+JSON.stringify(counters));
   if(counters.draw > 0) {
     drawCards(matchPath, counters.draw, playerWord, playerObject);
@@ -55,6 +55,9 @@ function activateCounters(counters, dispatch, matchPath, playerWord, playerObjec
   }
   if(counters.discard > 0) {
     openDiscardChoiceModal(dispatch, counters, playerWord, playerObject.hand);
+  }
+  if(counters.cropDiscard > 0) {
+    openCropDiscardChoiceModal(counters, dispatch, fieldData, playerWord);
   }
   updateDatabaseCounters(counters, matchPath, playerWord);
 }
@@ -441,7 +444,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-export function harvestCall(dispatch, fieldData, matchPath, playArea, playerNumber, userData) {
+export function harvestCall(dispatch, fieldData, marketArray, matchPath, playArea, playerNumber, userData) {
   console.log("harvesting from field: "+JSON.stringify(fieldData));
   
   if(fieldData.crops.length > 1) {
@@ -455,20 +458,18 @@ export function harvestCall(dispatch, fieldData, matchPath, playArea, playerNumb
     return;
   }
   else {
-    harvestCrop(fieldData.crops[0], dispatch, fieldData, matchPath, playArea, playerNumber, userData);
+    harvestCrop(fieldData.crops[0], dispatch, fieldData, null, marketArray, matchPath, playArea, playerNumber, userData);
   }
 }
 
-export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, playerNumber, userData) {
+export function harvestCrop(cropId, dispatch, fieldData, fieldSide, marketArray, matchPath, playArea, playerNumber, userData) {
   console.log("Harvesting "+cropId);
   dispatch(fromMatch.closeChoiceModal());
 
+  let counters= userData.counters;
   const playerWord= convertPlayerNumberToWord(playerNumber);
   const cropData= cardMap[cropId];
 
-  //for counter: take away a harvest...
-  let counters= userData.counters;
-  counters.harvest = counters.harvest-1;
   //add in the field's primary effect...
   const fieldCard= cardMap[fieldData.id];
   console.log("harvest from field: "+JSON.stringify(fieldCard));
@@ -481,6 +482,9 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
     else if(fieldCard.primary.special === "Local Graveyard" || fieldCard.primary.special=== "Treasure Trove") {
       counters= combineCounters(counters, {plenty: 1});
     }
+    else if(fieldCard.primary.special === "Refinery") {
+      counters= combineCounters(counters, {plenty: 2});
+    }
 
   }
   else if(fieldCard.primary.cropCount !== undefined) {
@@ -490,6 +494,20 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
     }
     else {
       counters= combineCounters(fieldCard.primary.lower, counters);
+    }
+  }
+  else if(fieldCard.primary.or !== undefined) {
+    console.log("Field has or and selected: "+JSON.stringify(fieldSide));
+    if(fieldSide === null) {
+      const title= "Activate which side of the field?";
+      fieldData.cropId= cropId;
+      const parentInfo= fieldData;
+      const options= [{id: fieldCard.primary.or.left, title: "left"}, {id: fieldCard.primary.or.right, title: "right"}];
+      dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
+      return;
+    }
+    else {
+      counters= combineCounters(fieldSide, counters);
     }
   }
   else {
@@ -506,18 +524,28 @@ export function harvestCrop(cropId, dispatch, fieldData, matchPath, playArea, pl
     counters= combineCounters(cropData.secondary, counters);
   }
 
+    //Don't forget to take away this Harvest action!
+  counters.harvest = counters.harvest-1;
+
   //finally activate what's been put together
   console.log("The combined harvest effects are: "+JSON.stringify(counters));
   if(counters.attack !== null) {
     activateAttack(counters.attack, matchPath, userData.user);
     counters.attack= null;
   }
-  activateCounters(counters, dispatch, matchPath, playerWord, userData);
 
-  //put the card in the play area...unless it's Treasure Trove
+  activateCounters(counters, dispatch, fieldData, matchPath, playerWord, userData);
+
+  //put the card in the play area...unless it's Special
   if(fieldCard.primary.special === "Treasure Trove") {
     userData.hand.push(cropId);
     insertObject(matchPath+'/'+playerWord+'/hand', userData.hand);    
+  }
+  else if(fieldCard.primary.special === "Refinery") {
+    userData.discard.push(marketArray[0]);
+    insertObject(matchPath+'/'+playerWord+'/discard', userData.discard);
+    marketArray.splice(0, 1);
+    insertObject(matchPath+'/market', marketArray);
   }
   else {
     playArea.push(cropId);
@@ -617,7 +645,7 @@ export function matchMount(dispatch) {
   }
 }
 
-export function modalAction(option, parentInfo, actionTitle, cardId, communityField, marketArray, matchPath, playArea, trashArray, user, userPlayerNumber, dispatch, history) {
+export function modalAction(option, parentInfo, actionTitle, cardId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch, history) {
   const playerWord= convertPlayerNumberToWord(userPlayerNumber);
   console.log("MODAL ACTION, option: "+JSON.stringify(option));
   let cardData= cardMap[cardId];
@@ -656,26 +684,34 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
     // Maybe from choice modal
   else if(actionTitle.startsWith("Play")) {
     let activatedCounters= null;
-    if(actionTitle==="Play Left") {
-      activatedCounters= cardData.primary.or.left;
-    }
-    else if(actionTitle==="Play Right") {
-      activatedCounters= cardData.primary.or.right;
+    if(cardData.primary.special===undefined) {
+      if(actionTitle==="Play Left") {
+        activatedCounters= cardData.primary.or.left;
+      }
+      else if(actionTitle==="Play Right") {
+        activatedCounters= cardData.primary.or.right;
+      }
+      else {
+        activatedCounters= isThereADefaultChoice(cardData, user);  //checks if there's an 'or'
+        if(activatedCounters === null) { //there is
+          if(option===null) { //it has not been decided, so puts up choice
+            const title= "Play which side of the 'OR' statement?";
+            const parentInfo= cardId;
+            const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
+            dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
+            return;
+          }
+          else { //it has been chosen, sets choice as activated area
+            activatedCounters= (option.title==="left" ? cardData.primary.or.left : cardData.primary.or.right);
+            console.log("The choice was made of what to play, it is: "+ JSON.stringify(activatedCounters));
+          }
+        }
+      }
     }
     else {
-      activatedCounters= isThereADefaultChoice(cardData, user);  //checks if there's an 'or'
-      if(activatedCounters === null) { //there is
-        if(option===null) { //it has not been decided, so puts up choice
-          const title= "Play which side of the 'OR' statement?";
-          const parentInfo= cardId;
-          const options= [{id: cardId, title: "left"}, {id: cardId, title: "right"}];
-          dispatch(fromMatch.openChoiceModal(options, parentInfo, false, title));
-          return;
-        }
-        else { //it has been chosen, sets choice as activated area
-          activatedCounters= (option.title==="left" ? cardData.primary.or.left : cardData.primary.or.right);
-          console.log("The choice was made of what to play, it is: "+ JSON.stringify(activatedCounters));
-        }
+      if(cardData.primary.special==="Nature Provides") {
+        console.log("Total crops is: "+totalCrops); 
+        activatedCounters= {coin: totalCrops};
       }
     }
     user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
@@ -685,7 +721,7 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
     }
     console.log("playing counters: "+JSON.stringify(activatedCounters));
 
-    playCard(activatedCounters, user.counters, dispatch, cardId, matchPath, playArea, playerWord, user);
+    playCard(activatedCounters, user.counters, dispatch, cardId, matchPath, playArea, playerWord, user, totalCrops);
   }
 
   else if(actionTitle.startsWith("Plant")) {
@@ -721,11 +757,26 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
     //Definitely from choice modal
   else if(actionTitle.startsWith("Harvest")) {
     console.log("Choice was to harvest!");
-    harvestCrop(option.id, dispatch, parentInfo, matchPath, playArea, userPlayerNumber, user);
+    harvestCrop(option.id, dispatch, parentInfo, null, marketArray, matchPath, playArea, userPlayerNumber, user);
     return;
+  }
+  else if(actionTitle.startsWith("Activate")) {
+    harvestCrop(parentInfo.cropId, dispatch, parentInfo, option.id, marketArray, matchPath, playArea, userPlayerNumber, user);
   }
   else if(actionTitle.startsWith("Replace")) {
     buyField(option.id, marketArray, matchPath, user.counters.coin - cardMap[option.id].cost, parentInfo, playerWord);
+  }
+  else if(actionTitle.startsWith("Toss")) {
+    console.log("The modal action is tossing!");
+    user.discard.push(option.id);
+    insertObject(matchPath+'/'+playerWord+'/discard', user.discard);
+    parentInfo.fieldData.crops.splice(parentInfo.fieldData.crops.indexOf(option.id), 1);
+    insertObject(matchPath+'/'+playerWord+'/fields/'+parentInfo.fieldData.id+"/crops", parentInfo.fieldData.crops);
+    parentInfo.counters.cropDiscard= parentInfo.cropDiscard - 1;
+    if(parentInfo.counters.cropDiscard > 0) {
+      openCropDiscardChoiceModal(parentInfo.counters, dispatch, parentInfo.fieldData, playerWord);
+      return;
+    }
   }
   else if(actionTitle.startsWith("Discard")) {
     console.log("The modal action is discarding!");
@@ -758,6 +809,19 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
     dispatch(fromMatch.closeChoiceModal());
   }
   dispatch(fromMatch.closeCardModal());
+}
+
+function openCropDiscardChoiceModal(counters, dispatch, fieldData, playerWord) {
+  console.log("asking to discard");
+  const title= "Toss which crop? ("+counters.cropDiscard+ " left to toss)";
+  const parentInfo= null;
+  parentInfo.counters= counters;
+  parentInfo.fieldData= fieldData;
+  let options= [];
+  for(var i=0; i<fieldData.crops.length; i++) {
+    options.push({id: fieldData.crops[i], title: i});
+  }
+  dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
 }
 
 function openDiscardChoiceModal(dispatch, counters, playerWord, hand) {
@@ -797,12 +861,13 @@ export function playCard(activatedArea, counters, dispatch, id, matchPath, playA
   insertObject(matchPath+'/playArea', playArea);
   removeAndInsertArray(playerObject.hand, id, matchPath+'/'+playerWord+'/hand');
   counters= combineCounters(activatedArea, counters);
+
   if(counters.attack !== null) {
     activateAttack(counters.attack, matchPath, playerObject.user);
     counters.attack= null;
   }
   console.log("the played card's effects have been combined with the users: "+JSON.stringify(counters));
-  activateCounters(counters, dispatch, matchPath, playerWord, playerObject);
+  activateCounters(counters, dispatch, null, matchPath, playerWord, playerObject);
 
   const cardFaction= cardMap[id].faction;
   if(cardFaction !== "N") {

@@ -5,7 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import {cropPicture} from '../utils'
 
 
-const Field= ({crops, data, harvestable, harvestCrop, matchPath, openCardModal, playArea, playerNumber}) => (
+const Field= ({crops, data, harvestable, harvestCrop, marketArray, matchPath, openCardModal, playArea, playerNumber}) => (
 	<div className="fieldDiv">
 	    <img 
 	      className="fieldImg"
@@ -17,7 +17,7 @@ const Field= ({crops, data, harvestable, harvestCrop, matchPath, openCardModal, 
 	    	className="cropsImg"
 	    	style={{cursor: harvestable?"pointer":"default"}}
 	    	src={cropPicture}
-	    	onClick={() => harvestable?harvestCrop(matchPath, playArea, playerNumber):null}
+	    	onClick={() => harvestable?harvestCrop(marketArray, matchPath, playArea, playerNumber):null}
 	    />
 	    <div className="textOverField" >{crops.length}</div>
     </div>
