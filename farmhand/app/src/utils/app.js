@@ -521,7 +521,28 @@ export function harvestCrop(cropId, dispatch, fieldData, fieldSide, marketArray,
 
   //and maybe the crop's seed secondary
   if(cropData.type==="seed") {
-    counters= combineCounters(cropData.secondary, counters);
+    if(cropData.secondary.special!==undefined) {
+      console.log("Special Seed!");
+      if(cropData.secondary.special==="Black Market Seed") {
+        const lucky= getRandomInt(2);
+        if(lucky===1) {
+          counters= combineCounters({plenty:-1}, counters);
+        }
+        else {
+          counters= combineCounters({plenty:3}, counters);
+        }
+      }
+      else if(cropData.secondary.special==="Wildflower") {  //taking the top card of the market and adding it to the player's discard
+        counters= combineCounters({plenty:1}, counters);
+        userData.discard.push(marketArray[0]);
+        insertObject(matchPath+'/'+playerWord+'/discard', userData.discard);
+        marketArray.splice(0, 1);
+        insertObject(matchPath+'/market', marketArray);
+      }
+    }
+    else {
+      counters= combineCounters(cropData.secondary, counters);
+    }
   }
 
     //Don't forget to take away this Harvest action!
@@ -713,11 +734,30 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
         console.log("Total crops is: "+totalCrops); 
         activatedCounters= {coin: totalCrops};
       }
+      else if(cardData.primary.special==="Black Market Seed") {
+        const lucky = getRandomInt(2);
+        console.log("Flipping for black market! "+lucky);
+        if(lucky===1) {
+          activatedCounters= {plenty: -1};
+        }
+        else {
+          activatedCounters= {plenty: 1};
+        }
+      }
+      else {
+        activatedCounters= {};
+      }
     }
     user.activatedFactions= user.activatedFactions===undefined?[]:user.activatedFactions;
     console.log("playing card, and have activated factions: "+user.activatedFactions.toString()+'\n'+"this faction is: "+cardData.faction);
     if(user.activatedFactions.includes(cardData.faction) && cardData.type==="tool") { //if there's synergy, adds it in
       activatedCounters= combineCounters(activatedCounters, cardData.secondary);
+    }
+
+
+    if(cardData.primary.special==="Recycle") {
+      console.log("recycling from: "+JSON.stringify(user.discard));
+      activatedCounters.special= "Recycle";
     }
     console.log("playing counters: "+JSON.stringify(activatedCounters));
 
@@ -756,7 +796,7 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
 
     //Definitely from choice modal
   else if(actionTitle.startsWith("Harvest")) {
-    console.log("Choice was to harvest!");
+    console.log("Choice was to harvest!" + JSON.stringify(totalCrops));
     harvestCrop(option.id, dispatch, parentInfo, null, marketArray, matchPath, playArea, userPlayerNumber, user);
     return;
   }
@@ -777,6 +817,12 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
       openCropDiscardChoiceModal(parentInfo.counters, dispatch, parentInfo.fieldData, playerWord);
       return;
     }
+  }
+  else if(actionTitle.startsWith("Recycle")) {
+    console.log("Recycling!");
+    user.hand.push(option.id);
+    insertObject(matchPath+'/'+playerWord+'/hand', user.hand);
+    removeAndInsertArray(user.discard, option.id, matchPath+'/'+playerWord+'/discard');
   }
   else if(actionTitle.startsWith("Discard")) {
     console.log("The modal action is discarding!");
@@ -874,6 +920,17 @@ export function playCard(activatedArea, counters, dispatch, id, matchPath, playA
     playerObject.activatedFactions.push(cardFaction);
   }
   insertObject(matchPath+'/'+playerWord+'/activatedFactions', playerObject.activatedFactions);
+
+  if(activatedArea.special==="Recycle") {
+    console.log("recycle option special playCard "+JSON.stringify(playerObject.discard));
+    const title= "Recycle which card from your discard?";
+    const parentInfo= null;
+    let options= [];
+    for(var i=0; i<playerObject.discard.length; i++) {
+      options.push({id: playerObject.discard[i], title: cardMap[playerObject.discard[i]].title});
+    }
+    dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
+  }
 }
 
 export function playMatch(key, dispatch) {

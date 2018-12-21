@@ -627,6 +627,54 @@ export const cardMap= {
 			marketScrap: 1
 		}
 	},
+	35: {
+		title: "Black Market Seed",
+		type: "seed",
+		picture: "https://i.ibb.co/R0Z6GKM/Black-Market-Seed.png",
+		cost: 2,
+		faction: "C",
+		primary: {
+			special: "Black Market Seed"
+		},
+		secondary: {
+			special: "Black Market Seed"
+		}
+	},
+	36: {
+		title: "Recycle",
+		type: "tool",
+		picture: "https://i.ibb.co/FxfYhWq/Recycle.png",
+		cost: 3,
+		faction: "G",
+		primary: {
+			special: "Recycle"
+		},
+		secondary: {
+			scrap: 1
+		}
+	},
+	37: {
+		title: "Wildflower",
+		type: "seed",
+		picture: "https://i.ibb.co/h2B1yC8/Wildflower.png",
+		cost: 3,
+		faction: "C",
+		primary: {
+			or: {
+				left: {
+					coin: 2,
+					draw: 1
+				},
+				right: {
+					draw: 2
+				}
+			}
+		},
+		secondary: {
+			special: "Wildflower"
+		}
+	},
+
 
 
 	1001: {
