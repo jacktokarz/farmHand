@@ -7,7 +7,8 @@ import {
 	getCardModalId,
 	getCardModalVis,
 	getCommunityField,
-	getCurrentPlayerNumber, 
+	getCurrentPlayerNumber,
+	getMatchLog,
 	getMarketArray, 
 	getMatchPath,
 	getPlayArea, 
@@ -55,6 +56,7 @@ const mapStateToProps= (state) => {
 		communityField: getCommunityField(state),
 		currentPlayerNumber: getCurrentPlayerNumber(state),
 		data: getCardModalData(state),
+		logLength: getMatchLog(state)===null?0:getMatchLog(state).length,
 		marketArray: getMarketArray(state),
 		matchPath: getMatchPath(state),
 		playArea: getPlayArea(state),
@@ -68,9 +70,9 @@ const mapStateToProps= (state) => {
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeCardModal()),
-	func: (actionTitle, cardId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber) => {
+	func: (actionTitle, cardId, communityField, logLength, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber) => {
 		console.log("Card Modal container");
-		modalAction(null, null, actionTitle, cardId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch); 
+		modalAction(null, null, actionTitle, cardId, communityField, logLength, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch); 
 	},
 })
 

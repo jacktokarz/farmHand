@@ -121,6 +121,23 @@ body {
 	margin: 10% auto;
 }
 
+.matchLog {
+	border: black solid 1px;
+	overflow-wrap: all;
+	float: left;
+	background-color: #586369;
+	margin-left: 1%;
+	overflow-y: scroll;
+	
+}
+.matchLog p{
+	text-align: left;
+	font-size: 12px;
+	color: #F0F3F5;
+	margin: 4px 1px 4px 2px;
+}
+
+
 .noPadding {
 	padding-left: 0;
 	padding-right: 0;
@@ -141,6 +158,7 @@ body {
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: wrap;
+	margin-top: 10%;
 }
 
 .surrounded {
@@ -251,7 +269,7 @@ body {
 	text-align: center;
 	width: 90%;
 	height: auto;
-	background: url("https://image.ibb.co/eoVC8o/cardBack.png");
+	background: url("https://i.ibb.co/JyVDnzD/cardBack.png");
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;

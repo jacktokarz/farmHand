@@ -10,6 +10,7 @@ import {
 	getChoiceModalVis,
 	getCommunityField,
 	getMarketArray,
+	getMatchLog,
 	getMatchPath,
 	getPlayArea,
 	getPlayerOne,
@@ -52,6 +53,7 @@ const mapStateToProps= (state) => {
 	return {
 		cardModalId: getCardModalId(state),
 		communityField: getCommunityField(state),
+		logLength: getMatchLog(state)===null?0:getMatchLog(state).length,
 		marketArray: getMarketArray(state),
 		matchPath: getMatchPath(state),
 		options: getChoiceModalOptions(state),
@@ -69,8 +71,8 @@ const mapStateToProps= (state) => {
 
 const mapDispatchToProps= dispatch => ({
 	closeModal: () => dispatch(fromMatch.closeChoiceModal()),
-	func: (option, cardModalId, communityField, marketArray, matchPath, parentInfo, playArea, actionTitle, totalCrops, trashArray, user, userPlayerNumber, history) =>
-		modalAction(option, parentInfo, actionTitle, cardModalId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch, history),
+	func: (option, cardModalId, communityField, logLength, marketArray, matchPath, parentInfo, playArea, actionTitle, totalCrops, trashArray, user, userPlayerNumber, history) =>
+		modalAction(option, parentInfo, actionTitle, cardModalId, communityField, logLength, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch, history),
 })
 
 

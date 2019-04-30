@@ -6,6 +6,7 @@ export const actionTypes= {
 	OPENCHOICEMODAL: 'match openChoiceModal',
 	SAVECOMMUNITYFIELD: 'match saveCommunityField',
 	SAVEMARKETARRAY: 'match saveMarketArray',
+	SAVE_MATCH_LOG: 'match saveMatchLog',
 	SAVEMATCHPATH: 'match saveMatchPath',
 	SAVENUMBEROFPLAYERS: 'match saveNumberOfPlayers',
 	SAVEPLAYERONE: 'match savePlayerOne',
@@ -59,6 +60,11 @@ export const saveCommunityField= (field) => ({
 export const saveMarketArray= (array) => ({
 	type: actionTypes.SAVEMARKETARRAY,
 	payload: array,
+})
+
+export const saveMatchLog= (array) => ({
+	type: actionTypes.SAVE_MATCH_LOG,
+	matchLog: array,
 })
 
 export const saveMatchPath= (path) => ({

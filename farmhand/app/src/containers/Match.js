@@ -4,6 +4,7 @@ import {
 	getCommunityField,
 	getCurrentPlayerNumber,
 	getMarketArray,
+	getMatchLog,
 	getMatchPath,
 	getNumberOfPlayers,
 	getPlayArea,
@@ -18,27 +19,31 @@ import {Match} from '../components'
 import {buyMarketPlenty, buyStarterField, endTurn, matchMount} from '../utils'
 
 
-const mapStateToProps= state => { console.log("comm field is: "+JSON.stringify(getCommunityField(state))); return {
-	communityField: getCommunityField(state),
-	currentPlayerNumber: getCurrentPlayerNumber(state),
-	marketArray: getMarketArray(state),
-	matchPath: getMatchPath(state),
-	matchPlayers: [getPlayerOne(state), getPlayerTwo(state), getPlayerThree(state)],
-	numberOfPlayers: getNumberOfPlayers(state),
-	playArea: getPlayArea(state)===null?[]:getPlayArea(state),
-	turnCount: getTurnCount(state),
-	user: getUser(state),
-	userPlayerNumber: getUserPlayerNumber(state),
-} }
+const mapStateToProps= state => { 
+	return {
+		communityField: getCommunityField(state),
+		currentPlayerNumber: getCurrentPlayerNumber(state),
+		marketArray: getMarketArray(state),
+		matchLog: getMatchLog(state),
+		logLength: getMatchLog(state)===null?0:getMatchLog(state).length,
+		matchPath: getMatchPath(state),
+		matchPlayers: [getPlayerOne(state), getPlayerTwo(state), getPlayerThree(state)],
+		numberOfPlayers: getNumberOfPlayers(state),
+		playArea: getPlayArea(state)===null?[]:getPlayArea(state),
+		turnCount: getTurnCount(state),
+		user: getUser(state),
+		userPlayerNumber: getUserPlayerNumber(state),
+	} 
+}
 
 const mapDispatchToProps= dispatch => {
 	matchMount(dispatch);
 	return {
-		buyMarketPlenty: (matchPath, userPlayerNumber, userPlayer) => { 
-			buyMarketPlenty(matchPath, userPlayerNumber, userPlayer);
+		buyMarketPlenty: (logLength, matchPath, userPlayerNumber, userPlayer) => { 
+			buyMarketPlenty(logLength, matchPath, userPlayerNumber, userPlayer);
 		},
-		buyMarketStarterField: (marketArray, matchPath, user, userPlayerNumber) => { 
-			buyStarterField(dispatch, marketArray, matchPath, user, userPlayerNumber)
+		buyMarketStarterField: (logLength, marketArray, matchPath, user, userPlayerNumber) => { 
+			buyStarterField(dispatch, logLength, marketArray, matchPath, user, userPlayerNumber)
 		},
 		endTurn: (currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) => { 
 			endTurn(currentPlayerNumber, userPlayer, matchPath, numberOfPlayers, playArea, turnCount) 

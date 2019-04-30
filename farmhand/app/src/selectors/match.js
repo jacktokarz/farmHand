@@ -15,6 +15,7 @@ export const getChoiceModalTitle= createSelector(matchState, state => state.choi
 export const getChoiceModalVis= createSelector(matchState, state => state.choiceModalVis);
 export const getCommunityField= createSelector(matchState, state => state.communityField);
 export const getCurrentPlayerNumber= createSelector(matchState, state => state.currentPlayerNumber);
+export const getMatchLog= createSelector(matchState, state => state.matchLog);
 export const getMatchPath= createSelector(matchState, state => state.matchPath);
 export const getMarketArray= createSelector(matchState, state => state.marketArray);
 export const getNumberOfPlayers= createSelector(matchState, state => state.numberOfPlayers);

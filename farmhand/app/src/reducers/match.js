@@ -16,6 +16,7 @@ const initState=
 		communityField: {id: 1997, crops: [], available: true},
 		currentPlayerNumber: 1,
 		marketArray: [0,0,0,0,0,0],
+		matchLog: [],
 		matchPath: "/matches/0",
 		numberOfPlayers: 3,
 		playerOne:
@@ -105,6 +106,10 @@ export default (state=initState, action) => {
 			return {...state, 
 				marketArray: action.payload,
 			};
+		case fromMatch.actionTypes.SAVE_MATCH_LOG:
+			return {...state,
+				matchLog: action.matchLog,
+			}
 		case fromMatch.actionTypes.SAVEMATCHPATH:
 			return {...state, 
 				matchPath: action.payload,

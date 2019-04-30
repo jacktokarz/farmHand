@@ -5,7 +5,7 @@ import {ChoiceModal} from '../containers'
 import {} from '../utils'
 
 
-const CardModal= ({actions, cardId, closeModal, communityField, currentPlayerNumber, data, func, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, vis}) => (
+const CardModal= ({actions, cardId, closeModal, communityField, currentPlayerNumber, data, func, logLength, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, vis}) => (
 
 	<div style={{display: vis}} className="modal" onClick={ (event) => (!event.target.classList.contains("inside") ? closeModal() : "" ) }>
 		<div className="clear-modal-content" id="modalContent">
@@ -15,7 +15,7 @@ const CardModal= ({actions, cardId, closeModal, communityField, currentPlayerNum
 					<button 
 						className="inside modal-button"
 						style={{cursor: "pointer", display: (currentPlayerNumber===userPlayerNumber?"inline-block":"none")}} 
-						onClick={ () => func(i, cardId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber)}
+						onClick={ () => func(i, cardId, communityField, logLength, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber)}
 					>
 						{i}
 					</button>

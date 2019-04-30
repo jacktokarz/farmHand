@@ -89,7 +89,7 @@ function addPlayerToMatch(dispatch, path, deck, hand, playerWord, user) {
     });
 }
 
-export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldId, playerWord) {
+export function buyField(fieldIdToReplace, logLength, market, matchPath, newCoin, newFieldId, playerWord, userObject) {
   console.log("playing field: "+newFieldId);
   const newField= {id: newFieldId, crops: [], available: false};
   if(fieldIdToReplace!==null) {
@@ -100,34 +100,36 @@ export function buyField(fieldIdToReplace, market, matchPath, newCoin, newFieldI
         snapshot.child(playerWord+'/fields').child(fieldIdToReplace).child('/crops').forEach(function(childSnapshot) {
           crops.push(childSnapshot.val());
         });
-        database.ref(matchPath+'/'+playerWord+'/fields/'+newFieldId).set(newField);
-        buyWrapUp(newFieldId, matchPath, newCoin, crops, playerWord);
-        if(starterFields.includes(fieldIdToReplace)) {
-          let newStarters= snapshot.child("starterFields").val();
-          newStarters.splice(0, 0, fieldIdToReplace);
-          insertObject(matchPath+'/starterFields', newStarters);
-        }
+        insertObject(matchPath+'/'+playerWord+'/fields/'+newFieldId, newField);
+        insertObject(matchPath+'/'+playerWord+'/fields/'+fieldIdToReplace, null);
+        buyWrapUp(newFieldId, logLength, matchPath, newCoin, userObject.discard.concat(crops), userObject.user, playerWord);
+        // if(starterFields.includes(fieldIdToReplace)) {
+        //   let newStarters= snapshot.child("starterFields").val();
+        //   newStarters.splice(0, 0, fieldIdToReplace);
+        //   insertObject(matchPath+'/starterFields', newStarters);
+        // }
       });
   }
   else {
     database.ref(matchPath+'/'+playerWord+'/fields/'+newFieldId).set(newField);
-    buyWrapUp(newFieldId, market, matchPath, newCoin, [], playerWord);
+    buyWrapUp(newFieldId, logLength, market, matchPath, newCoin, userObject.discard, userObject.user, playerWord);
   }
 }
 
-export function buyMarketCard(id, market, matchPath, newCoin, userObject, userWord) {
+export function buyMarketCard(id, logLength, market, matchPath, newCoin, userObject, userWord) {
   userObject.discard.push(id);
-  buyWrapUp(id, market, matchPath, newCoin, userObject.discard, userWord);
+  buyWrapUp(id, logLength, market, matchPath, newCoin, userObject.discard, userObject.user, userWord);
 }
 
-export function buyMarketPlenty(matchPath, playerNumber, userPlayer) {
+export function buyMarketPlenty(logLength, matchPath, playerNumber, userPlayer) {
   const playerWord= convertPlayerNumberToWord(playerNumber);
   userPlayer.counters.coin= userPlayer.counters.coin-5;
   userPlayer.counters.plenty= userPlayer.counters.plenty+1;
   insertObject(matchPath+'/'+playerWord+'/counters', userPlayer.counters);
+  insertObject(matchPath+'/log/'+logLength, {user: userPlayer.user, message: "bought a Plenty"});
 }
 
-export function buyStarterField(dispatch, marketArray, matchPath, user, playerNumber) {
+export function buyStarterField(dispatch, logLength, marketArray, matchPath, user, playerNumber) {
   const playerWord= convertPlayerNumberToWord(playerNumber);
   database.ref(matchPath+'/starterFields').once('value')
     .then(function(snapshot) {
@@ -141,15 +143,16 @@ export function buyStarterField(dispatch, marketArray, matchPath, user, playerNu
         dispatch(fromMatch.openChoiceModal(options, parentInfo, true, title));
       }
       else {
-        buyField(null, marketArray, matchPath, user.counters.coin - cardMap[fieldId].cost, fieldId, playerWord);
+        buyField(null, logLength, marketArray, matchPath, user.counters.coin - cardMap[fieldId].cost, fieldId, playerWord, user);
       }
     });
 }
 
-function buyWrapUp(id, market, matchPath, newCoin, newDiscard, userWord) {
+function buyWrapUp(id, logLength, market, matchPath, newCoin, newDiscard, username, userWord) {
   insertObject( matchPath+'/'+userWord+'/discard', newDiscard);
   removeAndInsertArray(market, id, matchPath+'/market');
   insertObject( matchPath+'/'+userWord+'/counters/coin', newCoin);
+  insertObject( matchPath+'/log/'+logLength, {user: username, message: "bought a "+cardMap[id].title+"."});
 }
 
 export function combineCounters(one, two) {
@@ -444,7 +447,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-export function harvestCall(dispatch, fieldData, marketArray, matchPath, playArea, playerNumber, userData) {
+export function harvestCall(dispatch, fieldData, logLength, marketArray, matchPath, playArea, playerNumber, userData) {
   console.log("harvesting from field: "+JSON.stringify(fieldData));
   
   if(fieldData.crops.length > 1) {
@@ -458,11 +461,11 @@ export function harvestCall(dispatch, fieldData, marketArray, matchPath, playAre
     return;
   }
   else {
-    harvestCrop(fieldData.crops[0], dispatch, fieldData, null, marketArray, matchPath, playArea, playerNumber, userData);
+    harvestCrop(fieldData.crops[0], dispatch, fieldData, null, logLength, marketArray, matchPath, playArea, playerNumber, userData);
   }
 }
 
-export function harvestCrop(cropId, dispatch, fieldData, fieldSide, marketArray, matchPath, playArea, playerNumber, userData) {
+export function harvestCrop(cropId, dispatch, fieldData, fieldSide, logLength, marketArray, matchPath, playArea, playerNumber, userData) {
   console.log("Harvesting "+cropId);
   dispatch(fromMatch.closeChoiceModal());
 
@@ -582,6 +585,7 @@ export function harvestCrop(cropId, dispatch, fieldData, fieldSide, marketArray,
   else {
     insertObject(matchPath+'/'+playerWord+'/fields/'+fieldData.id+'/crops', fieldData.crops);
   }
+  insertObject(matchPath+'/log/'+logLength, {user: userData.user, message: "harvested a "+cropData.title+" from "+fieldCard.title+"."});
 }
 
 export function insertObject(dbPath, obj) {
@@ -666,7 +670,7 @@ export function matchMount(dispatch) {
   }
 }
 
-export function modalAction(option, parentInfo, actionTitle, cardId, communityField, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch, history) {
+export function modalAction(option, parentInfo, actionTitle, cardId, communityField, logLength, marketArray, matchPath, playArea, totalCrops, trashArray, user, userPlayerNumber, dispatch, history) {
   const playerWord= convertPlayerNumberToWord(userPlayerNumber);
   console.log("MODAL ACTION, option: "+JSON.stringify(option));
   let cardData= cardMap[cardId];
@@ -684,21 +688,21 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
         return;
       }
       else {
-        buyField(null, marketArray, matchPath, user.counters.coin - cardData.cost, cardId, playerWord);
+        buyField(null, logLength, marketArray, matchPath, user.counters.coin - cardData.cost, cardId, playerWord, user);
       }
     }
     else {
       console.log("Buying not a field");
-      buyMarketCard(cardId, marketArray, matchPath, user.counters.coin - cardData.cost, user, playerWord);
+      buyMarketCard(cardId, logLength, marketArray, matchPath, user.counters.coin - cardData.cost, user, playerWord);
     }
   }
 
   else if(actionTitle.startsWith("Scrap")) {
     if(marketArray.includes(cardId)) {
-      scrapCard(cardId, communityField, marketArray, matchPath, playerWord, null, user.counters.marketScrap, trashArray);
+      scrapCard(cardId, communityField, logLength, marketArray, matchPath, playerWord, user, user.counters.marketScrap, trashArray);
     }
     else {
-      scrapCard(cardId, communityField, null, matchPath, playerWord, user, user.counters.scrap, trashArray);
+      scrapCard(cardId, communityField, logLength, null, matchPath, playerWord, user, user.counters.scrap, trashArray);
     }
   }
 
@@ -797,14 +801,14 @@ export function modalAction(option, parentInfo, actionTitle, cardId, communityFi
     //Definitely from choice modal
   else if(actionTitle.startsWith("Harvest")) {
     console.log("Choice was to harvest!" + JSON.stringify(totalCrops));
-    harvestCrop(option.id, dispatch, parentInfo, null, marketArray, matchPath, playArea, userPlayerNumber, user);
+    harvestCrop(option.id, dispatch, parentInfo, null, logLength, marketArray, matchPath, playArea, userPlayerNumber, user);
     return;
   }
   else if(actionTitle.startsWith("Activate")) {
-    harvestCrop(parentInfo.cropId, dispatch, parentInfo, option.id, marketArray, matchPath, playArea, userPlayerNumber, user);
+    harvestCrop(parentInfo.cropId, dispatch, parentInfo, option.id, logLength, marketArray, matchPath, playArea, userPlayerNumber, user);
   }
   else if(actionTitle.startsWith("Replace")) {
-    buyField(option.id, marketArray, matchPath, user.counters.coin - cardMap[option.id].cost, parentInfo, playerWord);
+    buyField(option.id, logLength, marketArray, matchPath, user.counters.coin - cardMap[option.id].cost, parentInfo, playerWord, user);
   }
   else if(actionTitle.startsWith("Toss")) {
     console.log("The modal action is tossing!");
@@ -965,7 +969,7 @@ export function removeFromDatabase(path) {
   database.ref().update(updates);
 }
 
-export function scrapCard(cardId, commField, market, matchPath, playerWord, playerObject, scrapCounter, trashArray) {
+export function scrapCard(cardId, commField, logLength, market, matchPath, playerWord, playerObject, scrapCounter, trashArray) {
   let updatedCounter="marketScrap";
   if(market===null) {
     updatedCounter= "scrap";
@@ -987,6 +991,7 @@ export function scrapCard(cardId, commField, market, matchPath, playerWord, play
     trashArray.push(cardId);
     insertObject(matchPath+'/trashPile', trashArray);
   }
+  insertObject(matchPath+'/log/'+logLength, {user: playerObject.user, message: "scrapped a "+cardMap[cardId].title+" from "+(updatedCounter==="scrap"?"their hand":"the market")+"."});
 }
 
 function setCookie(cname, cvalue) {

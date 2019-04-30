@@ -56,6 +56,12 @@ export function listenForMatches(dispatch) {
   });
 }
 
+function listenForMatchLog(dispatch, matchPath) {
+	database.ref(matchPath+'/log').on("value", snapshot => {
+		dispatch(fromMatch.saveMatchLog(snapshot.val()));		
+	});
+}
+
 function listenForMatchMarketArray(dispatch, matchPath ) {
   database.ref(matchPath+'/market/').on("value", snapshot => {
   	console.log("retrieving market info for "+matchPath);
@@ -73,6 +79,7 @@ export function listenForMatchUpdates(dispatch, matchPath, userPlayerNumber) {
 	userPlayerNumber= userPlayerNumber===0?"playerOne":(userPlayerNumber===1?"playerTwo":"playerThree");
 	listenForCommunityField(dispatch, matchPath);
 	listenForCurrentPlayerNumber(dispatch, matchPath);
+	listenForMatchLog(dispatch, matchPath);
 	listenForMatchMarketArray(dispatch, matchPath);
 	listenForPlayArea(dispatch, matchPath);
 	listenForPlayerUpdates(dispatch, matchPath, "playerOne", userPlayerNumber);
@@ -96,6 +103,7 @@ function listenForPlayArea(dispatch, matchPath) {
 }
 
 function listenForPlayerUpdates(dispatch, matchPath, playerNumber, userPlayerNumber) {
+	console.log("starting to listen for "+playerNumber);
 	database.ref(matchPath+'/'+playerNumber).on("value", snapshot => {
 		console.log("Update for player "+playerNumber+" visile for "+userPlayerNumber);
 		const user= snapshot.child('user').val();
